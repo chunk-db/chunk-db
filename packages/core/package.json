@@ -1,0 +1,16 @@
+{
+  "name": "@chunk-db/core",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Arswarog <arswarog@yandex.ru>",
+  "homepage": "",
+  "license": "MIT",
+  "main": "index.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  }
+}
