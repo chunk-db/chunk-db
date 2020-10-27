@@ -1,0 +1,4 @@
+describe('AbstractChunk', () => {
+    test('fromUnknown', () => {
+    })
+});

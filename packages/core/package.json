@@ -11,6 +11,6 @@
   ],
   "scripts": {
     "build": "tsc",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "test": "echo \\\"Error: run __tests__ from root\\\" && exit 1"
   }
 }

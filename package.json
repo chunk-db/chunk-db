@@ -3,19 +3,29 @@
   "private": true,
   "scripts": {
     "build": "lerna run build",
-    "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/"
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "docs": "typedoc"
   },
   "devDependencies": {
+    "@babel/core": "^7.12.0",
+    "@babel/preset-env": "^7.12.0",
+    "@babel/preset-typescript": "^7.12.0",
+    "@types/jest": "^26.0.14",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
+    "babel-jest": "^26.5.2",
     "eslint": "^7.11.0",
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
-    "eslint-plugin-functional": "^3.1.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.1.4",
+    "jest": "^26.5.3",
     "lerna": "^3.20.2",
     "prettier": "^2.1.2",
     "prettier-eslint": "^11.0.0",
+    "ts-jest": "^26.4.1",
+    "typedoc": "^0.19.2",
     "typescript": "^4.0.3"
   }
 }
