@@ -1,6 +1,6 @@
-import { IChunkStorageDriver, NotFoundChunkError } from "./storage.types";
-import { IGenericChunk } from "./chunks/ChunkFactory";
-import { ChunkID } from "./common";
+import { IChunkStorageDriver, NotFoundChunkError } from './storage.types';
+import { IGenericChunk } from './chunks/ChunkFactory';
+import { ChunkID } from './common';
 
 export class InMemoryChunkStorage implements IChunkStorageDriver {
     chunks = new Map<ChunkID, IGenericChunk>();
@@ -19,5 +19,18 @@ export class InMemoryChunkStorage implements IChunkStorageDriver {
 
     async remove(id: ChunkID): Promise<void> {
         this.chunks.delete(id);
+    }
+
+    setChunks(chunks: IGenericChunk[]): void {
+        chunks.forEach(chunk => this.set(chunk));
+    }
+
+    clear(): void {
+        this.chunks.clear();
+    }
+
+    reset(chunks: IGenericChunk[]): void {
+        this.clear();
+        this.setChunks(chunks);
     }
 }

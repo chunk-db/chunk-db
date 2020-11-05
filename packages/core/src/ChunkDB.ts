@@ -1,56 +1,81 @@
-import { Branch } from './branch';
-import { IChunkDBConfig, IRefCollection } from './db.types';
-import { Tag } from './Tag';
+import { CollectionConfig, IChunkDBConfig, ICollectionTypes } from './db.types';
 import { IChunkStorageDriver } from './storage.types';
 import { ChunkStorage } from './ChunkStorage';
-import { Scenario, ScenarioContext } from './scenarios/scenario.types';
+import {
+    isCall,
+    ScenarioAction,
+    ScenarioContext,
+} from './scenarios/scenario.types';
+import { Collection } from './collection';
+import { UUID } from './common';
+import { Space } from './space';
 
-export class ChunkDB {
+export class ChunkDB<RECORDS extends ICollectionTypes> {
     public storage: ChunkStorage;
+    public collections: { [NAME in keyof RECORDS]: Collection<RECORDS, NAME, RECORDS[NAME]> };
     private storageDriver: IChunkStorageDriver;
+    public spaces: Map<UUID, Space<RECORDS>> = new Map();
 
-    // private readonly config: IChunkDBConfig;
-    private readonly refs: IRefCollection = { branches: {}, tags: {} };
-
-    constructor(config: IChunkDBConfig) {
-        // this.config = config;
+    constructor(config: IChunkDBConfig<RECORDS>) {
+        this.collections = {} as any;
+        Object.entries(config.collections)
+              .forEach(([name, cfg]) => {
+                  this.collections[name as keyof RECORDS] = new Collection(this, name, new CollectionConfig(name, cfg));
+              });
         this.storageDriver = config.storage;
         this.storage = new ChunkStorage(this.storageDriver);
     }
 
-    public tag(name: string): Tag {
-        if (name in this.refs.tags)
-            return new Tag(this, name);
-        else
-            return new Tag(this, name);
+    public collection<NAME extends keyof RECORDS>(name: NAME): Collection<RECORDS, NAME, RECORDS[NAME]> {
+        if (name in this.collections)
+            return this.collections[name];
+
+        throw new Error(`Invalid collection "${name}"`);
     }
 
-    public branch(name: string): Branch {
-        return new Branch(this, name);
-    }
-
-    public async run<T, ARGS extends any[]>(scenario: Scenario<T, ARGS>, ...args: ARGS): Promise<T> {
-        console.log(scenario, args, this.storage);
-        const gen = scenario(...args);
-
+    public run(scenario: any): any {
         const context: ScenarioContext = {
-            storage: this.storage
+            storage: this.storage,
         };
 
-        let result: any;
+        return scenarioRunner(context, scenario);
 
-        while (true) {
-            const { done, value } = gen.next(result);
-            console.log(done, value);
-            if (done)
-                return value as T;
+        // const gen = scenario.apply(context, args);
+        //
+        // let result: any;
+        //
+        // while (true) {
+        //     const { done, value } = gen.next(result);
+        //     if (done)
+        //         return value as T;
+        //
+        //     const [action, ...callArgs] = value;
+        //
+        //     result = await action.apply(context, callArgs);
+        // }
+    }
+}
 
-            if (!Array.isArray(value))
-                throw new Error('Invalid return');
+export interface Runner<T> {
+    next(): Promise<{ done: boolean, value: T }>;
+}
 
-            const [action, ...callArgs] = value;
-
-            result = await action(context, ...callArgs);
+function scenarioRunner<T>(context: ScenarioContext, scenario: Generator<ScenarioAction | T, ScenarioAction, ScenarioAction>): Runner<T> {
+    async function next(result?: any): Promise<{ done: boolean, value: T }> {
+        for (; ;) {
+            const tmp = scenario.next(result);
+            const done = !!tmp.done;
+            const value: any = tmp.value;
+            if (isCall(value)) {
+                const { action, args } = value;
+                result = await action.apply(context, args);
+                if (done)
+                    return { done, value: result };
+            } else {
+                return { done, value };
+            }
         }
     }
+
+    return { next };
 }

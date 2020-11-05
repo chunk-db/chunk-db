@@ -1,12 +1,14 @@
-import { call, getChunk } from './scenario';
 import { ChunkID, UUID } from '../common';
 import { AbstractChunk, ChunkType } from '../chunks/AbstractChunk';
 import { mapToArray } from '../chunks/utils';
 import { IRecord } from '../record.types';
 import { NotFoundChunkError } from '../storage.types';
-import { buildQuery, IQuery, Query } from '../Query';
+import { buildQuery, ConditionValidator, IQuery } from '../ConditionValidator';
+import { getChunk } from './utils';
+import { call } from './scenario.types';
+import { FindScenario } from './find.types';
 
-export function* findAll<T extends IRecord = IRecord>(headChunkID: ChunkID, query: IQuery = {}): Generator<any, T[], any> {
+export function* findBruteForce<T extends IRecord = IRecord>(headChunkID: ChunkID, query: IQuery = {}): FindScenario<T> {
     const map = new Map<UUID, IRecord>();
     const builtQuery = buildQuery(query);
     let chunk: AbstractChunk;
@@ -16,15 +18,20 @@ export function* findAll<T extends IRecord = IRecord>(headChunkID: ChunkID, quer
         chunk = yield call(getChunk, chunkID);
         if (!chunk)
             throw new NotFoundChunkError(chunkID);
-        const records = mapToArray(chunk.records);
+        const records: any = mapToArray(chunk.records).filter(isNew(map, builtQuery));
 
         switch (chunk.type) {
             case ChunkType.Snapshot:
-                records.forEach(addNew(map, builtQuery));
-                return mapToArray<T>(map as any); // TODO
+                return {
+                    chunkID,
+                    records,
+                }; // TODO
                 break;
             case ChunkType.Incremental:
-                records.forEach(addNew(map, builtQuery));
+                yield {
+                    chunkID,
+                    records,
+                };
                 chunkID = chunk.parents[0];
                 break;
             default:
@@ -33,12 +40,15 @@ export function* findAll<T extends IRecord = IRecord>(headChunkID: ChunkID, quer
     }
 }
 
-function addNew<T extends IRecord>(map: Map<UUID, T>, filter: Query) {
+function isNew<T extends IRecord>(map: Map<UUID, T>, filter: ConditionValidator) {
     return (record: T) => {
         if (map.has(record._id))
-            return;
+            return false;
 
-        if (filter(record))
-            map.set(record._id, record);
+        if (!filter(record))
+            return false;
+
+        map.set(record._id, record);
+        return true;
     };
 }

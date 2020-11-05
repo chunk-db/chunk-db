@@ -20,11 +20,11 @@ export type IQuery = {
     [key: string]: Primitive | Condition;
 }
 
-export type Query<T extends IRecord = IRecord> = (record: T) => boolean;
+export type ConditionValidator<T extends IRecord = IRecord> = (record: T) => boolean;
 
-export function buildQuery(query: IQuery): Query {
+export function buildQuery(query: IQuery): ConditionValidator {
     if (typeof query !== 'object')
-        throw new Error('Query must be an object');
+        throw new Error('ConditionValidator must be an object');
 
     const byFields = Object.keys(query).map(path => {
         const getter = getFieldByPath(path);

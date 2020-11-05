@@ -1,39 +1,79 @@
+/* eslint-disable import/order */
+import { demoStorage, IDemoRecord } from '../__tests__/chunks.demo';
 import { ChunkDB } from './ChunkDB';
-import { demoStorage } from '../__tests__/chunks.demo';
-import { ChunkID } from './common';
-import { call, getChunk } from './scenarios/scenario';
-import { AbstractChunk, ChunkType } from './chunks/AbstractChunk';
+import { InMemoryChunkStorage } from './inmemory-storage';
+import { call, getStorage, ScenarioContext } from './scenarios/scenario.types';
 
 describe('ChunkDB', () => {
-    let db: ChunkDB;
     describe('run', () => {
+        let db: ChunkDB<{ records: IDemoRecord }>;
+        let storage: InMemoryChunkStorage;
         beforeEach(async () => {
+            storage = await demoStorage();
             db = new ChunkDB({
-                storage: await demoStorage(),
-                collections: {}
+                storage,
+                collections: {
+                    records: {
+                        factory(data: any): IDemoRecord {return data;},
+                    },
+                },
             });
         });
 
-        function* testScenario(chunkID: ChunkID) {
-            console.log(chunkID);
-            const chunk: AbstractChunk = yield call(getChunk, chunkID);
-            console.log(chunk);
-            return {
-                id: chunk.id,
-                type: chunk.type
-            };
+        async function increment(this: ScenarioContext, value: number): Promise<any> {
+            return value + 1;
         }
 
-        test('base', async () => {
-            // arrange
+        test('should return any value', async () => {
+            function* testFunc() {
+                yield 'storage';
+                return 'storage return';
+            }
 
-            // act
-            const result = await db.run(testScenario, 'a1');
+            const gen = db.run(testFunc());
+            expect(await gen.next()).toEqual({
+                done: false,
+                value: 'storage',
+            });
+            expect(await gen.next()).toEqual({
+                done: true,
+                value: 'storage return',
+            });
+        });
 
-            // assert
-            expect(result).toEqual({
-                id: 'a1',
-                type: ChunkType.Incremental
+        test('should return call', async () => {
+            function* testFunc() {
+                const x = yield call(increment, 1);
+                yield x;
+                return call(increment, 2);
+            }
+
+            const gen = db.run(testFunc());
+            expect(await gen.next()).toEqual({
+                done: false,
+                value: 2,
+            });
+            expect(await gen.next()).toEqual({
+                done: true,
+                value: 3,
+            });
+        });
+
+        test('should receive storage', async () => {
+            function* testFunc() {
+                const storage = yield call(getStorage);
+                yield storage;
+                return call(increment, 1);
+            }
+
+            const gen = db.run(testFunc());
+            expect(await gen.next()).toEqual({
+                done: false,
+                value: db.storage,
+            });
+            expect(await gen.next()).toEqual({
+                done: true,
+                value: 2,
             });
         });
     });

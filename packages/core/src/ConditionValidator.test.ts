@@ -1,4 +1,4 @@
-import { buildQuery } from './Query';
+import { buildQuery } from './ConditionValidator';
 
 describe('Query', () => {
     const obj = {

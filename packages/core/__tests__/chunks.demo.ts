@@ -27,6 +27,11 @@ export const chunkA1: IGenericChunk<IDemoRecord> = {
     },
 };
 
+export const allDemoChunks = [
+    chunkABC1,
+    chunkA1,
+];
+
 export async function demoStorage() {
     const storage = new InMemoryChunkStorage();
     await storage.set(chunkABC1);
