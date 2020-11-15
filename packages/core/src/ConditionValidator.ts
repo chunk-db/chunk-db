@@ -1,6 +1,6 @@
-import { Primitive } from './common';
 import { IRecord } from './record.types';
 import { getFieldByPath } from './utils';
+import { Primitive } from './common.types';
 
 /**
  * Доступные операторы

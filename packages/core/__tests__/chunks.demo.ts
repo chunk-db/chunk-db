@@ -1,7 +1,7 @@
 import { IGenericChunk } from '../src/chunks/ChunkFactory';
 import { ChunkType } from '../src/chunks/AbstractChunk';
-import { InMemoryChunkStorage } from '../src/inmemory-storage';
 import { IRecord } from '../src/record.types';
+import { InMemoryChunkStorage } from '../src/in-memory-chunk-storage';
 
 export interface IDemoRecord extends IRecord {
     user: number;
@@ -34,7 +34,7 @@ export const allDemoChunks = [
 
 export async function demoStorage() {
     const storage = new InMemoryChunkStorage();
-    await storage.set(chunkABC1);
-    await storage.set(chunkA1);
+    await storage.saveChunk(chunkABC1);
+    await storage.saveChunk(chunkA1);
     return storage;
 }

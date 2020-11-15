@@ -1,8 +1,9 @@
 import { demoStorage, IDemoRecord } from '../../__tests__/chunks.demo';
 import { ChunkDB } from '../ChunkDB';
 import { AbstractChunk } from '../chunks/AbstractChunk';
-import { ChunkID } from '../common';
+import { ChunkID } from '../common.types';
 import { NotFoundChunkError } from '../storage.types';
+
 import { call } from './scenario.types';
 import { getChunk } from './utils';
 

@@ -1,9 +1,9 @@
 import { ChunkDB } from './ChunkDB';
-import { ChunkID } from './common';
 import { IQuery } from './ConditionValidator';
 import { IRecord } from './record.types';
 import { FindScenario, IFindResult } from './scenarios/find.types';
 import { findBruteForce } from './scenarios/findBruteForce';
+import { ChunkID } from './common.types';
 
 /**
  * Отвечает за создание выборки для конкретного пространства данных по конкретному запросу

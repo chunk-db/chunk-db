@@ -1,4 +1,5 @@
 import { IRecord } from "../record.types";
+
 import { AbstractChunk, ChunkType } from "./AbstractChunk";
 import { IGenericChunk } from "./ChunkFactory";
 

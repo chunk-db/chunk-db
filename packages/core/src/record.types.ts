@@ -1,3 +1,3 @@
-import { UUID } from './common';
+import { UUID } from './common.types';
 
 export type IRecord = { _id: UUID }

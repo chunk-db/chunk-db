@@ -1,22 +1,34 @@
-import { CollectionConfig, IChunkDBConfig, ICollectionTypes } from './db.types';
-import { IChunkStorageDriver } from './storage.types';
 import { ChunkStorage } from './ChunkStorage';
+import { Accessor } from './accessor';
+import { Collection } from './collection';
+import {
+    CollectionConfig,
+    IChunkDBConfig,
+    ICollectionTypes, ITransactionConfig, SpaceID,
+    Transaction, UUID,
+} from './common.types';
+import { InnerDBError, SpaceNotFoundError } from './errors';
+import { UpdateEvent } from './events';
 import {
     isCall,
     ScenarioAction,
     ScenarioContext,
 } from './scenarios/scenario.types';
-import { Collection } from './collection';
-import { UUID } from './common';
-import { Space } from './space';
+import { ISpace, Refs, Space } from './space';
+import { IStorageDriver } from './storage.types';
+import { applyTransaction } from './scenarios/applyTransaction';
 
 export class ChunkDB<RECORDS extends ICollectionTypes> {
     public storage: ChunkStorage;
     public collections: { [NAME in keyof RECORDS]: Collection<RECORDS, NAME, RECORDS[NAME]> };
-    private storageDriver: IChunkStorageDriver;
-    public spaces: Map<UUID, Space<RECORDS>> = new Map();
+    public spaces: Map<SpaceID, Space<RECORDS>> = new Map();
+
+    private readonly storageDriver: IStorageDriver;
+    private activeTransactions: Accessor<RECORDS>[] = [];
+    private readonly applyTransaction;
 
     constructor(config: IChunkDBConfig<RECORDS>) {
+        this.applyTransaction = config.applyTransaction || applyTransaction;
         this.collections = {} as any;
         Object.entries(config.collections)
               .forEach(([name, cfg]) => {
@@ -34,8 +46,11 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
     }
 
     public run(scenario: any): any {
-        const context: ScenarioContext = {
+        const context: ScenarioContext<RECORDS> = {
             storage: this.storage,
+            activeTransactions: this.activeTransactions,
+            updateSpaceRefs: this.updateSpaceRefs,
+            spaces: this.spaces,
         };
 
         return scenarioRunner(context, scenario);
@@ -54,13 +69,66 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
         //     result = await action.apply(context, callArgs);
         // }
     }
+
+    /**
+     * Getting data only from accessor for isolation
+     *
+     * Транзакция может быть выполнена в любое время.
+     * В одно и тоже время могут выполняться несколько транзакций.
+     * В пределах одной транзакции данные не меняются, что обеспечивается
+     * доступом только через accessor
+     * В общий доступ данные попадают только по завершению транзакции
+     * Если несколько транзакций изменили одни и те же данные, то последующие
+     * конфликтующие будут перезапущены
+     *
+     * @param spaceID
+     * @param transaction
+     */
+    public async transaction(spaceID: SpaceID, transaction: Transaction<RECORDS>): Promise<UpdateEvent>;
+    public async transaction(spaceID: SpaceID, config: ITransactionConfig, transaction: Transaction<RECORDS>): Promise<UpdateEvent>;
+    public async transaction(spaceID: SpaceID, maybeConfig: ITransactionConfig | Transaction<RECORDS>, maybeTransaction?: Transaction<RECORDS>): Promise<UpdateEvent> {
+        const space = this.spaces.get(spaceID);
+        if (!space)
+            throw new SpaceNotFoundError(spaceID);
+
+        let transaction: Transaction<RECORDS>;
+        const config: ITransactionConfig = {
+            restartOnFail: false,
+        };
+        if (maybeTransaction) {
+            transaction = maybeTransaction;
+            Object.assign(config, maybeConfig as ITransactionConfig);
+        } else {
+            transaction = maybeConfig as Transaction<RECORDS>;
+        }
+
+        const accessor = new Accessor(this, space);
+        await transaction(accessor);
+
+        const gen = this.run(this.applyTransaction(accessor));
+        console.log(gen);
+        const result = await gen.next();
+        console.log(result);
+        if (!result.done)
+            throw new InnerDBError('Scenario applyTransaction must return only ones');
+
+        return result.value;
+    }
+
+    private async updateSpaceRefs(spaceID: SpaceID, refs: Refs<RECORDS>): Promise<void> {
+        this.spaces.set(spaceID, {
+            ...this.spaces.get(spaceID)!,
+            refs,
+        });
+        await this.storage.saveSpace(this.spaces.get(spaceID) as ISpace);
+    }
 }
 
 export interface Runner<T> {
     next(): Promise<{ done: boolean, value: T }>;
 }
 
-function scenarioRunner<T>(context: ScenarioContext, scenario: Generator<ScenarioAction | T, ScenarioAction, ScenarioAction>): Runner<T> {
+function scenarioRunner<T>(context: ScenarioContext<any>, scenario: Generator<ScenarioAction | T, ScenarioAction, ScenarioAction>): Runner<T> {
     async function next(result?: any): Promise<{ done: boolean, value: T }> {
         for (; ;) {
             const tmp = scenario.next(result);

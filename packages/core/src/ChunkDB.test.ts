@@ -1,8 +1,8 @@
-/* eslint-disable import/order */
 import { demoStorage, IDemoRecord } from '../__tests__/chunks.demo';
+
 import { ChunkDB } from './ChunkDB';
-import { InMemoryChunkStorage } from './inmemory-storage';
 import { call, getStorage, ScenarioContext } from './scenarios/scenario.types';
+import { InMemoryChunkStorage } from './in-memory-chunk-storage';
 
 describe('ChunkDB', () => {
     describe('run', () => {
@@ -20,7 +20,7 @@ describe('ChunkDB', () => {
             });
         });
 
-        async function increment(this: ScenarioContext, value: number): Promise<any> {
+        async function increment(this: ScenarioContext<{ records: IDemoRecord }>, value: number): Promise<any> {
             return value + 1;
         }
 

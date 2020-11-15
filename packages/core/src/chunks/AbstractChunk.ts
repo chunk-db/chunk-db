@@ -1,21 +1,24 @@
-import { UUID } from "../common";
-import { IRecord } from "../record.types";
-import { IGenericChunk } from "./ChunkFactory";
-import { objectToMap } from "./utils";
+import { UUID } from '../common.types';
+import { IRecord } from '../record.types';
+
+import { IGenericChunk } from './ChunkFactory';
+import { objectToMap } from './utils';
 
 export enum ChunkType {
-    Unknown = "",
-    Snapshot = "snapshot",
-    Incremental = "incremental",
-    Update = "update",
-    Merge = "merge",
+    Unknown = '',
+    Snapshot = 'snapshot',
+    Incremental = 'incremental',
+    Update = 'update',
+    Merge = 'merge',
+    Draft = 'draft',
+    TemporaryTransaction = 'temporary-transaction',
 }
 
 /**
  * Чанк содержит информацию об одном одновлении в одной коллекции
  */
 export abstract class AbstractChunk<T extends IRecord = IRecord> {
-    public readonly id: UUID = "";
+    public readonly id: UUID = '';
     public abstract type: ChunkType;
     public readonly records: ReadonlyMap<UUID, T>;
     public readonly parents: UUID[];
@@ -33,7 +36,7 @@ export abstract class AbstractChunk<T extends IRecord = IRecord> {
             id: this.id,
             type: this.type,
             parents: this.parents.slice(),
-            records
+            records,
         };
     }
 }

@@ -1,6 +1,13 @@
-import { ChunkID } from './common';
+import { Accessor } from './accessor';
 import { IRecord } from './record.types';
-import { IChunkStorageDriver } from './storage.types';
+import { IStorageCacheDriver, IStorageDriver } from './storage.types';
+import { Brand } from 'utility-types';
+
+export type ID = string;
+export type UUID = string;
+export type ChunkID = string;
+export type SpaceID = Brand<string, 'SpaceID'>;
+export type Primitive = string | number | boolean;
 
 export type CollectionType<T> = T extends ICollectionConfig<infer R> ? R : never;
 
@@ -9,9 +16,10 @@ export interface ICollectionTypes {
 }
 
 export interface IChunkDBConfig<T extends { [key: string]: IRecord }> {
-    storage: IChunkStorageDriver;
-
+    storage: IStorageDriver;
     collections: { [key in keyof T]: ICollectionConfig<T[key]> };
+    cache?: IStorageCacheDriver | null;
+    applyTransaction?: (accessor: Accessor<any>) => Generator<any, any, any>;
 }
 
 interface Type<T> {
@@ -59,4 +67,10 @@ export class CollectionConfig<T extends IRecord = IRecord> {
 export interface IRefCollection {
     branches: { [name: string]: ChunkID },
     tags: { [name: string]: ChunkID },
+}
+
+export type Transaction<RECORDS extends ICollectionTypes> = (accessor: Accessor<RECORDS>) => void;
+
+export interface ITransactionConfig {
+    restartOnFail: boolean; // TODO not working
 }

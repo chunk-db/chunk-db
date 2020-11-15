@@ -1,20 +1,22 @@
-import { ICollectionTypes } from './db.types';
-import { UUID } from './common';
+import { ICollectionTypes, SpaceID } from './common.types';
+import { UUID } from './common.types';
+
+export type Refs<RECORDS extends ICollectionTypes = any> = {
+    [NAME in keyof RECORDS]: UUID;
+}
 
 export interface ISpace<RECORDS extends ICollectionTypes = any> {
-    id: UUID;
+    id: SpaceID;
     name: string;
     description?: string;
-    refs: {
-        [NAME in keyof RECORDS]: UUID;
-    };
+    refs: Refs<RECORDS>;
 }
 
 export class Space<RECORDS extends ICollectionTypes = any> {
-    public readonly id: UUID;
+    public readonly id: SpaceID;
     public name: string;
     public description: string;
-    public refs: { [NAME in keyof RECORDS]: UUID };
+    public refs: Refs<RECORDS>;
 
     constructor(config: ISpace<RECORDS>) {
         this.id = config.id;

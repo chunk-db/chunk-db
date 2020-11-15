@@ -2,8 +2,8 @@ import { ChunkDB } from './ChunkDB';
 import { IQuery } from './ConditionValidator';
 import { Cursor } from './cursor';
 import { IRecord } from './record.types';
-import { ChunkID } from './common';
 import { QuerySelector } from './query-selector';
+import { ChunkID } from './common.types';
 
 /**
  * Создание и донастройка запроса к БД

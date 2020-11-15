@@ -1,31 +1,32 @@
 import { ChunkDB } from './ChunkDB';
 import { IQuery } from './ConditionValidator';
+import { CollectionConfig } from './common.types';
 import { Query } from './query';
 import { IRecord } from './record.types';
-import { Space } from './space';
-import { CollectionConfig } from './db.types';
+import { Refs } from './space';
 
 /**
  * Доступ к данным конкретной коллекции и пространства
  */
 export class SpaceReader<T extends IRecord = IRecord> {
     constructor(private readonly db: ChunkDB<any>,
-                public readonly space: Space,
+                public readonly refs: Refs,
                 public readonly config: CollectionConfig<T>) {
-        if (!space)
-            throw new Error(`Invalid space "${this.space.id}`);
+        if (!refs)
+            throw new Error(`Refs can not be null`);
     }
 
     find(query: IQuery): Query<T> {
-        const chunkID = this.space.refs[this.config.name];
+        const chunkID = this.refs[this.config.name];
         if (!chunkID)
-            throw new Error(`Space "${this.space.id}" have invalid ref "${this.space.refs[this.config.name]}" for ${this.config.name}`);
+            throw new Error(`Invalid ref "${this.refs[this.config.name]}" for ${this.config.name}`);
 
         return new Query<T>(this.db, chunkID, query);
     }
 
-    findOne(): Promise<T[]> {
-        return [] as any;
+    async findOne(query: IQuery): Promise<T | null> {
+        const records = await this.findAll(query);
+        return records[0] || null;
     }
 
     findAll(query: IQuery): Promise<T[]> {

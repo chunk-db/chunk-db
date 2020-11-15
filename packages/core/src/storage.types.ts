@@ -1,20 +1,36 @@
-import { IRecord } from "./record.types";
-import { ChunkID } from "./common";
-import { IGenericChunk } from "./chunks/ChunkFactory";
-import { IRefCollection } from "./db.types";
+import { IGenericChunk } from './chunks/ChunkFactory';
+import { ChunkID, SpaceID } from './common.types';
+import { IRecord } from './record.types';
+import { ISpace, Refs, Space } from './space';
 
-export interface IRefStorageDriver {
-    saveRefs(refs: IRefCollection): Promise<void>;
+export interface IStorageDriver {
+    // chunks
+    loadChunk(id: ChunkID): Promise<IGenericChunk | undefined>;
 
-    loadRefs(): Promise<IRefCollection>;
+    saveChunk(chunk: IGenericChunk): Promise<IGenericChunk>;
+
+    markDraftChunkAsUnused(id: ChunkID): Promise<void>;
+
+    // spaces
+    loadSpace(id: SpaceID): Promise<ISpace | undefined>;
+
+    saveSpace(space: ISpace): Promise<ISpace>;
+
+    // save meta
+    // load meta
+    // remove meta
 }
 
-export interface IChunkStorageDriver {
-    get(id: ChunkID): Promise<IGenericChunk>;
+export interface IStorageCacheDriver extends IStorageDriver {
+    // chunks
+    removeChunk(id: ChunkID): Promise<void>;
 
-    set(chunk: IGenericChunk): Promise<IGenericChunk>;
+    clearChunks(): Promise<void>;
 
-    remove(id: ChunkID): Promise<void>;
+    // spaces
+    getAllSpaces(): Promise<ISpace[]>;
+
+    clearSpaces(): Promise<void>;
 }
 
 export interface IChunk<T extends IRecord = IRecord> {

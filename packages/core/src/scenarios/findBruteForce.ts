@@ -1,4 +1,4 @@
-import { ChunkID, UUID } from '../common';
+import { ChunkID, UUID } from '../common.types';
 import { AbstractChunk, ChunkType } from '../chunks/AbstractChunk';
 import { mapToArray } from '../chunks/utils';
 import { IRecord } from '../record.types';
@@ -27,6 +27,7 @@ export function* findBruteForce<T extends IRecord = IRecord>(headChunkID: ChunkI
                     records,
                 }; // TODO
                 break;
+            case ChunkType.TemporaryTransaction:
             case ChunkType.Incremental:
                 yield {
                     chunkID,

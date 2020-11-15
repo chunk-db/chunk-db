@@ -1,44 +1,47 @@
 import { ChunkDB } from '../src/ChunkDB';
-import { InMemoryChunkStorage } from '../src/inmemory-storage';
-import { allDemoChunks, IDemoRecord } from './chunks.demo';
 import { Cursor } from '../src/cursor';
 import { Space } from '../src/space';
 
-describe('ChunkDB e2e tests', () => {
-    describe('fetch data', () => {
-        let storage: InMemoryChunkStorage;
-        let db: ChunkDB<{ records: IDemoRecord }>;
-        const baseSpace = new Space<{ records: IDemoRecord }>({
-            id: 'base-space',
-            name: 'initial',
-            refs: {
-                records: 'initial',
-            },
-        });
-        const space = new Space<{ records: IDemoRecord }>({
-            id: 'test-space',
-            name: 'a1',
-            refs: {
-                records: 'a1',
-            },
-        });
+import { allDemoChunks, IDemoRecord } from './chunks.demo';
+import { SpaceID, UUID } from '../src/common.types';
+import { InMemoryChunkStorage } from '../src/in-memory-chunk-storage';
+import { delay } from '../src/common';
 
-        beforeEach(async () => {
-            storage = new InMemoryChunkStorage();
-            storage.reset(allDemoChunks);
-            db = new ChunkDB({
-                storage,
-                collections: {
-                    records: {
-                        factory(data: any): IDemoRecord {
-                            return data;
-                        },
+describe('ChunkDB e2e tests', () => {
+    let storage: InMemoryChunkStorage;
+    let db: ChunkDB<{ records: IDemoRecord }>;
+    const baseSpace = new Space<{ records: IDemoRecord }>({
+        id: 'base-space' as SpaceID,
+        name: 'initial',
+        refs: {
+            records: 'initial',
+        },
+    });
+    const space = new Space<{ records: IDemoRecord }>({
+        id: 'test-space' as SpaceID,
+        name: 'a1',
+        refs: {
+            records: 'a1',
+        },
+    });
+    beforeEach(async () => {
+        storage = new InMemoryChunkStorage();
+        storage.reset(allDemoChunks);
+        db = new ChunkDB({
+            storage,
+            collections: {
+                records: {
+                    factory(data: any): IDemoRecord {
+                        return data;
                     },
                 },
-            });
-            db.spaces.set(baseSpace.id, baseSpace);
-            db.spaces.set(space.id, space);
+            },
         });
+        db.spaces.set(baseSpace.id, { ...baseSpace });
+        db.spaces.set(space.id, { ...space });
+    });
+
+    describe('fetch data', () => {
         describe('find', () => {
             describe('all', () => {
                 test('all', async () => {
@@ -47,7 +50,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const cursor = db
                         .collection('records')
-                        .space('test-space')
+                        .space('test-space' as SpaceID)
                         .find({})
                         .exec();
 
@@ -69,7 +72,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .collection('records')
-                        .space('test-space')
+                        .space('test-space' as SpaceID)
                         .find({ user: 2 })
                         .exec()
                         .one();
@@ -85,7 +88,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .collection('records')
-                        .space('base-space')
+                        .space('base-space' as SpaceID)
                         .find({ user: 1 })
                         .exec()
                         .one();
@@ -101,7 +104,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .collection('records')
-                        .space('test-space')
+                        .space('test-space' as SpaceID)
                         .find({ user: 10 })
                         .exec()
                         .all();
@@ -118,7 +121,7 @@ describe('ChunkDB e2e tests', () => {
                 // act
                 const cursor = db
                     .collection('records')
-                    .space('test-space')
+                    .space('test-space' as SpaceID)
                     .find({})
                     .exec<IDemoRecord>();
 
@@ -135,6 +138,102 @@ describe('ChunkDB e2e tests', () => {
                     values: ['a1', 'd0'],
                 });
             });
+        });
+    });
+    describe('change data', () => {
+        describe('add records', () => {
+            it('read and write one record (sync)', async () => {
+                // arrange
+                console.log(space.refs);
+                let id: UUID = '';
+
+                // act
+                const event = await db.transaction(space.id, async tx => {
+                    const record = await tx.collection('records').findOne({ user: 1 });
+                    expect(record).toEqual({
+                        _id: 'a',
+                        user: 1,
+                        value: 'a1',
+                    });
+
+                    const insertedRecord = await tx.insert('records', {
+                        user: 3,
+                        value: 'some value',
+                    });
+
+                    id = insertedRecord._id;
+                });
+
+                const records = await db.collection('records').space(space.id).findAll({ user: 3 });
+                const newSpace = db.spaces.get(space.id)!;
+                console.log(space.refs);
+                console.log(newSpace.refs);
+                expect(space.refs).not.toBe(newSpace.refs);
+                expect(space.refs).not.toEqual(newSpace.refs);
+
+                // assert
+                expect(records.length).toBe(1);
+                expect(records[0].value).toBe('some value');
+                expect(event).toEqual({
+                    deleted: [],
+                    inserted: [id],
+                    updated: [],
+                    upserted: [id],
+                });
+            });
+
+            // isolation in transaction
+            it('isolation', async () => {
+                // arrange
+                let id: UUID = '';
+
+                // act
+                const event = await db.transaction(space.id, async tx => {
+                    // insert record
+                    const record = await tx.insert('records', {
+                        user: 8,
+                        value: 'value',
+                    });
+                    id = record._id;
+
+                    await delay(10);
+
+                    // emulate query out from transaction in the middle of transaction
+                    const recordsFromOut = await db.collection('records').space(space.id).findAll({ user: 8 });
+                    expect(recordsFromOut.length).toBe(0);
+
+                    // query in the transaction
+                    const recordsFromTx = await tx.collection('records').findAll({ user: 8 });
+                    expect(recordsFromTx).toEqual([{
+                        _id: record._id,
+                        user: 8,
+                        value: 'value',
+                    }]);
+
+                    await delay(10);
+
+                    // continue transaction
+                    await tx.upsert('records', {
+                        ...record,
+                        value: 'new value',
+                    });
+                });
+                const records = await db.collection('records').space(space.id).findAll({ user: 8 });
+
+                // assert
+                expect(records.length).toBe(1);
+                expect(records[0].value).toBe('new value');
+                expect(event).toEqual({
+                    deleted: [],
+                    inserted: [id],
+                    updated: [],
+                    upserted: [id],
+                });
+            });
+
+            // isolation in parallels transactions
+
+            // conflict in transactions
         });
     });
 });

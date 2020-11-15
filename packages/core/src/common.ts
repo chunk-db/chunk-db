@@ -1,4 +1,3 @@
-export type ID = string;
-export type UUID = string;
-export type ChunkID = string;
-export type Primitive = string | number | boolean;
+export function delay(timeout = 0): Promise<any> {
+    return new Promise<void>(resolve => setTimeout(resolve, timeout));
+}
