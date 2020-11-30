@@ -1,8 +1,7 @@
 import { ChunkDB } from './ChunkDB';
-import { allDemoChunks, IDemoRecord } from '../__tests__/chunks.demo';
+import { IDemoRecord } from '../__tests__/chunks.demo';
 import { ISpace, Space } from './space';
-import { InMemoryChunkStorage } from './in-memory-chunk-storage';
-import { ID, SpaceID, UUID } from './common.types';
+import { SpaceID } from './common.types';
 import { StorageTestDriver } from './storage-test';
 import { IGenericChunk } from './chunks/ChunkFactory';
 
@@ -77,8 +76,6 @@ describe('accessor', () => {
             expect(chunk2.refs['records']).toEqual(chunkID);
             action2.resolve(chunk2);
 
-            // ---
-
             const newSpace = db.spaces.get(space.id)!;
             console.log(space.refs);
             console.log(newSpace.refs);
@@ -87,7 +84,8 @@ describe('accessor', () => {
 
             expect(event).toEqual({
                 deleted: [],
-                inserted: [insertedRecord!._id],
+                inserted: [],
+                // inserted: [insertedRecord!._id], TODO
                 updated: [],
                 upserted: [insertedRecord!._id],
             });

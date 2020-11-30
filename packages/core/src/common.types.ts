@@ -19,7 +19,7 @@ export interface IChunkDBConfig<T extends { [key: string]: IRecord }> {
     storage: IStorageDriver;
     collections: { [key in keyof T]: ICollectionConfig<T[key]> };
     cache?: IStorageCacheDriver | null;
-    applyTransaction?: (accessor: Accessor<any>) => Generator<any, any, any>;
+    spaces?: (SpaceID | string)[];
 }
 
 interface Type<T> {

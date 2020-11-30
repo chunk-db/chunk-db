@@ -18,10 +18,10 @@ export function chunkFactory(data: unknown): AbstractChunk {
     switch (data.type) {
         case ChunkType.Snapshot:
             return new SnapshotChunk(data);
+        case ChunkType.TemporaryTransaction:
         case ChunkType.Incremental:
-            return new IncrementalChunk(data);
         default:
-            throw new Error('Invalid or unsupported chunk data');
+            return new IncrementalChunk(data);
     }
 }
 

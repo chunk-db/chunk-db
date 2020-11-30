@@ -63,9 +63,9 @@ export class Accessor<RECORDS extends ICollectionTypes> {
     async upsert<NAME extends keyof RECORDS, T extends RECORDS[NAME]>(collection: NAME, record: T): Promise<T> {
         this.writeIntoCollection(collection);
         console.log(`insert into ${collection}`);
-        this.chunks[collection]!.records.set(record._id, record);
         if (!this.chunks[collection]!.records.has(record._id))
             this.stats.upserted.push(record._id);
+        this.chunks[collection]!.records.set(record._id, record);
 
         this.db.storage.saveChunk(this.chunks[collection]!);
 

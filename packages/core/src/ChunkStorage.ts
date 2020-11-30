@@ -3,6 +3,7 @@ import { AbstractChunk } from './chunks/AbstractChunk';
 import { chunkFactory } from './chunks/ChunkFactory';
 import { ChunkID, SpaceID, UUID } from './common.types';
 import { ISpace, Refs, Space } from './space';
+import { DBError } from './errors';
 
 export class ChunkStorage {
     private chunks = new Map<ChunkID, AbstractChunk>();
@@ -33,5 +34,12 @@ export class ChunkStorage {
     saveSpace(space: ISpace): Promise<ISpace> {
         this.spaces.set(space.id, space);
         return this.driver.saveSpace(space);
+    }
+
+    async loadSpace(id: SpaceID): Promise<ISpace> {
+        const space = await this.driver.loadSpace(id);
+        if (!space)
+            throw new DBError(`Space "${id}" not found`);
+        return space;
     }
 }
