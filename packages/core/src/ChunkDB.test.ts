@@ -1,11 +1,10 @@
 import { demoStorage, IDemoRecord } from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
-import { call, getStorage, ScenarioContext } from './scenarios/scenario.types';
-import { InMemoryChunkStorage } from './in-memory-chunk-storage';
-import { StorageTestDriver } from './storage-test';
-import { Space } from './space';
 import { SpaceID } from './common.types';
+import { InMemoryChunkStorage } from './in-memory-chunk-storage';
+import { call, getStorage, ScenarioContext } from './scenarios/scenario.types';
+import { Space } from './space';
 
 describe('ChunkDB', () => {
     describe('run', () => {
@@ -99,8 +98,8 @@ describe('ChunkDB', () => {
                 },
             });
 
-            let driver = await demoStorage();
-            let db1: ChunkDB<{ records: IDemoRecord }> = new ChunkDB({
+            const driver = await demoStorage();
+            const db1: ChunkDB<{ records: IDemoRecord }> = new ChunkDB({
                 cache: null,
                 storage: driver,
                 collections: {
@@ -127,9 +126,15 @@ describe('ChunkDB', () => {
             });
 
             // assert
+            const updatedSpace = db1.spaces.get(space.id)!;
+            expect(updatedSpace.refs['records']).not.toBe(space.refs['records']);
+            const chunk = db1.storage.getExists(updatedSpace.refs['records']);
+            expect(chunk).toBeTruthy();
+            expect(chunk!.parents).toHaveLength(1);
+            expect(chunk!.parents[0]).toBe(space.refs['records']);
 
             // arrange
-            let db2: ChunkDB<{ records: IDemoRecord }> = new ChunkDB({
+            const db2: ChunkDB<{ records: IDemoRecord }> = new ChunkDB({
                 cache: null,
                 storage: driver,
                 collections: {
@@ -144,8 +149,6 @@ describe('ChunkDB', () => {
                 ],
             });
 
-            console.log(driver.spaces.keys());
-
             // act 2: find record
             await db2.ready$;
             const foundRecord = await db2.collection('records')
@@ -154,8 +157,60 @@ describe('ChunkDB', () => {
 
             // assert
             expect(foundRecord).toEqual(record);
-            console.log(driver.spaces);
-            console.log(driver.chunks);
+            // console.log(driver.spaces);
+            // console.log(driver.chunks);
+        });
+    });
+
+    describe('getChain', () => {
+        let db: ChunkDB<{ records: IDemoRecord }>;
+        let storage: InMemoryChunkStorage;
+        beforeEach(async () => {
+            storage = await demoStorage();
+            db = new ChunkDB({
+                storage,
+                collections: {
+                    records: {
+                        factory(data: any): IDemoRecord {return data;},
+                    },
+                },
+            });
+        });
+
+        test('get empty', async () => {
+            // act
+            const chain = await db.getFlatChain('a1', 0);
+
+            // assert
+            expect(chain).toHaveLength(0);
+        });
+
+        test('get last one', async () => {
+            // act
+            const chain = await db.getFlatChain('a1', 1);
+
+            // assert
+            expect(chain).toHaveLength(1);
+            expect(chain[0].id).toEqual('a1');
+        });
+
+        test('get all chain (top)', async () => {
+            // act
+            const chain = await db.getFlatChain('a1', Infinity);
+
+            // assert
+            expect(chain).toHaveLength(2);
+            expect(chain[0].id).toEqual('a1');
+            expect(chain[1].id).toEqual('initial');
+        });
+
+        test('get all chain (in middle)', async () => {
+            // act
+            const chain = await db.getFlatChain('initial', Infinity);
+
+            // assert
+            expect(chain).toHaveLength(1);
+            expect(chain[0].id).toEqual('initial');
         });
     });
 });

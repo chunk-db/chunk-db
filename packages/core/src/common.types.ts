@@ -1,7 +1,8 @@
+import { Brand } from 'utility-types';
+
 import { Accessor } from './accessor';
 import { IRecord } from './record.types';
 import { IStorageCacheDriver, IStorageDriver } from './storage.types';
-import { Brand } from 'utility-types';
 
 export type ID = string;
 export type UUID = string;
@@ -69,7 +70,7 @@ export interface IRefCollection {
     tags: { [name: string]: ChunkID },
 }
 
-export type Transaction<RECORDS extends ICollectionTypes> = (accessor: Accessor<RECORDS>) => void;
+export type Transaction<RECORDS extends ICollectionTypes> = (accessor: Accessor<RECORDS>) => Promise<void>;
 
 export interface ITransactionConfig {
     restartOnFail: boolean; // TODO not working

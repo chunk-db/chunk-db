@@ -1,11 +1,12 @@
 import { ChunkStorage } from './ChunkStorage';
 import { Accessor } from './accessor';
+import { AbstractChunk } from './chunks';
 import { Collection } from './collection';
 import {
     CollectionConfig,
     IChunkDBConfig,
     ICollectionTypes, ITransactionConfig, SpaceID,
-    Transaction,
+    Transaction, UUID,
 } from './common.types';
 import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';
@@ -22,10 +23,13 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
     public collections: { [NAME in keyof RECORDS]: Collection<RECORDS, NAME, RECORDS[NAME]> };
     public spaces: Map<SpaceID, Space<RECORDS>> = new Map();
 
-    private readonly storageDriver: IStorageDriver;
-    private activeTransactions: Accessor<RECORDS>[] = [];
     public ready = false;
     public ready$: Promise<void>;
+
+    private readonly storageDriver: IStorageDriver;
+    private activeTransactions: Accessor<RECORDS>[] = [];
+    private storeSubscriptions: Array<() => void> = [];
+    private spaceSubscriptions = new Map<SpaceID, Array<() => void>>();
 
     constructor(config: IChunkDBConfig<RECORDS>) {
         this.collections = {} as any;
@@ -58,6 +62,25 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
             });
         this.ready$ = Promise.all(promises)
                              .then(() => {this.ready = true;});
+    }
+
+    public subscribe(cb: () => void): () => void;
+    public subscribe(spaceID: SpaceID, cb: () => void): () => void;
+    public subscribe(spaceID: SpaceID | (() => void), cb?: () => void): () => void {
+        if (typeof spaceID === 'function') {
+            this.storeSubscriptions.push(spaceID);
+
+            return () => this.storeSubscriptions = this.storeSubscriptions.filter(
+                item => item !== spaceID,
+            );
+        }
+
+        const list: Array<() => void> = this.spaceSubscriptions.get(spaceID) || [];
+
+        list.push(cb!);
+
+        this.spaceSubscriptions.set(spaceID, list);
+        return () => this.spaceSubscriptions.set(spaceID, list.filter(item => item !== cb));
     }
 
     public collection<NAME extends keyof RECORDS>(name: NAME): Collection<RECORDS, NAME, RECORDS[NAME]> {
@@ -138,12 +161,36 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
         return accessor.getStats();
     }
 
+    public async getFlatChain(head: string, maxDepth = 3): Promise<AbstractChunk[]> {
+        if (!maxDepth || !head)
+            return [];
+
+        const chain = [];
+        let lastChunksIds: UUID[] = [head];
+        for (let depth = 0; depth < maxDepth && lastChunksIds.length; depth++) {
+            const chunksIds = [];
+
+            for (const chunkId of lastChunksIds) {
+                const chunk = await this.storage.loadChunk(chunkId);
+                chain.push(chunk);
+                chunksIds.push(...chunk.parents);
+            }
+
+            lastChunksIds = chunksIds;
+        }
+
+        return chain;
+    }
+
     private async updateSpaceRefs(spaceID: SpaceID, refs: Refs<RECORDS>): Promise<void> {
         this.spaces.set(spaceID, {
             ...this.spaces.get(spaceID)!,
             refs,
         });
         await this.storage.saveSpace(this.spaces.get(spaceID) as ISpace);
+        const subscribers = this.spaceSubscriptions.get(spaceID);
+        if (subscribers)
+            subscribers.forEach(cb => cb());
     }
 }
 

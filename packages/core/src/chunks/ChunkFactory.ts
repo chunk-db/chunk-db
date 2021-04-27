@@ -1,9 +1,9 @@
+import { UUID } from '../common.types';
 import { IRecord } from '../record.types';
 
 import { AbstractChunk, ChunkType } from './AbstractChunk';
 import { IncrementalChunk } from './IncrementalChunk';
 import { SnapshotChunk } from './SnapshotChunk';
-import { UUID } from '../common.types';
 
 export interface IGenericChunk<T extends IRecord = IRecord> {
     id?: UUID;

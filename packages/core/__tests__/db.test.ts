@@ -1,11 +1,11 @@
 import { ChunkDB } from '../src/ChunkDB';
+import { delay } from '../src/common';
+import { SpaceID, UUID } from '../src/common.types';
 import { Cursor } from '../src/cursor';
+import { InMemoryChunkStorage } from '../src/in-memory-chunk-storage';
 import { Space } from '../src/space';
 
 import { allDemoChunks, IDemoRecord } from './chunks.demo';
-import { SpaceID, UUID } from '../src/common.types';
-import { InMemoryChunkStorage } from '../src/in-memory-chunk-storage';
-import { delay } from '../src/common';
 
 describe('ChunkDB e2e tests', () => {
     let storage: InMemoryChunkStorage;
@@ -144,7 +144,7 @@ describe('ChunkDB e2e tests', () => {
         describe('add records', () => {
             it('read and write one record (sync)', async () => {
                 // arrange
-                console.log(space.refs);
+                const refBefore = space.refs['records'];
                 let id: UUID = '';
 
                 // act
@@ -166,10 +166,10 @@ describe('ChunkDB e2e tests', () => {
 
                 const records = await db.collection('records').space(space.id).findAll({ user: 3 });
                 const newSpace = db.spaces.get(space.id)!;
-                console.log(space.refs);
-                console.log(newSpace.refs);
                 expect(space.refs).not.toBe(newSpace.refs);
                 expect(space.refs).not.toEqual(newSpace.refs);
+                expect(newSpace.refs['records']).not.toBe(refBefore);
+                expect(db.storage.getExists(newSpace.refs['records'])).toBeTruthy();
 
                 // assert
                 expect(records.length).toBe(1);

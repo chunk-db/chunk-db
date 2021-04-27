@@ -11,7 +11,7 @@ export class TemporaryTransactionChunk<T extends IRecord = IRecord> extends Abst
         super({
             id,
             type: ChunkType.TemporaryTransaction,
-            parents: [parent],
+            parents: parent ? [parent] : [],
             records: arrayToObject(records as any[]),
         });
     }

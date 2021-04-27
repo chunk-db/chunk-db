@@ -48,7 +48,6 @@ export class Accessor<RECORDS extends ICollectionTypes> {
 
     async insert<NAME extends keyof RECORDS, T extends RECORDS[NAME]>(collection: NAME, record: Optional<T, '_id'>): Promise<T> {
         this.writeIntoCollection(collection);
-        console.log(`insert into ${collection}`);
         if (!record._id)
             record = {
                 ...record,
@@ -57,12 +56,14 @@ export class Accessor<RECORDS extends ICollectionTypes> {
         this.chunks[collection]!.records.set(record._id!, record as T);
         this.stats.inserted.push(record._id!);
         this.stats.upserted.push(record._id!);
+
+        this.db.storage.saveChunk(this.chunks[collection]!);
+
         return record as T;
     }
 
     async upsert<NAME extends keyof RECORDS, T extends RECORDS[NAME]>(collection: NAME, record: T): Promise<T> {
         this.writeIntoCollection(collection);
-        console.log(`insert into ${collection}`);
         if (!this.chunks[collection]!.records.has(record._id))
             this.stats.upserted.push(record._id);
         this.chunks[collection]!.records.set(record._id, record);
@@ -81,6 +82,5 @@ export class Accessor<RECORDS extends ICollectionTypes> {
 
         this.updatedRefs[collection] = chunkID;
         this.chunks[collection] = chunk;
-        console.log(this.updatedRefs);
     }
 }

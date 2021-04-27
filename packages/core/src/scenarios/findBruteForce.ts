@@ -1,12 +1,14 @@
-import { ChunkID, UUID } from '../common.types';
+import 'regenerator-runtime/runtime';
+import { buildQuery, ConditionValidator, IQuery } from '../ConditionValidator';
 import { AbstractChunk, ChunkType } from '../chunks/AbstractChunk';
 import { mapToArray } from '../chunks/utils';
+import { ChunkID, UUID } from '../common.types';
 import { IRecord } from '../record.types';
 import { NotFoundChunkError } from '../storage.types';
-import { buildQuery, ConditionValidator, IQuery } from '../ConditionValidator';
-import { getChunk } from './utils';
-import { call } from './scenario.types';
+
 import { FindScenario } from './find.types';
+import { call } from './scenario.types';
+import { getChunk } from './utils';
 
 export function* findBruteForce<T extends IRecord = IRecord>(headChunkID: ChunkID, query: IQuery = {}): FindScenario<T> {
     const map = new Map<UUID, IRecord>();
@@ -36,7 +38,7 @@ export function* findBruteForce<T extends IRecord = IRecord>(headChunkID: ChunkI
                 chunkID = chunk.parents[0];
                 break;
             default:
-                throw new Error(`Unsupported chunk type "${chunk.type}`);
+                throw new Error(`Unsupported chunk type "${chunk.type}"`);
         }
     }
 }

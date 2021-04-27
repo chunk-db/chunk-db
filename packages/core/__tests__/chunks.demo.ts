@@ -1,7 +1,7 @@
-import { IGenericChunk } from '../src/chunks/ChunkFactory';
 import { ChunkType } from '../src/chunks/AbstractChunk';
-import { IRecord } from '../src/record.types';
+import { IGenericChunk } from '../src/chunks/ChunkFactory';
 import { InMemoryChunkStorage } from '../src/in-memory-chunk-storage';
+import { IRecord } from '../src/record.types';
 
 export interface IDemoRecord extends IRecord {
     user: number;
