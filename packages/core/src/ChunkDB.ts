@@ -5,7 +5,7 @@ import {
     CollectionConfig,
     IChunkDBConfig,
     ICollectionTypes, ITransactionConfig, SpaceID,
-    Transaction, UUID,
+    Transaction,
 } from './common.types';
 import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';

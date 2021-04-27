@@ -1,9 +1,9 @@
-import { IStorageDriver } from './storage.types';
 import { AbstractChunk } from './chunks/AbstractChunk';
 import { chunkFactory } from './chunks/ChunkFactory';
-import { ChunkID, SpaceID, UUID } from './common.types';
-import { ISpace, Refs, Space } from './space';
+import { ChunkID, SpaceID } from './common.types';
 import { DBError } from './errors';
+import { ISpace } from './space';
+import { IStorageDriver } from './storage.types';
 
 export class ChunkStorage {
     private chunks = new Map<ChunkID, AbstractChunk>();

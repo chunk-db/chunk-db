@@ -10,9 +10,9 @@ import { ChunkID } from './common.types';
  */
 export class QuerySelector<T extends IRecord = IRecord> {
     private scenario: FindScenario<T>;
-    #done = false;
+    private _done = false;
     public get done() {
-        return this.#done;
+        return this._done;
     }
 
     constructor(private readonly db: ChunkDB<any>,
@@ -23,7 +23,7 @@ export class QuerySelector<T extends IRecord = IRecord> {
 
     async next(): Promise<IFindResult<T>> {
         const { done, value } = await this.scenario.next();
-        this.#done = !!done;
+        this._done = !!done;
         return value;
     }
 }
