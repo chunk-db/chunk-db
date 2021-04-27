@@ -3,10 +3,11 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "rootDir": "./src",
-    "outDir": "build"
+    "outDir": "dist"
   },
   "exclude": [
     "__tests__",
+    "build",
     "**/*.test.ts"
   ]
 }
