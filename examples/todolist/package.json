@@ -1,11 +1,14 @@
 {
-  "name": "todolist",
+  "name": "@chunk-db/todolist-example",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "predocs": "next build",
+    "docs": "next export",
+    "docs:export": "cp -r out/* ../../_docs"
   },
   "dependencies": {
     "@chunk-db/core": "^0.0.0",

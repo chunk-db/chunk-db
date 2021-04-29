@@ -1,7 +1,7 @@
+import { SnapshotChunk } from './SnapshotChunk';
 
-describe("SnapshotChunk", () => {
-    test("base", () => {
-        // const data = SnapshotChunk.isChunk({});
-        // expect(data).toBeFalsy();
+describe('SnapshotChunk', () => {
+    test('base', () => {
+        expect(true).toBeFalsy();
     });
 });

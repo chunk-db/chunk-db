@@ -1,6 +1,5 @@
 import React from 'react';
-import { TodoApp } from './_components/TodoApp';
-import { DevToolsUI } from './_devTools';
+import { DevToolsUI, TodoApp } from '../../src/todolist';
 
 const App = () => {
     return (

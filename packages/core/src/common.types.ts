@@ -16,7 +16,7 @@ export interface ICollectionTypes {
     [key: string]: IRecord;
 }
 
-export interface IChunkDBConfig<T extends { [key: string]: IRecord }> {
+export interface IChunkDBConfig<T extends ICollectionTypes> {
     storage: IStorageDriver;
     collections: { [key in keyof T]: ICollectionConfig<T[key]> };
     cache?: IStorageCacheDriver | null;

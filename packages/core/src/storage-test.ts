@@ -2,7 +2,6 @@ import { IGenericChunk } from './chunks/ChunkFactory';
 import { ChunkID, SpaceID } from './common.types';
 import { ISpace, Refs } from './space';
 import { IStorageCacheDriver } from './storage.types';
-import { delay } from './common';
 
 // export enum ActionType {
 //     loadChunk = 'loadChunk',
@@ -143,7 +142,7 @@ export class StorageTestDriver implements IStorageCacheDriver {
     }
 }
 
-function doAndWait(fn: () => void, message: string, timeout = 1) {
+function doAndWait(fn: (...args: any[]) => void, message: string, timeout = 1) {
     return async () => new Promise<void>(resolve => {
         fn();
         console.log('doAndWait: ' + message);

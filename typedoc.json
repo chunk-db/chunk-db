@@ -1,4 +1,24 @@
 {
-  "mode": "file",
-  "out": "docs"
+  "entryPoints": [
+    "packages/core/src"
+  ],
+  "excludeExternals": true,
+  "externalPattern": [
+    "node_modules",
+    "node_modules/**",
+    "**/node_modules/**",
+    "**/node_modules",
+    "examples/**"
+  ],
+  "exclude": [
+    "node_modules",
+    "node_modules/**",
+    "**/node_modules/**",
+    "**/node_modules",
+    "**/examples/**",
+    "**/*+(index|.spec|.e2e).ts"
+  ],
+  "out": "docs",
+  "excludeNotDocumented": true,
+  "listInvalidSymbolLinks": true
 }

@@ -16,7 +16,7 @@ const space = new Space<{ todos: IDemoRecord }>({
 
 storage.createSpace(space);
 
-export const db = new ChunkDB<IDBScheme>({
+export const db = new ChunkDB<any>({ // TODO
     storage,
     collections: {
         todos: {},

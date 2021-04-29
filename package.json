@@ -1,19 +1,34 @@
 {
   "name": "chunk-db",
   "private": true,
+  "repository": {
+    "url": "https://github.com/chunk-db/chunk-db.git"
+  },
+  "author": {
+    "name": "Arswarog",
+    "email": "arswarog@yandex.ru"
+  },
+  "homepage": "https://chunk-db.github.io",
   "scripts": {
     "dev": "lerna run dev",
     "build": "lerna run build",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/",
     "test": "jest",
     "test:watch": "jest --watch",
-    "docs": "typedoc"
+    "docs": "npm run docs:clean && npm run docs:generate && npm run docs:export && npm run docs:publish",
+    "docs:clean": "rimraf _docs",
+    "docs:generate": "lerna run docs",
+    "predocs:export": "mkdir _docs",
+    "docs:export": "lerna run docs:export",
+    "predocs:publish": "touch _docs/.nojekyll && touch _docs/_next/.nojekyll",
+    "docs:publish": "gh-pages -d _docs -r git@github.com:chunk-db/chunk-db.github.io.git -b master --dotfiles",
+    "install": "lerna bootstrap"
   },
   "devDependencies": {
     "@babel/core": "^7.12.0",
     "@babel/preset-env": "^7.12.0",
     "@babel/preset-typescript": "^7.12.0",
-    "@types/jest": "^26.0.14",
+    "@types/jest": "^26.0.23",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.14.2",
     "babel-jest": "^26.6.0",
@@ -22,13 +37,14 @@
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-prettier": "^3.1.4",
+    "gh-pages": "^3.1.0",
     "jest": "^26.6.3",
     "lerna": "^3.20.2",
     "prettier": "^2.1.2",
     "prettier-eslint": "^11.0.0",
     "react-scripts": "4.0.2",
     "ts-jest": "^26.4.1",
-    "typedoc": "^0.19.2",
+    "typedoc": "0.20.9",
     "typescript": "^4.0.3"
   },
   "dependencies": {
