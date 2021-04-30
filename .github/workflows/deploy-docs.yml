@@ -1,0 +1,66 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run.
+on:
+    # Triggers the workflow on push or pull request events but only for the main branch
+    push:
+        branches: [ master, docs, "github-actions" ]
+
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+    # This workflow contains a single job called "build"
+    main:
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
+
+        # Steps represent a sequence of tasks that will be executed as part of the job
+        steps:
+            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Setup node
+                uses: actions/setup-node@v2
+                with:
+                    node-version: '14'
+
+            -   name: Cache node modules
+                uses: actions/cache@v2
+                env:
+                    cache-name: cache-node-modules
+                with:
+                    path: |
+                        node_modules
+                        */*/node_modules
+                    key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+            -   name: Install
+                run: yarn install
+
+            -   name: Lint
+                run: yarn run lint
+
+            -   name: Check
+                run: yarn run prettier:check
+
+            -   name: Build packages
+                run: yarn run build:packages
+
+            -   name: Build examples
+                run: yarn run build:examples
+
+            -   name: Generate docs
+                run: yarn run docs
+
+            -   name: Deploy
+                uses: peaceiris/actions-gh-pages@v3
+                with:
+                    personal_token: ${{ secrets.ACCESS_TOKEN }}
+                    publish_dir: ./_docs
+                    publish_branch: master
+                    external_repository: chunk-db/chunk-db.github.io

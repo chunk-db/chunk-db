@@ -13,7 +13,8 @@
     "src"
   ],
   "scripts": {
-    "build": "microbundle",
+    "build": "yarn run build:package",
+    "build:package": "microbundle",
     "dev": "microbundle --no-compress watch",
     "test": "jest -c ../../jest.config.js",
     "docs": "npm run docs:clean && npm run docs:generate",

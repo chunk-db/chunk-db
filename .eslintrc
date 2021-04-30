@@ -32,16 +32,6 @@
     "WebAssembly": true
   },
   "rules": {
-    "@typescript-eslint/explicit-module-boundary-types": "off",
-    "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-inferrable-types": "off",
-    "eslint-comments/disable-enable-pair": [
-      "warn",
-      {
-        "allowWholeFile": true
-      }
-    ],
-    "eslint-comments/no-unused-disable": "error",
     "import/order": [
       "warn",
       {
@@ -57,6 +47,22 @@
         "ignoreDeclarationSort": true,
         "ignoreCase": true
       }
-    ]
+    ],
+    "eslint-comments/disable-enable-pair": [
+      "warn",
+      {
+        "allowWholeFile": true
+      }
+    ],
+    "eslint-comments/no-unused-disable": "error",
+    "@typescript-eslint/ban-ts-comment": [
+      "warn",
+      {
+        "ts-ignore": "allow-with-description"
+      }
+    ],
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-inferrable-types": "off"
   }
 }

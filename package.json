@@ -9,12 +9,18 @@
     "email": "arswarog@yandex.ru"
   },
   "homepage": "https://chunk-db.github.io",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
   "scripts": {
     "dev": "lerna run --parallel dev",
-    "build": "lerna run build",
+    "build": "yarn run build",
+    "build:packages": "lerna run build:package",
+    "build:examples": "lerna run build:example",
     "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",
     "prettier": "prettier --write './**/*.{js,jsx,ts,tsx}'",
-    "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/",
+    "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/*/src examples/*/src examples/*/pages",
     "test": "jest",
     "test:watch": "jest --watch",
     "docs": "npm run docs:clean && npm run docs:generate && npm run docs:export",
@@ -31,6 +37,7 @@
     "@babel/preset-env": "^7.12.0",
     "@babel/preset-typescript": "^7.12.0",
     "@types/jest": "^26.0.23",
+    "@types/styled-jsx": "^2.2.8",
     "@typescript-eslint/eslint-plugin": "^4.4.1",
     "@typescript-eslint/parser": "^4.14.2",
     "babel-jest": "^26.6.0",
@@ -42,14 +49,12 @@
     "gh-pages": "^3.1.0",
     "jest": "^26.6.3",
     "lerna": "^3.20.2",
+    "postcss": "^8.3.2",
     "prettier": "2.3.1",
     "prettier-eslint": "^11.0.0",
     "react-scripts": "4.0.2",
     "ts-jest": "^26.4.1",
-    "typedoc": "0.20.9",
-    "typescript": "^4.0.3"
-  },
-  "dependencies": {
-    "utility-types": "^3.10.0"
+    "typedoc": "^0.20.36",
+    "typescript": "<4.2.0"
   }
 }
