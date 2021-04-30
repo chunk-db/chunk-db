@@ -10,6 +10,8 @@
   "ignorePatterns": [
     "node_modules",
     "build",
+    "dist",
+    "_docs",
     "coverage"
   ],
   "plugins": [
@@ -31,15 +33,16 @@
   },
   "rules": {
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
     "eslint-comments/disable-enable-pair": [
-      "error",
+      "warn",
       {
         "allowWholeFile": true
       }
     ],
     "eslint-comments/no-unused-disable": "error",
     "import/order": [
-      "error",
+      "warn",
       {
         "newlines-between": "always",
         "alphabetize": {
@@ -48,7 +51,7 @@
       }
     ],
     "sort-imports": [
-      "error",
+      "warn",
       {
         "ignoreDeclarationSort": true,
         "ignoreCase": true

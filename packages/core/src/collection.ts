@@ -1,9 +1,9 @@
-import { IRecord } from './record.types';
 import { ChunkDB } from './ChunkDB';
 import {
     CollectionConfig,
     ICollectionTypes, SpaceID,
 } from './common.types';
+import { IRecord } from './record.types';
 import { SpaceReader } from './space-reader';
 
 /**

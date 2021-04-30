@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ITodo } from '../_store/store.types';
+import { ITodo } from '../store/store.types';
 
 export const useTodoState = (initialValue) => {
     const [todos, setTodos] = useState<ITodo[]>(initialValue);

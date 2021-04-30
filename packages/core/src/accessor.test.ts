@@ -1,9 +1,10 @@
-import { ChunkDB } from './ChunkDB';
 import { IDemoRecord } from '../__tests__/chunks.demo';
-import { ISpace, Space } from './space';
-import { SpaceID } from './common.types';
-import { StorageTestDriver } from './storage-test';
+
+import { ChunkDB } from './ChunkDB';
 import { IGenericChunk } from './chunks/ChunkFactory';
+import { SpaceID } from './common.types';
+import { ISpace, Space } from './space';
+import { StorageTestDriver } from './storage-test';
 
 describe('accessor', () => {
     jest.setTimeout(1000);

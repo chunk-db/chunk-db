@@ -1,6 +1,7 @@
-import { IRecord } from '../record.types';
-import { AbstractChunk, ChunkType } from './AbstractChunk';
 import { ChunkID, UUID } from '../common.types';
+import { IRecord } from '../record.types';
+
+import { AbstractChunk, ChunkType } from './AbstractChunk';
 import { arrayToObject } from './utils';
 
 export class TemporaryTransactionChunk<T extends IRecord = IRecord> extends AbstractChunk<T> {

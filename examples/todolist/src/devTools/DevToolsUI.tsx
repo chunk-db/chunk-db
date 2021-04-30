@@ -1,12 +1,14 @@
-import { SpaceID } from '@chunk-db/core';
+import { ChunkDB, SpaceID } from '@chunk-db/core';
 import { AbstractChunk } from '@chunk-db/core/dist/chunks';
 import React, { useEffect, useState } from 'react';
 
-import { db } from '../_store/store';
+interface IProps {
+    db: ChunkDB<any>
+}
 
 const spaceID = 'space' as SpaceID;
 
-export const DevToolsUI = () => {
+export const DevToolsUI = ({db}: IProps) => {
     const [index, setIndex] = useState(0);
     const [chain, setChain] = useState<AbstractChunk[]>([]);
 

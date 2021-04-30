@@ -1,5 +1,5 @@
-import { IRecord } from '../record.types';
 import { UUID } from '../common.types';
+import { IRecord } from '../record.types';
 
 export function objectToMap<T extends IRecord = IRecord>(data: { [key: string]: T }): ReadonlyMap<UUID, T> {
     return new Map(Object.keys(data).map(key => [key, data[key]] as [string, T]));

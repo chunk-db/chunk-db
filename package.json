@@ -15,7 +15,7 @@
     "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/",
     "test": "jest",
     "test:watch": "jest --watch",
-    "docs": "npm run docs:clean && npm run docs:generate && npm run docs:export && npm run docs:publish",
+    "docs": "npm run docs:clean && npm run docs:generate && npm run docs:export",
     "docs:clean": "rimraf _docs",
     "docs:generate": "lerna run docs",
     "predocs:export": "mkdir _docs",

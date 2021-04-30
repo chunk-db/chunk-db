@@ -1,5 +1,5 @@
-import { UpdateEvent } from './events';
 import { UUID } from './common.types';
+import { UpdateEvent } from './events';
 
 export class DBError extends Error {}
 

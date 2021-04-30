@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { DevToolsUI, TodoApp } from '../../src/todolist';
+import { db } from '../../src/todolist/store/store';
 
 const App = () => {
     return (
@@ -8,7 +10,7 @@ const App = () => {
                 <TodoApp />
             </div>
             <div className="devtools-container">
-                <DevToolsUI />
+                <DevToolsUI db={db}/>
             </div>
             <style jsx>{`
                 .app {
