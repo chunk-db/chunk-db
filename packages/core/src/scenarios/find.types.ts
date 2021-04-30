@@ -1,5 +1,5 @@
-import { IRecord } from '../record.types';
 import { ChunkID } from '../common.types';
+import { IRecord } from '../record.types';
 
 export interface IFindResult<T extends IRecord = IRecord> {
     chunkID: ChunkID;

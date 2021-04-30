@@ -1,5 +1,5 @@
-import { IRecord } from './record.types';
 import { QuerySelector } from './query-selector';
+import { IRecord } from './record.types';
 
 /**
  * Предоставляет возможность получения данных по конкретному запросу

@@ -1,6 +1,6 @@
+import { delay } from './common';
 import { SpaceID } from './common.types';
 import { StorageTestDriver } from './storage-test';
-import { delay } from './common';
 
 describe('StorageTestDriver', () => {
     describe('checking', () => {

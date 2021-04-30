@@ -1,7 +1,7 @@
 import { ChunkType } from "./AbstractChunk";
 import { chunkFactory } from "./ChunkFactory";
-import { SnapshotChunk } from "./SnapshotChunk";
 import { IncrementalChunk } from "./IncrementalChunk";
+import { SnapshotChunk } from "./SnapshotChunk";
 
 describe("chunk factory", () => {
     it("snapshot chunk", () => {

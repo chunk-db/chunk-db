@@ -1,8 +1,9 @@
-import { ScenarioContext } from './scenario.types';
-import { ChunkID, UUID } from '../common.types';
 import { AbstractChunk } from '../chunks/AbstractChunk';
-import { NotFoundChunkError } from '../storage.types';
+import { ChunkID, UUID } from '../common.types';
 import { Refs, Space } from '../space';
+import { NotFoundChunkError } from '../storage.types';
+
+import { ScenarioContext } from './scenario.types';
 
 export async function getChunk(this: ScenarioContext<any>, chunkID: ChunkID): Promise<AbstractChunk> {
     const chunk = await this.storage.loadChunk(chunkID);
@@ -16,5 +17,8 @@ export async function updateSpaceRefs(this: ScenarioContext<any>, spaceID: UUID,
 }
 
 export async function getSpace(this: ScenarioContext<any>, spaceID: UUID): Promise<Space> {
-    return this.spaces.get(spaceID)!;
+    const space = this.spaces.get(spaceID);
+    if (space)
+        return space;
+    throw new Error(`Space "${spaceID}" not defined`);
 }

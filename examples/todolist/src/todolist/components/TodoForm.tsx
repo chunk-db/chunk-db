@@ -1,7 +1,7 @@
 import TextField from '@material-ui/core/TextField';
 import React from 'react';
 
-import { useInputState } from '../_hooks/useInputState';
+import { useInputState } from '../hooks/useInputState';
 
 interface IProps {
     saveTodo: (value: string) => void;

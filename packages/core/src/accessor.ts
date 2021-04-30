@@ -2,11 +2,11 @@ import { Optional } from 'utility-types';
 import { v4 } from 'uuid';
 
 import { ChunkDB } from './ChunkDB';
+import { TemporaryTransactionChunk } from './chunks/TemporaryTransactionChunk';
 import { ICollectionTypes, UUID } from './common.types';
+import { UpdateEvent } from './events';
 import { Refs, Space } from './space';
 import { SpaceReader } from './space-reader';
-import { TemporaryTransactionChunk } from './chunks/TemporaryTransactionChunk';
-import { UpdateEvent } from './events';
 
 export class Accessor<RECORDS extends ICollectionTypes> {
     public updatedRefs: { [NAME in keyof RECORDS]?: UUID; } = {};

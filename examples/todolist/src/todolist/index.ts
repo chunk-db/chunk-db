@@ -1,2 +1,2 @@
-export * from './_devTools';
-export * from './_components/TodoApp';
+export * from '../devTools';
+export * from './components/TodoApp';

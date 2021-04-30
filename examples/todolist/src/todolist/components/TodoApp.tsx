@@ -3,8 +3,8 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import React, { useCallback } from 'react';
 
-import { useTodoState } from '../_hooks/useTodoState';
-import { db } from '../_store/store';
+import { useTodoState } from '../hooks/useTodoState';
+import { db } from '../store/store';
 
 import { TodoForm } from './TodoForm';
 import { TodoList } from './TodoList';

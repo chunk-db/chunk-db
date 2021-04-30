@@ -1,7 +1,9 @@
-import { ChunkDB } from '../ChunkDB';
 import { demoStorage, IDemoRecord } from '../../__tests__/chunks.demo';
-import { findBruteForce } from './findBruteForce';
+import { ChunkDB } from '../ChunkDB';
 import { IQuery } from '../ConditionValidator';
+
+import { findBruteForce } from './findBruteForce';
+
 
 describe('findBruteForce', () => {
     let db: ChunkDB<{ records: IDemoRecord }>;

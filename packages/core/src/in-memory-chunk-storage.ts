@@ -1,4 +1,4 @@
-import { IGenericChunk } from './chunks/ChunkFactory';
+import { IGenericChunk } from './chunks';
 import { ChunkID, SpaceID } from './common.types';
 import { DBError } from './errors';
 import { ISpace, Refs } from './space';
