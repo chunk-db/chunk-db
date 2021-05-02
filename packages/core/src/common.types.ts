@@ -7,7 +7,7 @@ import { IStorageCacheDriver, IStorageDriver } from './storage.types';
 export type ID = string;
 export type UUID = string;
 export type ChunkID = string;
-export type SpaceID = Brand<string, 'SpaceID'>;
+export type SpaceID = string;
 export type Primitive = string | number | boolean;
 
 export type CollectionType<T> = T extends ICollectionConfig<infer R> ? R : never;
@@ -74,4 +74,19 @@ export type Transaction<RECORDS extends ICollectionTypes> = (accessor: Accessor<
 
 export interface ITransactionConfig {
     restartOnFail: boolean; // TODO not working
+}
+
+/**
+ * Object for control subscription
+ */
+export interface Subscription {
+    /**
+     * Unsubscribe this subscription
+     */
+    (): void;
+
+    /**
+     * Unsubscribe this subscription
+     */
+    unsubscribe(): void;
 }

@@ -42,7 +42,7 @@ describe('ChunkDB e2e tests', () => {
     });
 
     describe('fetch data', () => {
-        describe('find', () => {
+        describe('find (by collection)', () => {
             describe('all', () => {
                 test('all', async () => {
                     // arrange
@@ -73,6 +73,78 @@ describe('ChunkDB e2e tests', () => {
                     const result = await db
                         .collection('records')
                         .space('test-space' as SpaceID)
+                        .find({ user: 2 })
+                        .exec()
+                        .one();
+
+                    // assert
+                    expect(result).toEqual(
+                        { _id: 'd', user: 2, value: 'd0' },
+                    );
+                });
+                test('query on another head', async () => {
+                    // arrange
+
+                    // act
+                    const result = await db
+                        .collection('records')
+                        .space('base-space' as SpaceID)
+                        .find({ user: 1 })
+                        .exec()
+                        .one();
+
+                    // assert
+                    expect(result).toEqual(
+                        { _id: 'a', user: 1, value: 'a0' },
+                    );
+                });
+                test('no results', async () => {
+                    // arrange
+
+                    // act
+                    const result = await db
+                        .collection('records')
+                        .space('test-space' as SpaceID)
+                        .find({ user: 10 })
+                        .exec()
+                        .all();
+
+                    // assert
+                    expect(result).toEqual([]);
+                });
+            });
+        });
+        describe('find (by space)', () => {
+            describe('all', () => {
+                test('all', async () => {
+                    // arrange
+
+                    // act
+                    const cursor = db
+                        .space('test-space' as SpaceID)
+                        .collection('records')
+                        .find({})
+                        .exec();
+
+                    // assert
+                    expect(cursor).toBeInstanceOf(Cursor);
+
+                    const result = await cursor.all();
+
+                    expect(result).toEqual([
+                        { _id: 'a', user: 1, value: 'a1' },
+                        { _id: 'd', user: 2, value: 'd0' },
+                    ]);
+                });
+            });
+            describe('one', () => {
+                test('one', async () => {
+                    // arrange
+
+                    // act
+                    const result = await db
+                        .space('test-space' as SpaceID)
+                        .collection('records')
                         .find({ user: 2 })
                         .exec()
                         .one();
