@@ -5,7 +5,7 @@ import { Collection } from './collection';
 import {
     CollectionConfig,
     IChunkDBConfig,
-    ICollectionTypes, ITransactionConfig, SpaceID,
+    ICollectionTypes, ITransactionConfig, SpaceID, Subscription,
     Transaction, UUID,
 } from './common.types';
 import { SpaceNotFoundError } from './errors';
@@ -17,6 +17,8 @@ import {
 } from './scenarios/scenario.types';
 import { ISpace, Refs, Space } from './space';
 import { IStorageDriver } from './storage.types';
+import { makeSubscription } from './common';
+import { DataSpace } from './data-space';
 
 export class ChunkDB<RECORDS extends ICollectionTypes> {
     public storage: ChunkStorage;
@@ -64,15 +66,27 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
                              .then(() => {this.ready = true;});
     }
 
-    public subscribe(cb: () => void): () => void;
-    public subscribe(spaceID: SpaceID, cb: () => void): () => void;
-    public subscribe(spaceID: SpaceID | (() => void), cb?: () => void): () => void {
+    /**
+     * Subscribe for any changes
+     *
+     * @deprecated
+     * @param cb Callback
+     */
+    public subscribe(cb: () => void): Subscription;
+    /**
+     * Subscribe for any changes on space
+     *
+     * @deprecated
+     * @param cb Callback
+     */
+    public subscribe(spaceID: SpaceID, cb: () => void): Subscription;
+    public subscribe(spaceID: SpaceID | (() => void), cb?: () => void): Subscription {
         if (typeof spaceID === 'function') {
             this.storeSubscriptions.push(spaceID);
 
-            return () => this.storeSubscriptions = this.storeSubscriptions.filter(
+            return makeSubscription(() => this.storeSubscriptions = this.storeSubscriptions.filter(
                 item => item !== spaceID,
-            );
+            ));
         }
 
         const list: Array<() => void> = this.spaceSubscriptions.get(spaceID) || [];
@@ -80,7 +94,25 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
         list.push(cb!);
 
         this.spaceSubscriptions.set(spaceID, list);
-        return () => this.spaceSubscriptions.set(spaceID, list.filter(item => item !== cb));
+        return makeSubscription(() => this.spaceSubscriptions.set(spaceID, list.filter(item => item !== cb)));
+    }
+
+    /**
+     * Get [[DataSpace]]
+     * @param spaceId
+     */
+    public space(spaceId: string | ISpace): DataSpace<RECORDS> {
+        if (!spaceId)
+            throw new Error(`Invalid space ""`);
+        if (typeof spaceId === 'object')
+            spaceId = spaceId.id;
+
+        const space = this.spaces.get(spaceId);
+
+        if (!space)
+            throw new Error(`Invalid space "${spaceId}"`);
+
+        return new DataSpace<RECORDS>(this, space);
     }
 
     public collection<NAME extends keyof RECORDS>(name: NAME): Collection<RECORDS, NAME, RECORDS[NAME]> {
