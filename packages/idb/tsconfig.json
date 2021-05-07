@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "rootDir": "./src",
+    "outDir": "dist",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  "exclude": [
+    "__tests__",
+    "build",
+    "**/*.test.ts"
+  ],
+  "include": [
+    "src"
+  ]
+}

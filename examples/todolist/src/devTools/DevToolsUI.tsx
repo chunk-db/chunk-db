@@ -14,10 +14,12 @@ export const DevToolsUI = ({db}: IProps) => {
 
     const update = () => setIndex(index + 1);
 
-    const space = db.spaces.get(spaceID);
+    const space = db.spaces.getLoaded(spaceID);
     console.log(space);
 
     useEffect(() => {
+        if (!space)
+            return;
         db.getFlatChain(space.refs['todos'], Infinity).then(list => setChain(list));
     }, [space, index]);
 
@@ -31,12 +33,12 @@ export const DevToolsUI = ({db}: IProps) => {
     return (
         <div>
             <h2>Dev tools</h2>
-            <p>space id: {space.id}</p>
-            <p>ref (todos): {space.refs.todos}</p>
+            <p>space id: {space?.id}</p>
+            <p>ref (todos): {space?.refs.todos}</p>
             <p>chunks in storage: {chunksCount}</p>
             <ol>
                 {chain.map(chunk => (
-                    <li>{chunk.id} ({chunk.parents.join(', ')})</li>
+                    <li key={chunk.id}>{chunk.id} ({chunk.type})</li>
                 ))}
             </ol>
             <button onClick={update}>Update</button>

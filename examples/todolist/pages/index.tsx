@@ -38,7 +38,21 @@ export default function Home() {
                 <div className="grid">
                     <a href="core" className="card">
                         <h3>Core &rarr;</h3>
-                        <p>API for core package of DB</p>
+                        <p>
+                            API for core package of DB
+                        </p>
+                        <p>
+                            <code>@chunk-db/core</code>
+                        </p>
+                    </a>
+                    <a href="idb" className="card">
+                        <h3>IndexedDB &rarr;</h3>
+                        <p>
+                            IndexedDB storage adapter
+                        </p>
+                        <p>
+                            <code>@chunk-db/idb</code>
+                        </p>
                     </a>
                 </div>
             </main>
@@ -174,7 +188,7 @@ export default function Home() {
                 }
 
                 .card p {
-                    margin: 0;
+                    margin: 0.5em 0;
                     font-size: 1.25rem;
                     line-height: 1.5;
                 }

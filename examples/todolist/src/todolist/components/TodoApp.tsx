@@ -1,16 +1,17 @@
 import { SpaceID } from '@chunk-db/core';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useReducer } from 'react';
 
 import { useTodoState } from '../hooks/useTodoState';
-import { db } from '../store/store';
+import { useDB } from '../store/store';
 
 import { TodoForm } from './TodoForm';
 import { TodoList } from './TodoList';
 
 export const TodoApp = () => {
-    const { todos, addTodo, deleteTodo } = useTodoState([]);
+    const [_, redraw] = useReducer(state => state + 1, 0);
+    const { todos, addTodo, deleteTodo, setTodos } = useTodoState([]);
 
     const saveTodo = (todoText: string) => {
         const trimmedText = todoText.trim();
@@ -23,14 +24,36 @@ export const TodoApp = () => {
         }
     };
 
+    const db = useDB();
+    console.log('useDB:', db);
+
     const commitHandle = useCallback(() => {
-        db.transaction('space' as SpaceID, async tx => {
+        db.transaction('space', async tx => {
             for (const todo of todos)
                 await tx.insert('todos', todo);
         }).then(() => {
             console.log('tx complete');
         });
     }, [todos]);
+
+    const load = () => {
+        db.space('space')
+          .collection('todos')
+          .findAll({})
+          .then(
+              list => {
+                  console.log('loaded', list);
+                  setTodos(list);
+              },
+          );
+    };
+
+    useEffect(() => {
+        db.subscribe(() => {
+            console.log('update');
+            redraw();
+        });
+    }, [db, setTodos]);
 
     return (
         <div className="App">
@@ -48,6 +71,11 @@ export const TodoApp = () => {
                     onClick={commitHandle}
             >
                 Primary
+            </Button>
+            <Button variant="contained"
+                    onClick={load}
+            >
+                Update
             </Button>
         </div>
     );
