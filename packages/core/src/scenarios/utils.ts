@@ -17,7 +17,7 @@ export async function updateSpaceRefs(this: ScenarioContext<any>, spaceID: UUID,
 }
 
 export async function getSpace(this: ScenarioContext<any>, spaceID: UUID): Promise<Space> {
-    const space = this.spaces.get(spaceID);
+    const space = this.spaces.getLoaded(spaceID);
     if (space)
         return space;
     throw new Error(`Space "${spaceID}" not defined`);

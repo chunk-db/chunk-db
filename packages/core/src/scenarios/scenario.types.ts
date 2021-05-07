@@ -2,6 +2,7 @@ import { ChunkStorage } from '../ChunkStorage';
 import { Accessor } from '../accessor';
 import { ICollectionTypes, UUID } from '../common.types';
 import { Refs, Space } from '../space';
+import { Spaces } from '../spaces';
 
 export interface ScenarioAction {
     action: (...args: any[]) => any;
@@ -14,7 +15,7 @@ export interface ScenarioContext<RECORDS extends ICollectionTypes>  {
     storage: ChunkStorage;
     activeTransactions: Accessor<RECORDS>[];
     updateSpaceRefs(spaceID: UUID, refs: Refs<RECORDS>): void;
-    spaces: ReadonlyMap<UUID, Space>;
+    spaces: Spaces<RECORDS>;
 }
 
 const callSymbol = Symbol('Call');

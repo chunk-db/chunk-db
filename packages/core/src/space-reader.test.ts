@@ -27,7 +27,7 @@ describe('SpaceReader', () => {
             },
         });
 
-        db.spaces.set(space.id, space);
+        db.spaces.create(space);
     });
 
     it('findAll', async () => {

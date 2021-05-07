@@ -110,8 +110,10 @@ describe('ChunkDB', () => {
                     },
                 },
             });
-            db1.spaces.set(baseSpace.id, { ...baseSpace });
-            db1.spaces.set(space.id, { ...space });
+            db1.spaces.create(baseSpace);
+            await db1.spaces.save(baseSpace.id);
+            db1.spaces.create(space);
+            await db1.spaces.save(space.id);
 
             const record: IDemoRecord = {
                 _id: '123',
@@ -126,7 +128,7 @@ describe('ChunkDB', () => {
             });
 
             // assert
-            const updatedSpace = db1.spaces.get(space.id)!;
+            const updatedSpace = db1.spaces.getLoaded(space.id)!;
             expect(updatedSpace.refs['records']).not.toBe(space.refs['records']);
             const chunk = db1.storage.getExists(updatedSpace.refs['records']);
             expect(chunk).toBeTruthy();
@@ -144,13 +146,11 @@ describe('ChunkDB', () => {
                         },
                     },
                 },
-                spaces: [
-                    'test-space',
-                ],
             });
 
             // act 2: find record
-            await db2.ready$;
+            await db2.connect();
+            await db2.spaces.load('test-space');
             const foundRecord = await db2.collection('records')
                                          .space('test-space' as SpaceID)
                                          .findOne({ _id: '123' });
