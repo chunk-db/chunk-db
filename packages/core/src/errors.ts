@@ -7,7 +7,7 @@ export class InnerDBError extends Error {}
 
 export class SpaceNotFoundError extends DBError {
     constructor(spaceID: UUID) {
-        super(`Space not found "${spaceID}"`);
+        super(`Space "${spaceID}" not found`);
     }
 }
 

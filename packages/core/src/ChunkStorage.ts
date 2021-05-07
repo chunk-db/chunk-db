@@ -11,6 +11,14 @@ export class ChunkStorage {
 
     constructor(private readonly driver: IStorageDriver) {}
 
+    connect(): Promise<ChunkStorage> {
+        if (this.driver.connect) {
+            return this.driver.connect().then(() => this);
+        } else {
+            return Promise.resolve(this);
+        }
+    }
+
     getExists(id: ChunkID): AbstractChunk | null {
         return this.chunks.get(id) || null;
     }

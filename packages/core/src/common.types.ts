@@ -20,7 +20,6 @@ export interface IChunkDBConfig<T extends ICollectionTypes> {
     storage: IStorageDriver;
     collections: { [key in keyof T]: ICollectionConfig<T[key]> };
     cache?: IStorageCacheDriver | null;
-    spaces?: (SpaceID | string)[];
 }
 
 interface Type<T> {

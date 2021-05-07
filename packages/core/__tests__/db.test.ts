@@ -6,6 +6,7 @@ import { InMemoryChunkStorage } from '../src/in-memory-chunk-storage';
 import { Space } from '../src/space';
 
 import { allDemoChunks, IDemoRecord } from './chunks.demo';
+import { ChunkType } from '../src/chunks';
 
 describe('ChunkDB e2e tests', () => {
     let storage: InMemoryChunkStorage;
@@ -37,8 +38,10 @@ describe('ChunkDB e2e tests', () => {
                 },
             },
         });
-        db.spaces.set(baseSpace.id, { ...baseSpace });
-        db.spaces.set(space.id, { ...space });
+        db.spaces.create(baseSpace);
+        db.spaces.create(space);
+        await db.spaces.save(baseSpace.id);
+        await db.spaces.save(space.id);
     });
 
     describe('fetch data', () => {
@@ -237,7 +240,7 @@ describe('ChunkDB e2e tests', () => {
                 });
 
                 const records = await db.collection('records').space(space.id).findAll({ user: 3 });
-                const newSpace = db.spaces.get(space.id)!;
+                const newSpace = db.spaces.getLoaded(space.id)!;
                 expect(space.refs).not.toBe(newSpace.refs);
                 expect(space.refs).not.toEqual(newSpace.refs);
                 expect(newSpace.refs['records']).not.toBe(refBefore);
@@ -306,6 +309,26 @@ describe('ChunkDB e2e tests', () => {
             // isolation in parallels transactions
 
             // conflict in transactions
+        });
+    });
+    describe('chunks', () => {
+        test('first chunk must be Snapshot', async () => {
+            // act
+            const spaceId = db.spaces.create({ name: 'test' }).id;
+            await db.transaction(spaceId, async tx => {
+                await tx.insert('records', {
+                    _id: '123',
+                    value: '102',
+                    user: 101,
+                });
+            });
+
+            // assert
+            const space = db.spaces.getLoaded(spaceId)!;
+            console.log(space.refs);
+            const chunk = db.storage.getExists(space.refs.records);
+            console.log(chunk);
+            expect(chunk?.type).toEqual(ChunkType.Snapshot);
         });
     });
 });

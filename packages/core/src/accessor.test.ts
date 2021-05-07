@@ -38,8 +38,8 @@ describe('accessor', () => {
                 },
             },
         });
-        db.spaces.set(baseSpace.id, { ...baseSpace });
-        db.spaces.set(space.id, { ...space });
+        db.spaces.create(baseSpace);
+        db.spaces.create(space);
     });
     afterEach(() => {
         driver.verify();
@@ -98,7 +98,7 @@ describe('accessor', () => {
                     records: '',
                 },
             });
-            db.spaces.set(space.id, space);
+            db.spaces.create(space);
 
             // arrange
             const recordToSave: IDemoRecord = {

@@ -4,6 +4,8 @@ import { IRecord } from './record.types';
 import { ISpace } from './space';
 
 export interface IStorageDriver {
+    connect?(): Promise<void>;
+
     // chunks
     loadChunk(id: ChunkID): Promise<IGenericChunk | undefined>;
 

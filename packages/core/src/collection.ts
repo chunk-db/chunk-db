@@ -16,7 +16,7 @@ export class Collection<RECORDS extends ICollectionTypes, NAME extends keyof REC
     }
 
     public space(space: SpaceID): SpaceReader<T> {
-        const spaceInstance = this.db.spaces.get(space);
+        const spaceInstance = this.db.spaces.getLoaded(space);
         // console.log(this.db.spaces)
         if (!spaceInstance)
             throw new Error(`Invalid space "${space}"`);
