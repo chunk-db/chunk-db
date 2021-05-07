@@ -1,25 +1,53 @@
-import { ChunkDB, Space, SpaceID } from '@chunk-db/core';
-import { InMemoryChunkStorage } from '@chunk-db/core';
+import {
+    ChunkDB, ICollectionTypes,
+    InMemoryChunkStorage,
+    IStorageCacheDriver, IStorageDriver,
+    Space,
+    SpaceID,
+} from '@chunk-db/core';
 import { IDemoRecord } from '@chunk-db/core/__tests__/chunks.demo';
 
-import type { IDBScheme } from './store.types';
+import { IndexedDBDriver } from '@chunk-db/idb';
+import { useState } from 'react';
 
-export const storage = new InMemoryChunkStorage();
+const storage = process.browser
+    ? new IndexedDBDriver('chunk-db-todolist-example')
+    : new InMemoryChunkStorage();
 
-const space = new Space<{ todos: IDemoRecord }>({
-    id: 'space' as SpaceID,
+let space = new Space<{ todos: IDemoRecord }>({
+    id: 'space',
     name: 'a1',
     refs: {
-         todos: null,
+        todos: null,
     },
 });
-
-storage.createSpace(space);
 
 export const db = new ChunkDB<any>({ // TODO
     storage,
     collections: {
         todos: {},
     },
-    spaces: ['space'],
+    // spaces: ['space'],
 });
+
+let ready = false;
+const promise = db.connect().then((db: ChunkDB<any>) => {
+    console.log('connected');
+    db.spaces.load(space.id)
+      .catch(() => db.spaces.create(space))
+      .then(data => space = data)
+      .then(() => console.log('init spaces', db.spaces))
+      .then(() => ready = true);
+});
+
+export function useDB<T extends ICollectionTypes = any>(): ChunkDB<T> {
+    const [_, setReadyDB] = useState(false);
+
+    if (db && ready)
+        return db;
+
+    console.log('init db');
+    promise.then(() => setReadyDB(true));
+
+    return db;
+}

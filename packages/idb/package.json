@@ -1,0 +1,32 @@
+{
+  "name": "@chunk-db/idb",
+  "version": "0.0.0",
+  "description": "IndexedDB storage for ChunkDB",
+  "author": "Arswarog <arswarog@yandex.ru>",
+  "homepage": "",
+  "license": "MIT",
+  "source": "src/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/foo.module.js",
+  "unpkg": "dist/foo.umd.js",
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "build": "microbundle",
+    "dev": "microbundle watch",
+    "test": "jest -c ../../jest.config.js",
+    "docs": "npm run docs:clean && npm run docs:generate",
+    "docs:clean": "rimraf _docs",
+    "docs:generate": "typedoc",
+    "predocs:export": "mkdir -p ../../_docs/idb",
+    "docs:export": "cp -r _docs/* ../../_docs/idb"
+  },
+  "devDependencies": {
+    "@chunk-db/core": "^0.0.0",
+    "microbundle": "^0.12.4"
+  },
+  "peerDependencies": {
+    "@chunk-db/core": "^0.0.0"
+  }
+}

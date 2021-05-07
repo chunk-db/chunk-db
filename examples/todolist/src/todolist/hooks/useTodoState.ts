@@ -15,5 +15,6 @@ export const useTodoState = (initialValue) => {
 
             setTodos(newTodos);
         },
+        setTodos,
     };
 };
