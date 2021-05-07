@@ -4,6 +4,5 @@
     "examples/*"
   ],
   "hoist": true,
-  "version": "0.0.0",
-  "npmClient": "npm"
+  "version": "0.0.0"
 }
