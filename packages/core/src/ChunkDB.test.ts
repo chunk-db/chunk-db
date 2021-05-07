@@ -45,6 +45,7 @@ describe('ChunkDB', () => {
 
         test('should return call', async () => {
             function* testFunc() {
+                // @ts-ignore
                 const x = yield call(increment, 1);
                 yield x;
                 return call(increment, 2);
@@ -63,6 +64,7 @@ describe('ChunkDB', () => {
 
         test('should receive storage', async () => {
             function* testFunc() {
+                // @ts-ignore
                 const storage = yield call(getStorage);
                 yield storage;
                 return call(increment, 1);
