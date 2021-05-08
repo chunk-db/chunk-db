@@ -10,7 +10,7 @@
   },
   "homepage": "https://chunk-db.github.io",
   "scripts": {
-    "dev": "lerna run dev",
+    "dev": "lerna run --parallel dev",
     "build": "lerna run build",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/",
     "test": "jest",

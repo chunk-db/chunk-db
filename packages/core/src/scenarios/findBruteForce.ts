@@ -27,8 +27,7 @@ export function* findBruteForce<T extends IRecord = IRecord>(headChunkID: ChunkI
                 return {
                     chunkID,
                     records,
-                }; // TODO
-                break;
+                };
             case ChunkType.TemporaryTransaction:
             case ChunkType.Incremental:
                 yield {
