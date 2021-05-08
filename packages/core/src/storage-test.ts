@@ -3,27 +3,14 @@ import { ChunkID, SpaceID } from './common.types';
 import { ISpace, Refs } from './space';
 import { IStorageCacheDriver } from './storage.types';
 
-// export enum ActionType {
-//     loadChunk = 'loadChunk',
-//     saveChunk = 'saveChunk',
-//     markDraftChunkAsUnused = 'markDraftChunkAsUnused',
-//     loadSpace = 'loadSpace',
-//     createSpace = 'createSpace',
-//     updateSpace = 'updateSpace',
-//     removeChunk = 'removeChunk',
-//     clearChunks = 'clearChunks',
-//     getAllSpaces = 'getAllSpaces',
-//     clearSpaces = 'clearSpaces',
-// }
-
 export type ActionType = keyof IStorageCacheDriver;
 
 interface IAction {
     type: ActionType;
     id: ChunkID | SpaceID | string | undefined;
     value: IGenericChunk | ISpace | undefined;
-    resolve: (data: any) => Promise<void>;
-    reject: (error: any) => Promise<void>;
+    resolve: (data: any) => void;
+    reject: (error: any) => void;
 }
 
 export class StorageTestDriver implements IStorageCacheDriver {
@@ -91,8 +78,8 @@ export class StorageTestDriver implements IStorageCacheDriver {
                 type: 'loadChunk',
                 id,
                 value: undefined,
-                resolve: doAndWait(resolve, 'resolve loadChunk'),
-                reject: doAndWait(reject, 'reject loadChunk'),
+                resolve,
+                reject,
             });
         });
     }
@@ -103,8 +90,8 @@ export class StorageTestDriver implements IStorageCacheDriver {
                 type: 'loadSpace',
                 id,
                 value: undefined,
-                resolve: doAndWait(resolve, 'resolve loadSpace'),
-                reject: doAndWait(reject, 'reject loadSpace'),
+                resolve,
+                reject,
             });
         });
     }
@@ -123,29 +110,21 @@ export class StorageTestDriver implements IStorageCacheDriver {
                 type: 'saveChunk',
                 id: chunk.id,
                 value: chunk,
-                resolve: doAndWait(resolve, 'resolve saveChunk'),
-                reject: doAndWait(reject, 'reject saveChunk'),
+                resolve,
+                reject,
             });
         });
     }
 
     saveSpace(space: ISpace): Promise<ISpace> {
-        return new Promise((resolve, reject) => {
+        return new Promise<ISpace>((resolve, reject) => {
             this.actions.push({
                 type: 'saveSpace',
                 id: space.id,
                 value: space,
-                resolve: doAndWait(resolve, 'resolve saveSpace'),
-                reject: doAndWait(reject, 'reject saveSpace'),
+                resolve,
+                reject,
             });
         });
     }
-}
-
-function doAndWait(fn: (...args: any[]) => void, message: string, timeout = 1) {
-    return async () => new Promise<void>(resolve => {
-        fn();
-        console.log('doAndWait: ' + message);
-        setTimeout(resolve, timeout);
-    });
 }

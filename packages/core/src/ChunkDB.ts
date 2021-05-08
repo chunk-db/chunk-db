@@ -1,12 +1,16 @@
 import { ChunkStorage } from './ChunkStorage';
 import { Accessor } from './accessor';
-import { AbstractChunk } from './chunks';
+import { AbstractChunk, ChunkType } from './chunks';
 import { Collection } from './collection';
 import {
     CollectionConfig,
     IChunkDBConfig,
-    ICollectionTypes, ITransactionConfig, SpaceID, Subscription,
-    Transaction, UUID,
+    ICollectionTypes,
+    ITransactionConfig,
+    SpaceID,
+    Subscription,
+    Transaction,
+    UUID,
 } from './common.types';
 import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';
@@ -15,11 +19,12 @@ import {
     ScenarioAction,
     ScenarioContext,
 } from './scenarios/scenario.types';
-import { ISpace, Refs, Space } from './space';
+import { ISpace } from './space';
 import { IStorageDriver } from './storage.types';
 import { makeSubscription } from './common';
 import { DataSpace } from './data-space';
 import { Spaces } from './spaces';
+import { IRecord } from './record.types';
 
 export class ChunkDB<RECORDS extends ICollectionTypes> {
     public storage: ChunkStorage;
@@ -159,7 +164,7 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
         const accessor = new Accessor(this, space);
         await transaction(accessor);
 
-        this.updateSpaceRefs(spaceID, accessor.refs);
+        await this.applyTransaction(spaceID, accessor);
 
         return accessor.getStats();
     }
@@ -185,8 +190,32 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
         return chain;
     }
 
-    private async updateSpaceRefs(spaceID: SpaceID, refs: Refs<RECORDS>): Promise<void> {
-        return this.spaces.updateSpaceRefs(spaceID, refs);
+    /**
+     * Подготовка нового чанка данных и
+     * сохранение транзакции в пространстве данных
+     * @param spaceID
+     * @param accessor
+     * @private
+     */
+    private async applyTransaction(spaceID: SpaceID, accessor: Accessor<RECORDS>): Promise<void> {
+        const chunks: AbstractChunk<IRecord>[] = Object.keys(accessor.chunks).map(key => accessor.chunks[key]!);
+        if (!chunks)
+            return;
+
+        const space = this.spaces.getLoaded(spaceID);
+
+        const isFirstChunk = chunks.some(chunk => !chunk.parents.length);
+
+        if (isFirstChunk) {
+            chunks.forEach(chunk => chunk.type = ChunkType.Snapshot);
+        } else {
+            chunks.forEach(chunk => chunk.type = ChunkType.Incremental);
+        }
+
+        await Promise.all(chunks.map(chunk => this.storage.saveChunk(chunk)));
+        chunks.forEach(chunk => this.storage.removeTemporalChunk(chunk.id));
+
+        return this.spaces.updateSpaceRefs(space.id, accessor.refs);
     }
 }
 

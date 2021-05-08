@@ -1,6 +1,6 @@
-import { AbstractChunk } from './chunks/AbstractChunk';
+import { AbstractChunk, ChunkType } from './chunks/AbstractChunk';
 import { chunkFactory } from './chunks/ChunkFactory';
-import { ChunkID, SpaceID } from './common.types';
+import { ChunkID, SpaceID, UUID } from './common.types';
 import { DBError } from './errors';
 import { ISpace } from './space';
 import { IStorageDriver, NotFoundChunkError } from './storage.types';
@@ -27,6 +27,23 @@ export class ChunkStorage {
         this.chunks.set(chunk.id, chunk);
         await this.driver.saveChunk(chunk.toGenericChunk());
         return chunk;
+    }
+
+    saveTemporalChunk(chunk: AbstractChunk): AbstractChunk {
+        this.chunks.set(chunk.id, chunk);
+        return chunk;
+    }
+
+    removeTemporalChunk(id: UUID): boolean {
+        const chunk = this.chunks.get(id);
+        if (!chunk)
+            return true;
+
+        if (chunk.type !== ChunkType.TemporaryTransaction)
+            return false;
+
+        this.chunks.delete(id);
+        return true;
     }
 
     async loadChunk(id: ChunkID): Promise<AbstractChunk> {

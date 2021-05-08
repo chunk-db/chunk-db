@@ -25,7 +25,7 @@ export class Accessor<RECORDS extends ICollectionTypes> {
         upserted: [],
     };
 
-    private chunks: { [name in keyof RECORDS]?: TemporaryTransactionChunk } = {};
+    public chunks: { [name in keyof RECORDS]?: TemporaryTransactionChunk } = {};
 
     constructor(private db: ChunkDB<RECORDS>,
                 private space: Space<RECORDS>) {}
@@ -57,7 +57,7 @@ export class Accessor<RECORDS extends ICollectionTypes> {
         this.stats.inserted.push(record._id!);
         this.stats.upserted.push(record._id!);
 
-        this.db.storage.saveChunk(this.chunks[collection]!);
+        this.db.storage.saveTemporalChunk(this.chunks[collection]!);
 
         return record as T;
     }
@@ -68,7 +68,7 @@ export class Accessor<RECORDS extends ICollectionTypes> {
             this.stats.upserted.push(record._id);
         this.chunks[collection]!.records.set(record._id, record);
 
-        this.db.storage.saveChunk(this.chunks[collection]!);
+        this.db.storage.saveTemporalChunk(this.chunks[collection]!);
 
         return record as T;
     }
