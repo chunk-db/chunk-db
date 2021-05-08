@@ -325,10 +325,23 @@ describe('ChunkDB e2e tests', () => {
 
             // assert
             const space = db.spaces.getLoaded(spaceId)!;
-            console.log(space.refs);
             const chunk = db.storage.getExists(space.refs.records);
-            console.log(chunk);
             expect(chunk?.type).toEqual(ChunkType.Snapshot);
+        });
+        test('small changes must made Incremental chunk', async () => {
+            // act
+            await db.transaction(space.id, async tx => {
+                await tx.upsert('records', {
+                    _id: 'a',
+                    user: 1,
+                    value: 'a2',
+                });
+            });
+
+            // assert
+            const updatedSpace = db.spaces.getLoaded(space.id)!;
+            const chunk = db.storage.getExists(updatedSpace.refs.records);
+            expect(chunk!.type).toEqual(ChunkType.Incremental);
         });
     });
 });
