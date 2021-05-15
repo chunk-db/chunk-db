@@ -22,7 +22,7 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce('a1'));
+        const gen = db.run(findBruteForce(() => Promise.resolve('a1')));
 
         // assert
         expect(await gen.next()).toEqual({
@@ -49,7 +49,7 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce('a1', { user: 2 } as IQuery));
+        const gen = db.run(findBruteForce(() => Promise.resolve('a1'), { user: 2 } as IQuery));
 
         // assert
         expect(await gen.next()).toEqual({
@@ -74,7 +74,7 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce('a1', { user: 10 } as IQuery));
+        const gen = db.run(findBruteForce(() => Promise.resolve('a1'), { user: 10 } as IQuery));
 
         // assert
         expect(await gen.next()).toEqual({
@@ -97,7 +97,7 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce('initial', { user: 1 } as IQuery));
+        const gen = db.run(findBruteForce(() => Promise.resolve('initial'), { user: 1 } as IQuery));
 
         // assert
         expect(await gen.next()).toEqual({

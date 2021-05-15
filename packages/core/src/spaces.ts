@@ -1,9 +1,16 @@
 import { ChunkStorage } from './ChunkStorage';
 import { ISpace, Refs, Space } from './space';
-import { ICollectionTypes, SpaceID, Subscription } from './common.types';
+import {
+    CollectionConfig,
+    ICollectionTypes,
+    SpaceID,
+    Subscription, UUID,
+} from './common.types';
 import { makeSubscription } from './common';
 import { v4 } from 'uuid';
 import { SpaceNotFoundError } from './errors';
+import { DelayedRef, DelayedSpace } from './delayed-ref';
+import { IRecord } from './record.types';
 
 /**
  *
@@ -34,6 +41,10 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
         if (!space)
             throw new SpaceNotFoundError(id);
         return space;
+    }
+
+    getDelayedSpace(spaceId: UUID): DelayedSpace<RECORDS> {
+        return new DelayedSpace<RECORDS>(this, spaceId);
     }
 
     load(id: string): Promise<Space<RECORDS>> {

@@ -4,6 +4,7 @@ import { ChunkID } from './common.types';
 import { IRecord } from './record.types';
 import { FindScenario, IFindResult } from './scenarios/find.types';
 import { findBruteForce } from './scenarios/findBruteForce';
+import { DelayedRef } from './delayed-ref';
 
 /**
  * Отвечает за создание выборки для конкретного пространства данных по конкретному запросу
@@ -16,9 +17,9 @@ export class QuerySelector<T extends IRecord = IRecord> {
     }
 
     constructor(private readonly db: ChunkDB<any>,
-                private readonly chunkID: ChunkID,
+                private readonly delayedRef: DelayedRef<T>,
                 private readonly query: IQuery) {
-        this.scenario = this.db.run(findBruteForce(this.chunkID, this.query));
+        this.scenario = this.db.run(findBruteForce(this.delayedRef, this.query));
     }
 
     async next(): Promise<IFindResult<T>> {

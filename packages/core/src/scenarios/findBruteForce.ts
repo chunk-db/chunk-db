@@ -8,13 +8,15 @@ import { NotFoundChunkError } from '../storage.types';
 
 import { FindScenario } from './find.types';
 import { call } from './scenario.types';
-import { getChunk } from './utils';
+import { getChunk, resolveRelayedRef } from './utils';
+import { DelayedRef } from '../delayed-ref';
 
-export function* findBruteForce<T extends IRecord = IRecord>(headChunkID: ChunkID, query: IQuery = {}): FindScenario<T> {
+export function* findBruteForce<T extends IRecord = IRecord>(delayedRef: DelayedRef<T>, query: IQuery = {}): FindScenario<T> {
     const map = new Map<UUID, IRecord>();
     const builtQuery = buildQuery(query);
     let chunk: AbstractChunk;
 
+    const headChunkID: ChunkID = yield call(resolveRelayedRef, delayedRef);
     let chunkID = headChunkID;
     while (true) {
         chunk = yield call(getChunk, chunkID);

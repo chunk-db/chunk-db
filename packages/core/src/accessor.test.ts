@@ -41,6 +41,9 @@ describe('accessor', () => {
         });
         db.spaces.create(baseSpace);
         db.spaces.create(space);
+        db.spaces.save(baseSpace.id);
+        db.spaces.save(space.id);
+        driver.actions.length = 0;
     });
     afterEach(() => {
         driver.verify();
@@ -61,6 +64,13 @@ describe('accessor', () => {
             });
 
             // assert
+            await delay(1);
+
+            // step 0: load space
+            const action0 = driver.checkAction('loadSpace');
+            expect(action0.id).toBe(space.id);
+            await action0.resolve(space);
+
             await delay(1);
 
             // step 1: save empty chunk
@@ -120,6 +130,13 @@ describe('accessor', () => {
             });
 
             // assert
+            await delay(1);
+
+            // step 0: load space
+            const action0 = driver.checkAction('loadSpace');
+            expect(action0.id).toBe(space.id);
+            await action0.resolve(space);
+
             await delay(1);
 
             // step 1: save empty chunk

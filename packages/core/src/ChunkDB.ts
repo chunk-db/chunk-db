@@ -91,12 +91,7 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
         if (typeof spaceId === 'object')
             spaceId = spaceId.id;
 
-        const space = this.spaces.getLoaded(spaceId);
-
-        if (!space)
-            throw new Error(`Invalid space "${spaceId}"`);
-
-        return new DataSpace<RECORDS>(this, space);
+        return new DataSpace<RECORDS>(this, spaceId);
     }
 
     public collection<NAME extends keyof RECORDS>(name: NAME): Collection<RECORDS, NAME, RECORDS[NAME]> {
@@ -148,8 +143,6 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
     public async transaction(spaceID: SpaceID, transaction: Transaction<RECORDS>): Promise<UpdateEvent>;
     public async transaction(spaceID: SpaceID, config: ITransactionConfig, transaction: Transaction<RECORDS>): Promise<UpdateEvent>;
     public async transaction(spaceID: SpaceID, maybeConfig: ITransactionConfig | Transaction<RECORDS>, maybeTransaction?: Transaction<RECORDS>): Promise<UpdateEvent> {
-        const space = this.spaces.getLoaded(spaceID);
-
         let transaction: Transaction<RECORDS>;
         const config: ITransactionConfig = {
             restartOnFail: false,
@@ -161,6 +154,7 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
             transaction = maybeConfig as Transaction<RECORDS>;
         }
 
+        const space = await this.spaces.load(spaceID);
         const accessor = new Accessor(this, space);
         await transaction(accessor);
 
