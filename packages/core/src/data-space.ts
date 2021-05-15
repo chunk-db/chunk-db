@@ -9,7 +9,7 @@ import { Collection } from './collection';
  */
 export class DataSpace<RECORDS extends ICollectionTypes> {
     constructor(private readonly db: ChunkDB<RECORDS>,
-                public readonly space: Space) {
+                public readonly spaceId: SpaceID) {
     }
 
     public collection<NAME extends keyof RECORDS>(name: NAME): SpaceReader<RECORDS[NAME]> {
@@ -17,6 +17,6 @@ export class DataSpace<RECORDS extends ICollectionTypes> {
             throw new Error(`Invalid collection "${name}"`);
 
         const collection: Collection<RECORDS, NAME, RECORDS[NAME]> = this.db.collections[name];
-        return collection.space(this.space.id);
+        return collection.space(this.spaceId);
     }
 }

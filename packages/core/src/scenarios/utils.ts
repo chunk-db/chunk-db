@@ -4,6 +4,12 @@ import { Refs, Space } from '../space';
 import { NotFoundChunkError } from '../storage.types';
 
 import { ScenarioContext } from './scenario.types';
+import { DelayedRef } from '../delayed-ref';
+import { IRecord } from '../record.types';
+
+export function resolveRelayedRef<T extends IRecord>(this: ScenarioContext<any>, delayedRef: DelayedRef<T>): Promise<UUID> {
+    return delayedRef();
+}
 
 export async function getChunk(this: ScenarioContext<any>, chunkID: ChunkID): Promise<AbstractChunk> {
     const chunk = await this.storage.loadChunk(chunkID);

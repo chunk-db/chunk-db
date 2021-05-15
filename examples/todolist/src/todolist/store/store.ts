@@ -34,7 +34,10 @@ let ready = false;
 const promise = db.connect().then((db: ChunkDB<any>) => {
     console.log('connected');
     db.spaces.load(space.id)
-      .catch(() => db.spaces.create(space))
+      .catch(() => {
+          db.spaces.create(space);
+          return db.spaces.save(space.id);
+      })
       .then(data => space = data)
       .then(() => console.log('init spaces', db.spaces))
       .then(() => ready = true);

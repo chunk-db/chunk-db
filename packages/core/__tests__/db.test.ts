@@ -28,6 +28,8 @@ describe('ChunkDB e2e tests', () => {
     beforeEach(async () => {
         storage = new InMemoryChunkStorage();
         storage.reset(allDemoChunks);
+        storage.saveSpace(baseSpace);
+        storage.saveSpace(space);
         db = new ChunkDB({
             storage,
             collections: {
@@ -38,10 +40,6 @@ describe('ChunkDB e2e tests', () => {
                 },
             },
         });
-        db.spaces.create(baseSpace);
-        db.spaces.create(space);
-        await db.spaces.save(baseSpace.id);
-        await db.spaces.save(space.id);
     });
 
     describe('fetch data', () => {
@@ -274,7 +272,7 @@ describe('ChunkDB e2e tests', () => {
                     await delay(10);
 
                     // emulate query out from transaction in the middle of transaction
-                    const recordsFromOut = await db.collection('records').space(space.id).findAll({ user: 8 });
+                    const recordsFromOut = await db.space(space.id).collection('records').findAll({ user: 8 });
                     expect(recordsFromOut.length).toBe(0);
 
                     // query in the transaction
@@ -315,6 +313,7 @@ describe('ChunkDB e2e tests', () => {
         test('first chunk must be Snapshot', async () => {
             // act
             const spaceId = db.spaces.create({ name: 'test' }).id;
+            db.spaces.save(spaceId)
             await db.transaction(spaceId, async tx => {
                 await tx.insert('records', {
                     _id: '123',

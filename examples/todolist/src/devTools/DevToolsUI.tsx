@@ -8,14 +8,16 @@ interface IProps {
 
 const spaceID = 'space' as SpaceID;
 
-export const DevToolsUI = ({db}: IProps) => {
+export const DevToolsUI = ({ db }: IProps) => {
     const [index, setIndex] = useState(0);
     const [chain, setChain] = useState<AbstractChunk[]>([]);
 
     const update = () => setIndex(index + 1);
 
-    const space = db.spaces.getLoaded(spaceID);
-    console.log(space);
+    useEffect(() => {
+        setTimeout(() => db.spaces.load(spaceID).then(() => setIndex(-1)));
+    });
+    const space = db.spaces.isLoaded(spaceID) && db.spaces.getLoaded(spaceID);
 
     useEffect(() => {
         if (!space)
@@ -34,7 +36,7 @@ export const DevToolsUI = ({db}: IProps) => {
         <div>
             <h2>Dev tools</h2>
             <p>space id: {space?.id}</p>
-            <p>ref (todos): {space?.refs.todos}</p>
+            <p>ref (todos): {space?.refs?.todos}</p>
             <p>chunks in storage: {chunksCount}</p>
             <ol>
                 {chain.map(chunk => (

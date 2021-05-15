@@ -1,7 +1,7 @@
 import { AbstractChunk, ChunkType } from './chunks/AbstractChunk';
 import { chunkFactory } from './chunks/ChunkFactory';
 import { ChunkID, SpaceID, UUID } from './common.types';
-import { DBError } from './errors';
+import { DBError, SpaceNotFoundError } from './errors';
 import { ISpace } from './space';
 import { IStorageDriver, NotFoundChunkError } from './storage.types';
 
@@ -66,7 +66,7 @@ export class ChunkStorage {
     async loadSpace(id: SpaceID): Promise<ISpace> {
         const space = await this.driver.loadSpace(id);
         if (!space)
-            throw new DBError(`Space "${id}" not found`);
+            throw new SpaceNotFoundError(id);
         return space;
     }
 }

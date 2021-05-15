@@ -7,6 +7,7 @@ import { ICollectionTypes, UUID } from './common.types';
 import { UpdateEvent } from './events';
 import { Refs, Space } from './space';
 import { SpaceReader } from './space-reader';
+import { DelayedRef, DelayedSpace } from './delayed-ref';
 
 export class Accessor<RECORDS extends ICollectionTypes> {
     public updatedRefs: { [NAME in keyof RECORDS]?: UUID; } = {};
@@ -43,7 +44,7 @@ export class Accessor<RECORDS extends ICollectionTypes> {
     }
 
     public collection<NAME extends keyof RECORDS>(name: NAME): SpaceReader<RECORDS[NAME]> {
-        return new SpaceReader<any>(this.db, this.refs, this.db.collections[name as keyof RECORDS].config);
+        return new SpaceReader<any>(this.db, this.makeDelayedRef(name));
     }
 
     async insert<NAME extends keyof RECORDS, T extends RECORDS[NAME]>(collection: NAME, record: Optional<T, '_id'>): Promise<T> {
@@ -82,5 +83,9 @@ export class Accessor<RECORDS extends ICollectionTypes> {
 
         this.updatedRefs[collection] = chunkID;
         this.chunks[collection] = chunk;
+    }
+
+    private makeDelayedRef<NAME extends keyof RECORDS>(name: NAME): DelayedRef {
+        return () => Promise.resolve(this.refs[name]);
     }
 }

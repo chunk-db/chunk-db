@@ -26,7 +26,10 @@ export class StorageTestDriver implements IStorageCacheDriver {
             action => action.type === type && (id == null ? true : action.id === id),
         );
         if (!found.length)
-            throw new Error(`No found action "${type}"`);
+            if (this.actions.length)
+                throw new Error(`No found action "${type}". The first action is "${this.actions[0].type}"`);
+            else
+                throw new Error(`No found action "${type}". No any actions fired`);
         if (found.length > 1)
             throw new Error(`Found actions "${type}" more then one`);
         const index = this.actions.indexOf(found[0]);
