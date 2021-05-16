@@ -18,7 +18,7 @@ export const TodoApp = () => {
 
         if (trimmedText.length > 0) {
             addTodo({
-                id: Math.random().toString(16).substring(2),
+                _id: Math.random().toString(16).substring(2),
                 title: trimmedText,
             });
         }

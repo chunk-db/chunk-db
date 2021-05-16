@@ -17,14 +17,14 @@ interface IProps {
 export const TodoList = ({ todos, deleteTodo }: IProps) => (
     <List>
         {todos.map((todo) => (
-            <ListItem key={todo.id} dense button>
+            <ListItem key={todo._id} dense button>
                 <Checkbox tabIndex={-1} disableRipple />
                 <ListItemText primary={todo.title} />
                 <ListItemSecondaryAction>
                     <IconButton
                         aria-label="Delete"
                         onClick={() => {
-                            deleteTodo(todo.id);
+                            deleteTodo(todo._id);
                         }}
                     >
                         <DeleteIcon />
