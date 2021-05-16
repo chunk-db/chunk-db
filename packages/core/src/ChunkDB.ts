@@ -12,7 +12,6 @@ import {
     Transaction,
     UUID,
 } from './common.types';
-import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';
 import {
     isCall,
@@ -25,6 +24,7 @@ import { makeSubscription } from './common';
 import { DataSpace } from './data-space';
 import { Spaces } from './spaces';
 import { IRecord } from './record.types';
+import { SpaceNotFoundError } from './errors';
 
 export class ChunkDB<RECORDS extends ICollectionTypes> {
     public storage: ChunkStorage;
@@ -197,6 +197,8 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
             return;
 
         const space = this.spaces.getLoaded(spaceID);
+        if (!space)
+            throw new SpaceNotFoundError(spaceID);
 
         const isFirstChunk = chunks.some(chunk => !chunk.parents.length);
 

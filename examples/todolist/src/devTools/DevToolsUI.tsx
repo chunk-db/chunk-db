@@ -1,31 +1,24 @@
 import { ChunkDB, SpaceID } from '@chunk-db/core';
-import { AbstractChunk } from '@chunk-db/core/dist/chunks';
-import React, { useEffect, useState } from 'react';
+import {
+    useChunkDB,
+    useFlatChain,
+    useForceReload,
+    useSpace,
+} from '@chunk-db/react';
+import React from 'react';
 
 interface IProps {
-    db: ChunkDB<any>
+    db?: ChunkDB<any>
 }
 
 const spaceID = 'space' as SpaceID;
 
 export const DevToolsUI = ({ db }: IProps) => {
-    const [index, setIndex] = useState(0);
-    const [chain, setChain] = useState<AbstractChunk[]>([]);
+    db = db || useChunkDB();
+    const forceReload = useForceReload();
+    const chain = useFlatChain(spaceID, 'todos', Infinity);
+    const space = useSpace(spaceID);
 
-    const update = () => setIndex(index + 1);
-
-    useEffect(() => {
-        setTimeout(() => db.spaces.load(spaceID).then(() => setIndex(-1)));
-    });
-    const space = db.spaces.isLoaded(spaceID) && db.spaces.getLoaded(spaceID);
-
-    useEffect(() => {
-        if (!space)
-            return;
-        db.getFlatChain(space.refs['todos'], Infinity).then(list => setChain(list));
-    }, [space, index]);
-
-    console.log('db', db);
     if (!db)
         return (
             <div>not ready</div>
@@ -40,10 +33,11 @@ export const DevToolsUI = ({ db }: IProps) => {
             <p>chunks in storage: {chunksCount}</p>
             <ol>
                 {chain.map(chunk => (
-                    <li key={chunk.id}>{chunk.id} ({chunk.type})</li>
+                    <li key={chunk.id}>{chunk.id} ({chunk.type})
+                        [{chunk.records.size}]</li>
                 ))}
             </ol>
-            <button onClick={update}>Update</button>
+            <button onClick={forceReload}>Update</button>
         </div>
     );
 };
