@@ -54,6 +54,15 @@ export default function Home() {
                             <code>@chunk-db/idb</code>
                         </p>
                     </a>
+                    <a href="react" className="card">
+                        <h3>React &rarr;</h3>
+                        <p>
+                            React bindings
+                        </p>
+                        <p>
+                            <code>@chunk-db/react</code>
+                        </p>
+                    </a>
                 </div>
             </main>
 

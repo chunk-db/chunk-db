@@ -1,17 +1,15 @@
-import { SpaceID } from '@chunk-db/core';
+import { useChunkDB, useQueryAll, useSpace } from '@chunk-db/react';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import React, { useCallback, useEffect, useReducer } from 'react';
+import React, { useCallback } from 'react';
 
 import { useTodoState } from '../hooks/useTodoState';
-import { useDB } from '../store/store';
 
 import { TodoForm } from './TodoForm';
 import { TodoList } from './TodoList';
 
 export const TodoApp = () => {
-    const [_, redraw] = useReducer(state => state + 1, 0);
-    const { todos, addTodo, deleteTodo, setTodos } = useTodoState([]);
+    const { todos, addTodo, deleteTodo } = useTodoState([]);
 
     const saveTodo = (todoText: string) => {
         const trimmedText = todoText.trim();
@@ -24,36 +22,29 @@ export const TodoApp = () => {
         }
     };
 
-    const db = useDB();
-    console.log('useDB:', db);
+    const db = useChunkDB();
 
     const commitHandle = useCallback(() => {
         db.transaction('space', async tx => {
             for (const todo of todos)
                 await tx.insert('todos', todo);
         }).then(() => {
-            console.log('tx complete');
+            console.log('transaction complete');
         });
     }, [todos]);
 
-    const load = () => {
-        db.space('space')
-          .collection('todos')
-          .findAll({})
-          .then(
-              list => {
-                  console.log('loaded', list);
-                  setTodos(list);
-              },
-          );
-    };
+    const space = useSpace('space');
 
-    useEffect(() => {
-        db.subscribe(() => {
-            console.log('update');
-            redraw();
-        });
-    }, [db, setTodos]);
+    const todoList = useQueryAll(
+        'space',
+        space => space.collection('todos').find({}),
+    );
+
+    const symbols = useQueryAll(
+        'space',
+        space => space.collection('todos').find({}).exec()
+                      .reduce((len, todo) => len + todo.title.length, 0),
+    );
 
     return (
         <div className="App">
@@ -65,6 +56,9 @@ export const TodoApp = () => {
 
             <TodoList todos={todos}
                       deleteTodo={deleteTodo} />
+            <hr />
+            <TodoList todos={todoList}
+                      deleteTodo={deleteTodo} />
 
             <Button variant="contained"
                     color="primary"
@@ -72,11 +66,12 @@ export const TodoApp = () => {
             >
                 Primary
             </Button>
-            <Button variant="contained"
-                    onClick={load}
-            >
-                Update
-            </Button>
+            <p>Total symbols: {symbols}</p>
+            <pre>{JSON.stringify({
+                id: space.id,
+                name: space.name,
+                refs: space.refs,
+            }, null, 2)}</pre>
         </div>
     );
 };

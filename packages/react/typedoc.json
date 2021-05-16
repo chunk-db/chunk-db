@@ -1,0 +1,16 @@
+{
+  "entryPoints": [
+    "./src/index.ts"
+  ],
+  "excludeExternals": true,
+  "externalPattern": [
+    "**/node_modules/**"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/*(index|.spec|.e2e).ts"
+  ],
+  "out": "_docs",
+  "listInvalidSymbolLinks": true,
+  "excludePrivate": false
+}

@@ -7,7 +7,7 @@ import {
     UUID,
 } from './common.types';
 import { IRecord } from './record.types';
-import { Space } from './space';
+import { Refs, Space } from './space';
 
 export class DelayedSpace<RECORDS extends ICollectionTypes> {
     constructor(private readonly spaces: Spaces,
@@ -15,13 +15,19 @@ export class DelayedSpace<RECORDS extends ICollectionTypes> {
     ) {
     }
 
-    getRefs(): Promise<Space<RECORDS>> {
+    getSpace(): Promise<Space<RECORDS>> {
+        if (this.spaces.isLoaded(this.spaceID))
+            return Promise.resolve(this.spaces.getLoaded(this.spaceID)!);
+
         return this.spaces.load(this.spaceID);
     }
 
+    getRefs(): Promise<Refs> {
+        return this.getSpace().then(space => space.refs);
+    }
+
     getRef(config: CollectionConfig<any>): DelayedRef<any> { // todo types
-        return () => this.spaces.load(this.spaceID)
-                         .then(space => space.refs[config.name]);
+        return () => this.getSpace().then(space => space.refs[config.name]);
     }
 }
 

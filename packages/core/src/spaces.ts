@@ -36,11 +36,8 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
         return this.spaces.has(id);
     }
 
-    getLoaded(id: string): Space<RECORDS> {
-        const space = this.spaces.get(id);
-        if (!space)
-            throw new SpaceNotFoundError(id);
-        return space;
+    getLoaded(id: string): Space<RECORDS> | undefined {
+        return this.spaces.get(id);
     }
 
     getDelayedSpace(spaceId: UUID): DelayedSpace<RECORDS> {
@@ -52,6 +49,9 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
                    .then(data => {
                        const space = new Space(data);
                        this.spaces.set(space.id, space);
+                       const subscriptions = this.spaceSubscriptions.get(space.id);
+                       if (subscriptions)
+                           subscriptions.forEach(cb => cb());
                        return space;
                    });
     }
@@ -95,6 +95,9 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
         list.push(cb!);
 
         this.spaceSubscriptions.set(spaceID, list);
-        return makeSubscription(() => this.spaceSubscriptions.set(spaceID, list.filter(item => item !== cb)));
+        return makeSubscription(() => {
+            const list: Array<() => void> = this.spaceSubscriptions.get(spaceID) || [];
+            this.spaceSubscriptions.set(spaceID, list.filter(item => item !== cb));
+        });
     }
 }

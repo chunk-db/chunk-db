@@ -1,17 +1,20 @@
 import React from 'react';
 
 import { DevToolsUI, TodoApp } from '../../src/todolist';
+import { ChunkDBProvider } from '@chunk-db/react';
 import { db } from '../../src/todolist/store/store';
 
 const App = () => {
     return (
         <div className="app">
-            <div className="todolist-container">
-                <TodoApp />
-            </div>
-            <div className="devtools-container">
-                <DevToolsUI db={db}/>
-            </div>
+            <ChunkDBProvider value={db}>
+                <div className="todolist-container">
+                    <TodoApp />
+                </div>
+                <div className="devtools-container">
+                    <DevToolsUI db={db} />
+                </div>
+            </ChunkDBProvider>
             <style jsx>{`
                 .app {
                     display: flex;
