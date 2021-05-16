@@ -11,7 +11,7 @@ export const useTodoState = (initialValue) => {
             setTodos([...todos, todo]);
         },
         deleteTodo: (id: string) => {
-            const newTodos = todos.filter(todo => todo.id !== id);
+            const newTodos = todos.filter(todo => todo._id !== id);
 
             setTodos(newTodos);
         },
