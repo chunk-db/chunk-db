@@ -1,4 +1,8 @@
+import Box from '@material-ui/core/Box';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
+import SaveIcon from '@material-ui/icons/Save';
 import React from 'react';
 
 import { useInputState } from '../hooks/useInputState';
@@ -10,21 +14,33 @@ interface IProps {
 export const TodoForm = ({ saveTodo }: IProps) => {
     const { value, reset, onChange } = useInputState();
 
+    const saveTodoHandler = (event) => {
+        event.preventDefault();
+        if (value.trim())
+            saveTodo(value);
+        reset();
+    };
+
     return (
         <form
-            onSubmit={event => {
-                event.preventDefault();
-                saveTodo(value);
-                reset();
-            }}
+            onSubmit={saveTodoHandler}
         >
-            <TextField
-                variant="outlined"
-                placeholder="Add todo"
-                margin="normal"
-                onChange={onChange}
-                value={value}
-            />
+            <Box alignItems="bottom">
+                <TextField
+                    placeholder="Add todo"
+                    margin="normal"
+                    onChange={onChange}
+                    value={value}
+                />
+
+                <IconButton
+                    aria-label="Delete"
+                    type="submit"
+                    disabled={!value.trim()}
+                >
+                    <SaveIcon />
+                </IconButton>
+            </Box>
         </form>
     );
 };
