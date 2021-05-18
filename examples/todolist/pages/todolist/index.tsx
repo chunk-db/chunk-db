@@ -1,20 +1,30 @@
-import React from 'react';
+import { ChunkDBProvider } from '@chunk-db/react';
+import React, { useEffect, useState } from 'react';
 
 import { DevToolsUI, TodoApp } from '../../src/todolist';
-import { ChunkDBProvider } from '@chunk-db/react';
 import { db } from '../../src/todolist/store/store';
 
 const App = () => {
+    const [devToolsDB, setDevToolsDB] = useState(null);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            console.log('-= Set DB for DevTools =-');
+            setDevToolsDB(db);
+        }, 1000);
+        return () => clearTimeout(timer);
+    });
+
     return (
         <div className="app">
-            <ChunkDBProvider value={db}>
-                <div className="todolist-container">
+            <div className="todolist-container">
+                <ChunkDBProvider value={db}>
                     <TodoApp />
-                </div>
-                <div className="devtools-container">
-                    <DevToolsUI db={db} />
-                </div>
-            </ChunkDBProvider>
+                </ChunkDBProvider>
+            </div>
+            <div className="devtools-container">
+                <DevToolsUI db={devToolsDB} />
+            </div>
             <style jsx>{`
                 .app {
                     display: flex;

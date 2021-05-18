@@ -1,4 +1,5 @@
 import { useQueryAll } from '@chunk-db/react';
+import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import React from 'react';
@@ -26,7 +27,9 @@ export const TodoApp = () => {
 
     return (
         <div className="App">
-            <Typography component="h1" variant="h2">Todos</Typography>
+            <Box m={2}>
+                <Typography component="h1" variant="h2">Todos</Typography>
+            </Box>
 
             <TodoForm saveTodo={addTodo} />
 
