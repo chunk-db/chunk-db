@@ -1,4 +1,11 @@
-import { AbstractChunk, ChunkDB, DataSpace, ICollectionTypes, Query, UUID } from '@chunk-db/core';
+import {
+    AbstractChunk,
+    ChunkDB,
+    DataSpace,
+    ICollectionTypes,
+    Query,
+    UUID,
+} from '@chunk-db/core';
 import {
     createContext,
     useCallback,
@@ -20,13 +27,14 @@ export function useChunkDB<RECORDS extends ICollectionTypes = any>(): ChunkDB<RE
     return useContext(ChunkDBContext);
 }
 
-export function useSpace<RECORDS extends ICollectionTypes = any>(spaceID: UUID): DataSpace<RECORDS> {
+export function useSpace<RECORDS extends ICollectionTypes = any>(spaceID: UUID): DataSpace<RECORDS> | undefined {
     const db = useChunkDB();
-    const [space, setSpace] = useState<DataSpace<RECORDS>>(db && new DataSpace(db, spaceID));
+    const [space, setSpace] = useState<DataSpace<RECORDS> | undefined>(undefined);
+
     useEffect(() => {
-        console.log('useSpace effect', db, spaceID);
         if (!db)
             return;
+        setSpace(new DataSpace(db, spaceID));
         return db.spaces.subscribe(spaceID, () => setSpace(new DataSpace(db, spaceID)));
     }, [db, spaceID]);
 
@@ -38,7 +46,7 @@ export function useFlatChain(spaceID: UUID, collection: string, maxDepth?: numbe
     const db = useChunkDB();
     const space = useSpace(spaceID);
     useEffect(() => {
-        if (!db.ready) return;
+        if (!space || !db.ready) return;
         db.getFlatChain(space.refs[collection], maxDepth)
           .then(list => setChain(list));
     }, [db, space, collection, maxDepth]);
@@ -53,7 +61,7 @@ export function useQueryAll<PARAMS extends any[]>(spaceID: UUID, queryBuilder: (
     const space = useSpace(spaceID);
 
     useEffect(() => {
-        if (!db.ready) return;
+        if (!space || !db.ready) return;
         const query = queryBuilder(space, ...params);
         if (query instanceof Query)
             query.exec().all().then(setList);
