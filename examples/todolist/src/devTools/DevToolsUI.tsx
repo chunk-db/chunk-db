@@ -36,22 +36,22 @@ const UI = () => {
     const chunksCount = db?.storage['chunks'].size || 0;
 
     return (
-        <div>
-            <Box m={2}>
-                <Typography component="h1" variant="h2">Space</Typography>
+        <Box display="flex" alignItems="stretch" flexDirection="column">
+            <Box m={1}>
+                <Typography component="h1" variant="h2">Tech data</Typography>
             </Box>
-            <Box m={2}>
+            <Box m={1}>
                 <SpaceCard space={space} />
             </Box>
-            <Box m={2}>
+            <Box m={1}>
                 <Alert severity="info"
                        variant="outlined">
                     Total chunks in storage: {chunksCount}
                 </Alert>
             </Box>
-            <Box m={2}>
+            <Box m={1}>
                 <ChunkList chunks={chain} />
             </Box>
-        </div>
+        </Box>
     );
 };

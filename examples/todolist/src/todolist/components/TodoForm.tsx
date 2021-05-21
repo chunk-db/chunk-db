@@ -1,7 +1,7 @@
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import TextField from '@material-ui/core/TextField';
-import SaveIcon from '@material-ui/icons/Save';
+import AddIcon from '@material-ui/icons/Add';
 import React from 'react';
 
 import { useInputState } from '../hooks/useInputState';
@@ -26,6 +26,7 @@ export const TodoForm = ({ saveTodo }: IProps) => {
         >
             <Box alignItems="bottom">
                 <TextField
+                    size="small"
                     placeholder="Add todo"
                     margin="normal"
                     onChange={onChange}
@@ -37,7 +38,7 @@ export const TodoForm = ({ saveTodo }: IProps) => {
                     type="submit"
                     disabled={!value.trim()}
                 >
-                    <SaveIcon />
+                    <AddIcon />
                 </IconButton>
             </Box>
         </form>
