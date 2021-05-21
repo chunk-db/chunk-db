@@ -14,6 +14,8 @@ import {
     useState,
 } from 'react';
 
+export type QueryResult<T> = [T, boolean];// FIXME: [result: T, loading: boolean];
+
 export function useForceReload() {
     const [, updateState] = useState<any>();
     return useCallback(() => updateState({}), []);
@@ -54,8 +56,13 @@ export function useFlatChain(spaceID: UUID, collection: string, maxDepth?: numbe
     return chain;
 }
 
-export function useQueryAll<PARAMS extends any[]>(spaceID: UUID, queryBuilder: (space: DataSpace<any>, ...params: PARAMS) => Query | Promise<any>, ...params: PARAMS): any[] {
-    const [list, setList] = useState<any[]>([]);
+export function useQueryAll<PARAMS extends any[]>(
+    spaceID: UUID,
+    queryBuilder: (space: DataSpace<any>, ...params: PARAMS) => Query | Promise<any>,
+    defaultValue: any = null,
+    ...params: PARAMS
+): QueryResult<any[]> {
+    const [result, setResult] = useState<QueryResult<any[]>>([defaultValue, true]);
 
     const db = useChunkDB();
     const space = useSpace(spaceID);
@@ -64,10 +71,10 @@ export function useQueryAll<PARAMS extends any[]>(spaceID: UUID, queryBuilder: (
         if (!space || !db.ready) return;
         const query = queryBuilder(space, ...params);
         if (query instanceof Query)
-            query.exec().all().then(setList);
+            query.exec().all().then(list => setResult([list, false]));
         else
-            query.then(setList);
+            query.then(res => setResult([res, false]));
     }, [space, ...params]);
 
-    return list;
+    return result;
 }
