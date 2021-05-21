@@ -1,5 +1,6 @@
 import { useQueryAll } from '@chunk-db/react';
 import Box from '@material-ui/core/Box';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import React from 'react';
@@ -13,12 +14,12 @@ export const TodoApp = () => {
     const addTodo = useAddTodo();
     const deleteTodo = useDeleteTodo();
 
-    const todos = useQueryAll(
+    const [todos, loading] = useQueryAll(
         'space',
         space => space.collection('todos').find({}),
     );
 
-    const symbols = useQueryAll(
+    const [symbols, calculating] = useQueryAll(
         'space',
         space => space
             .collection('todos').find({}).exec()
@@ -26,20 +27,28 @@ export const TodoApp = () => {
     );
 
     return (
-        <div className="App">
-            <Box m={2}>
+        <Box display="flex"
+             alignItems="stretch"
+             flexDirection="column"
+             m={1}>
+            <Box m={1}>
                 <Typography component="h1" variant="h2">Todos</Typography>
+
+                <TodoForm saveTodo={addTodo} />
+
+                <Alert severity="info"
+                       variant="outlined">
+                    Total symbols in titles:&nbsp;
+                    {calculating
+                        ? <CircularProgress size={12} />
+                        : symbols}
+                </Alert>
             </Box>
 
-            <TodoForm saveTodo={addTodo} />
-
-            <Alert severity="info"
-                   variant="outlined">
-                Total symbols in titles: {symbols}
-            </Alert>
-
             <TodoList todos={todos}
-                      deleteTodo={deleteTodo} />
-        </div>
+                      deleteTodo={deleteTodo}
+                      loading={loading}
+            />
+        </Box>
     );
 };

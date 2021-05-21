@@ -8,6 +8,14 @@ const App = () => {
     const [devToolsDB, setDevToolsDB] = useState(null);
 
     useEffect(() => {
+        // Remove the server-side injected CSS.
+        const jssStyles = document.querySelector('#jss-server-side');
+        if (jssStyles) {
+            jssStyles.parentElement.removeChild(jssStyles);
+        }
+    }, []);
+
+    useEffect(() => {
         const timer = setTimeout(() => {
             console.log('-= Set DB for DevTools =-');
             setDevToolsDB(db);
@@ -34,11 +42,11 @@ const App = () => {
                 }
 
                 .todolist-container {
-                    flex: 1 1 40%;
+                    flex: 1 1 50%;
                 }
 
                 .devtools-container {
-                    flex: 1 1 60%;
+                    flex: 1 1 50%;
                 }
             `}</style>
         </div>
