@@ -6,7 +6,7 @@ import { ISpace } from './space';
 import { IStorageDriver, NotFoundChunkError } from './storage.types';
 
 export class ChunkStorage {
-    private chunks = new Map<ChunkID, AbstractChunk>();
+    private chunks = new Map<ChunkID, AbstractChunk | Promise<any>>();
     private spaces = new Map<SpaceID, ISpace>();
 
     constructor(private readonly driver: IStorageDriver) {}
@@ -20,7 +20,12 @@ export class ChunkStorage {
     }
 
     getExists(id: ChunkID): AbstractChunk | null {
-        return this.chunks.get(id) || null;
+        const chunk = this.chunks.get(id);
+        if (!chunk)
+            return null;
+        if ('then' in chunk)
+            return null;
+        return chunk;
     }
 
     async saveChunk(chunk: AbstractChunk): Promise<AbstractChunk> {
@@ -36,7 +41,7 @@ export class ChunkStorage {
 
     removeTemporalChunk(id: UUID): boolean {
         const chunk = this.chunks.get(id);
-        if (!chunk)
+        if (!chunk || 'then' in chunk)
             return true;
 
         if (chunk.type !== ChunkType.TemporaryTransaction)
@@ -49,13 +54,23 @@ export class ChunkStorage {
     async loadChunk(id: ChunkID): Promise<AbstractChunk> {
         if (!id)
             throw new NotFoundChunkError(id);
-        if (this.chunks.has(id))
-            return this.chunks.get(id)!;
+        const existsChunk = this.chunks.get(id);
+        if (existsChunk) {
+            if ('then' in existsChunk)
+                return existsChunk;
+            else
+                return existsChunk;
+        }
 
-        const genericChunk = await this.driver.loadChunk(id);
-        const chunk = chunkFactory(genericChunk);
-        this.chunks.set(chunk.id, chunk);
-        return chunk;
+        const promise = this.driver
+                            .loadChunk(id)
+                            .then(genericChunk => {
+                                const chunk = chunkFactory(genericChunk);
+                                this.chunks.set(id, chunk);
+                                return chunk;
+                            });
+        this.chunks.set(id, promise);
+        return promise;
     }
 
     saveSpace(space: ISpace): Promise<ISpace> {

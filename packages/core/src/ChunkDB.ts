@@ -2,6 +2,7 @@ import { ChunkStorage } from './ChunkStorage';
 import { Accessor } from './accessor';
 import { AbstractChunk, ChunkType } from './chunks';
 import { Collection } from './collection';
+import { makeSubscription } from './common';
 import {
     CollectionConfig,
     IChunkDBConfig,
@@ -12,19 +13,18 @@ import {
     Transaction,
     UUID,
 } from './common.types';
+import { DataSpace } from './data-space';
+import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';
+import { IRecord } from './record.types';
 import {
     isCall,
     ScenarioAction,
     ScenarioContext,
 } from './scenarios/scenario.types';
 import { ISpace } from './space';
-import { IStorageDriver } from './storage.types';
-import { makeSubscription } from './common';
-import { DataSpace } from './data-space';
 import { Spaces } from './spaces';
-import { IRecord } from './record.types';
-import { SpaceNotFoundError } from './errors';
+import { IStorageDriver } from './storage.types';
 
 export class ChunkDB<RECORDS extends ICollectionTypes> {
     public storage: ChunkStorage;
@@ -66,6 +66,7 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
      * Subscribe for any changes on space
      *
      * @deprecated
+     * @param spaceID Space identifier
      * @param cb Callback
      */
     public subscribe(spaceID: SpaceID, cb: () => void): Subscription;

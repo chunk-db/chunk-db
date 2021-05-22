@@ -53,7 +53,7 @@ export class IndexedDBDriver implements IStorageDriver {
     }
 
     loadChunk(id: ChunkID): Promise<IGenericChunk | undefined> {
-        console.log(`LOAD CHUNK "${id}"`);
+        console.log(`REAL LOAD CHUNK "${id}"`);
         return new Promise<IGenericChunk>((resolve, reject) => {
             if (!this.db)
                 return reject(new Error('DB not init'));
