@@ -17,6 +17,7 @@ import { IRecord } from './record.types';
  */
 export class Spaces<RECORDS extends ICollectionTypes = any> {
     private spaces: Map<SpaceID, Space<RECORDS>> = new Map();
+    private subscriptions: Array<() => void> = [];
     private spaceSubscriptions = new Map<SpaceID, Array<() => void>>();
 
     constructor(public readonly storage: ChunkStorage) {}
@@ -42,6 +43,10 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
 
     getDelayedSpace(spaceId: UUID): DelayedSpace<RECORDS> {
         return new DelayedSpace<RECORDS>(this, spaceId);
+    }
+
+    getList(): Readonly<ISpace>[] {
+        return Array.from(this.spaces.values());
     }
 
     load(id: string): Promise<Space<RECORDS>> {
@@ -85,19 +90,35 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
     }
 
     /**
-     * Subscribe for any changes on space
+     * Subscribe for any changes any spaces
      *
      * @param cb Callback
      */
-    public subscribe(spaceID: SpaceID, cb: () => void): Subscription {
-        const list: Array<() => void> = this.spaceSubscriptions.get(spaceID) || [];
-
-        list.push(cb!);
-
-        this.spaceSubscriptions.set(spaceID, list);
-        return makeSubscription(() => {
+    public subscribe(cb: () => void): Subscription;
+    /**
+     * Subscribe for any changes of chose space
+     *
+     * @param spaceID SpaceID
+     * @param cb Callback
+     */
+    public subscribe(spaceID: SpaceID, cb: () => void): Subscription;
+    public subscribe(spaceID: SpaceID | (() => void), cb?: () => void): Subscription {
+        if (typeof spaceID === 'function') {
+            const cb = spaceID;
+            this.subscriptions.push(cb);
+            return makeSubscription(() => {
+                this.subscriptions = this.subscriptions.filter(item => item !== cb);
+            });
+        } else {
             const list: Array<() => void> = this.spaceSubscriptions.get(spaceID) || [];
-            this.spaceSubscriptions.set(spaceID, list.filter(item => item !== cb));
-        });
+
+            list.push(cb!);
+
+            this.spaceSubscriptions.set(spaceID, list);
+            return makeSubscription(() => {
+                const list: Array<() => void> = this.spaceSubscriptions.get(spaceID) || [];
+                this.spaceSubscriptions.set(spaceID, list.filter(item => item !== cb));
+            });
+        }
     }
 }
