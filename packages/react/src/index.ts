@@ -2,7 +2,7 @@ import {
     AbstractChunk,
     ChunkDB,
     DataSpace,
-    ICollectionTypes,
+    ICollectionTypes, ISpace,
     Query,
     UUID,
 } from '@chunk-db/core';
@@ -41,6 +41,23 @@ export function useSpace<RECORDS extends ICollectionTypes = any>(spaceID: UUID):
     }, [db, spaceID]);
 
     return space;
+}
+
+export function useSpaces(): ISpace[] {
+    const db = useChunkDB();
+    const [spaces, setSpaces] = useState<ISpace[]>([]);
+
+    useEffect(() => {
+        if (!db)
+            return;
+        setSpaces(db.spaces.getList());
+
+        return db.spaces.subscribe(() => setSpaces(db.spaces.getList()));
+        // setSpaces(new DataSpace(db, spaceID));
+        // return db.spaces.subscribe(spaceID, () => setSpace(new DataSpace(db, spaceID)));
+    }, [db]);
+
+    return spaces;
 }
 
 export function useFlatChain(spaceID: UUID, collection: string, maxDepth?: number): Array<AbstractChunk> {
