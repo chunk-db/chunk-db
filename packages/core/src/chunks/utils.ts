@@ -10,7 +10,7 @@ export function objectToArray<T extends IRecord = IRecord>(data: { [key: string]
 }
 
 export function arrayToMap<T extends IRecord = IRecord>(data: T[]): ReadonlyMap<UUID, T> {
-    return new Map(data.map((item: IRecord) => [item._id, item] as [string, T]));
+    return new Map(data.map((item: any) => [item._id, item] as [string, T])); // TODO
 }
 
 export function mapToArray<T extends IRecord = IRecord>(map: ReadonlyMap<UUID, T>): T[] {
@@ -19,6 +19,6 @@ export function mapToArray<T extends IRecord = IRecord>(map: ReadonlyMap<UUID, T
 
 export function arrayToObject<T extends IRecord = IRecord>(data: T[]): { [key: string]: T } {
     const obj: any = {};
-    data.forEach(record => obj[record._id] = record);
+    data.forEach((record: any) => obj[record._id] = record); // TODO
     return obj;
 }

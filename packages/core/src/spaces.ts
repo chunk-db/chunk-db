@@ -1,29 +1,26 @@
 import { ChunkStorage } from './ChunkStorage';
 import { ISpace, Refs, Space } from './space';
 import {
-    CollectionConfig,
-    ICollectionTypes,
     SpaceID,
     Subscription, UUID,
 } from './common.types';
 import { makeSubscription } from './common';
 import { v4 } from 'uuid';
 import { SpaceNotFoundError } from './errors';
-import { DelayedRef, DelayedSpace } from './delayed-ref';
-import { IRecord } from './record.types';
+import { DelayedSpace } from './delayed-ref';
 
 /**
  *
  */
-export class Spaces<RECORDS extends ICollectionTypes = any> {
-    private spaces: Map<SpaceID, Space<RECORDS>> = new Map();
+export class Spaces {
+    private spaces: Map<SpaceID, Space> = new Map();
     private subscriptions: Array<() => void> = [];
     private spaceSubscriptions = new Map<SpaceID, Array<() => void>>();
 
     constructor(public readonly storage: ChunkStorage) {}
 
-    create(meta: Partial<ISpace>): Space<RECORDS> {
-        const space = new Space<RECORDS>({
+    create(meta: Partial<ISpace>): Space {
+        const space = new Space({
             id: meta.id || v4(),
             name: meta.name || 'some name',
             description: meta.description,
@@ -37,19 +34,19 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
         return this.spaces.has(id);
     }
 
-    getLoaded(id: string): Space<RECORDS> | undefined {
+    getLoaded(id: string): Space | undefined {
         return this.spaces.get(id);
     }
 
-    getDelayedSpace(spaceId: UUID): DelayedSpace<RECORDS> {
-        return new DelayedSpace<RECORDS>(this, spaceId);
+    getDelayedSpace(spaceId: UUID): DelayedSpace {
+        return new DelayedSpace(this, spaceId);
     }
 
     getList(): Readonly<ISpace>[] {
         return Array.from(this.spaces.values());
     }
 
-    load(id: string): Promise<Space<RECORDS>> {
+    load(id: string): Promise<Space> {
         return this.storage.loadSpace(id)
                    .then(data => {
                        const space = new Space(data);
@@ -61,7 +58,7 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
                    });
     }
 
-    save(id: string): Promise<Space<RECORDS>> {
+    save(id: string): Promise<Space> {
         const exists = this.spaces.get(id);
         if (!exists)
             throw new SpaceNotFoundError(id);
@@ -74,7 +71,7 @@ export class Spaces<RECORDS extends ICollectionTypes = any> {
         throw new Error('not implemented');
     }
 
-    async updateSpaceRefs(id: SpaceID, refs: Refs<RECORDS>): Promise<void> {
+    async updateSpaceRefs(id: SpaceID, refs: Refs): Promise<void> {
         const exists = this.spaces.get(id);
         if (!exists)
             throw new Error(`Space "id" not loaded`);

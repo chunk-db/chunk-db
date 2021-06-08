@@ -9,6 +9,7 @@ import { useAddTodo, useDeleteTodo } from '../hooks/useTodoOperations';
 
 import { TodoForm } from './TodoForm';
 import { TodoList } from './TodoList';
+import { todoScheme } from '../store/store.types';
 
 export const TodoApp = () => {
     const addTodo = useAddTodo();
@@ -16,13 +17,13 @@ export const TodoApp = () => {
 
     const [todos, loading] = useQueryAll(
         'space',
-        space => space.collection('todos').find({}),
+        space => space.collection(todoScheme).find({}),
     );
 
     const [symbols, calculating] = useQueryAll(
         'space',
         space => space
-            .collection('todos').find({}).exec()
+            .collection(todoScheme).find({}).exec()
             .reduce((len, todo) => len + todo.title.length, 0),
     );
 

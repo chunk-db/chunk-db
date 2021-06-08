@@ -1,4 +1,4 @@
-import { IDemoRecord } from '../__tests__/chunks.demo';
+import { IDemoRecord, TestRecord } from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
 import { IGenericChunk } from './chunks/ChunkFactory';
@@ -11,15 +11,15 @@ describe('accessor', () => {
     jest.setTimeout(1000);
 
     let driver: StorageTestDriver;
-    let db: ChunkDB<{ records: IDemoRecord }>;
-    const baseSpace = new Space<{ records: IDemoRecord }>({
+    let db: ChunkDB;
+    const baseSpace = new Space({
         id: 'base-space' as SpaceID,
         name: 'initial',
         refs: {
             records: 'initial',
         },
     });
-    const space = new Space<{ records: IDemoRecord }>({
+    const space = new Space({
         id: 'test-space' as SpaceID,
         name: 'a1',
         refs: {
@@ -31,13 +31,7 @@ describe('accessor', () => {
         db = new ChunkDB({
             cache: null,
             storage: driver,
-            collections: {
-                records: {
-                    factory(data: any): IDemoRecord {
-                        return data;
-                    },
-                },
-            },
+            collections: [TestRecord],
         });
         db.spaces.create(baseSpace);
         db.spaces.create(space);
@@ -60,7 +54,7 @@ describe('accessor', () => {
 
             // act
             const eventPromise = db.transaction(space.id, async tx => {
-                insertedRecord = await tx.upsert('records', recordToSave);
+                insertedRecord = await tx.upsert(TestRecord, recordToSave);
             });
 
             // assert
@@ -87,7 +81,7 @@ describe('accessor', () => {
             // step 2: save empty chunk
             const action2 = driver.checkAction('saveSpace', space.id);
             const chunk2: ISpace = action2.value as any;
-            expect(chunk2.refs['records']).toEqual(chunkID);
+            expect(chunk2.refs[TestRecord.name]).toEqual(chunkID);
             action2.resolve(chunk2);
 
             const newSpace = db.spaces.getLoaded(space.id)!;
@@ -107,7 +101,7 @@ describe('accessor', () => {
     });
     describe('insert', () => {
         test('insert record in first chunk', async () => {
-            const space = new Space<{ records: IDemoRecord }>({
+            const space = new Space({
                 id: 'some-space' as SpaceID,
                 name: 'initial',
                 refs: {
@@ -126,7 +120,7 @@ describe('accessor', () => {
 
             // act
             const eventPromise = db.transaction(space.id, async tx => {
-                insertedRecord = await tx.insert('records', recordToSave);
+                insertedRecord = await tx.insert(TestRecord, recordToSave);
             });
 
             // assert
@@ -154,7 +148,7 @@ describe('accessor', () => {
             // step 2: save empty chunk
             const action2 = driver.checkAction('saveSpace', space.id);
             const chunk2: ISpace = action2.value as any;
-            expect(chunk2.refs['records']).toEqual(chunkID);
+            expect(chunk2.refs[TestRecord.name]).toEqual(chunkID);
             action2.resolve(chunk2);
 
             const newSpace = db.spaces.getLoaded(space.id)!;

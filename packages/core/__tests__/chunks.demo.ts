@@ -1,12 +1,25 @@
-import { ChunkType } from '../src/chunks/AbstractChunk';
-import { IGenericChunk } from '../src/chunks/ChunkFactory';
-import { InMemoryChunkStorage } from '../src/in-memory-chunk-storage';
-import { IRecord } from '../src/record.types';
+import {
+    ChunkType,
+    IGenericChunk,
+    InMemoryChunkStorage,
+    IRecord,
+    Model,
+    UUID,
+} from '../src';
 
 export interface IDemoRecord extends IRecord {
+    _id: UUID;
     user: number;
     value: string;
 }
+
+export const TestRecord = new Model<IDemoRecord>('records', {
+    uuid: '_id',
+    factory(data: any): IDemoRecord {
+        return data;
+    },
+    indexes: {},
+});
 
 export const chunkABC1: IGenericChunk<IDemoRecord> = {
     id: 'initial',

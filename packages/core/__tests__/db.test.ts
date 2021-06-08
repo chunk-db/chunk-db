@@ -1,24 +1,27 @@
-import { ChunkDB } from '../src/ChunkDB';
-import { delay } from '../src/common';
-import { SpaceID, UUID } from '../src/common.types';
-import { Cursor } from '../src/cursor';
-import { InMemoryChunkStorage } from '../src/in-memory-chunk-storage';
-import { Space } from '../src/space';
+import {
+    ChunkDB,
+    ChunkType,
+    Cursor,
+    delay,
+    InMemoryChunkStorage,
+    Space,
+    SpaceID,
+    UUID,
+} from '../src';
 
-import { allDemoChunks, IDemoRecord } from './chunks.demo';
-import { ChunkType } from '../src/chunks';
+import { allDemoChunks, IDemoRecord, TestRecord } from './chunks.demo';
 
 describe('ChunkDB e2e tests', () => {
     let storage: InMemoryChunkStorage;
-    let db: ChunkDB<{ records: IDemoRecord }>;
-    const baseSpace = new Space<{ records: IDemoRecord }>({
+    let db: ChunkDB;
+    const baseSpace = new Space({
         id: 'base-space' as SpaceID,
         name: 'initial',
         refs: {
             records: 'initial',
         },
     });
-    const space = new Space<{ records: IDemoRecord }>({
+    const space = new Space({
         id: 'test-space' as SpaceID,
         name: 'a1',
         refs: {
@@ -32,13 +35,9 @@ describe('ChunkDB e2e tests', () => {
         storage.saveSpace(space);
         db = new ChunkDB({
             storage,
-            collections: {
-                records: {
-                    factory(data: any): IDemoRecord {
-                        return data;
-                    },
-                },
-            },
+            collections: [
+                TestRecord,
+            ],
         });
     });
 
@@ -50,7 +49,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const cursor = db
-                        .collection('records')
+                        .collection(TestRecord)
                         .space('test-space' as SpaceID)
                         .find({})
                         .exec();
@@ -72,7 +71,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .collection('records')
+                        .collection(TestRecord)
                         .space('test-space' as SpaceID)
                         .find({ user: 2 })
                         .exec()
@@ -88,7 +87,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .collection('records')
+                        .collection(TestRecord)
                         .space('base-space' as SpaceID)
                         .find({ user: 1 })
                         .exec()
@@ -104,7 +103,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .collection('records')
+                        .collection(TestRecord)
                         .space('test-space' as SpaceID)
                         .find({ user: 10 })
                         .exec()
@@ -123,7 +122,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const cursor = db
                         .space('test-space' as SpaceID)
-                        .collection('records')
+                        .collection(TestRecord)
                         .find({})
                         .exec();
 
@@ -145,7 +144,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .space('test-space' as SpaceID)
-                        .collection('records')
+                        .collection(TestRecord)
                         .find({ user: 2 })
                         .exec()
                         .one();
@@ -160,7 +159,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .collection('records')
+                        .collection(TestRecord)
                         .space('base-space' as SpaceID)
                         .find({ user: 1 })
                         .exec()
@@ -176,7 +175,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .collection('records')
+                        .collection(TestRecord)
                         .space('test-space' as SpaceID)
                         .find({ user: 10 })
                         .exec()
@@ -193,7 +192,7 @@ describe('ChunkDB e2e tests', () => {
 
                 // act
                 const cursor = db
-                    .collection('records')
+                    .collection(TestRecord)
                     .space('test-space' as SpaceID)
                     .find({})
                     .exec<IDemoRecord>();
@@ -219,7 +218,7 @@ describe('ChunkDB e2e tests', () => {
                 // act
                 const cursor = db
                     .space('')
-                    .collection('records')
+                    .collection(TestRecord)
                     .find({})
                     .exec();
 
@@ -253,19 +252,19 @@ describe('ChunkDB e2e tests', () => {
         describe('add records', () => {
             it('read and write one record (sync)', async () => {
                 // arrange
-                const refBefore = space.refs['records'];
+                const refBefore = space.refs[TestRecord.name];
                 let id: UUID = '';
 
                 // act
                 const event = await db.transaction(space.id, async tx => {
-                    const record = await tx.collection('records').findOne({ user: 1 });
+                    const record = await tx.collection(TestRecord).findOne({ user: 1 });
                     expect(record).toEqual({
                         _id: 'a',
                         user: 1,
                         value: 'a1',
                     });
 
-                    const insertedRecord = await tx.insert('records', {
+                    const insertedRecord = await tx.insert(TestRecord, {
                         user: 3,
                         value: 'some value',
                     });
@@ -273,12 +272,12 @@ describe('ChunkDB e2e tests', () => {
                     id = insertedRecord._id;
                 });
 
-                const records = await db.collection('records').space(space.id).findAll({ user: 3 });
+                const records = await db.collection(TestRecord).space(space.id).findAll({ user: 3 });
                 const newSpace = db.spaces.getLoaded(space.id)!;
                 expect(space.refs).not.toBe(newSpace.refs);
                 expect(space.refs).not.toEqual(newSpace.refs);
-                expect(newSpace.refs['records']).not.toBe(refBefore);
-                expect(db.storage.getExists(newSpace.refs['records'])).toBeTruthy();
+                expect(newSpace.refs[TestRecord.name]).not.toBe(refBefore);
+                expect(db.storage.getExists(newSpace.refs[TestRecord.name])).toBeTruthy();
 
                 // assert
                 expect(records.length).toBe(1);
@@ -299,7 +298,7 @@ describe('ChunkDB e2e tests', () => {
                 // act
                 const event = await db.transaction(space.id, async tx => {
                     // insert record
-                    const record = await tx.insert('records', {
+                    const record = await tx.insert(TestRecord, {
                         user: 8,
                         value: 'value',
                     });
@@ -308,11 +307,11 @@ describe('ChunkDB e2e tests', () => {
                     await delay(10);
 
                     // emulate query out from transaction in the middle of transaction
-                    const recordsFromOut = await db.space(space.id).collection('records').findAll({ user: 8 });
+                    const recordsFromOut = await db.space(space.id).collection(TestRecord).findAll({ user: 8 });
                     expect(recordsFromOut.length).toBe(0);
 
                     // query in the transaction
-                    const recordsFromTx = await tx.collection('records').findAll({ user: 8 });
+                    const recordsFromTx = await tx.collection(TestRecord).findAll({ user: 8 });
                     expect(recordsFromTx).toEqual([{
                         _id: record._id,
                         user: 8,
@@ -322,12 +321,12 @@ describe('ChunkDB e2e tests', () => {
                     await delay(10);
 
                     // continue transaction
-                    await tx.upsert('records', {
+                    await tx.upsert(TestRecord, {
                         ...record,
                         value: 'new value',
                     });
                 });
-                const records = await db.collection('records').space(space.id).findAll({ user: 8 });
+                const records = await db.collection(TestRecord).space(space.id).findAll({ user: 8 });
 
                 // assert
                 expect(records.length).toBe(1);
@@ -351,7 +350,7 @@ describe('ChunkDB e2e tests', () => {
             const spaceId = db.spaces.create({ name: 'test' }).id;
             db.spaces.save(spaceId);
             await db.transaction(spaceId, async tx => {
-                await tx.insert('records', {
+                await tx.insert(TestRecord, {
                     _id: '123',
                     value: '102',
                     user: 101,
@@ -366,7 +365,7 @@ describe('ChunkDB e2e tests', () => {
         test('small changes must made Incremental chunk', async () => {
             // act
             await db.transaction(space.id, async tx => {
-                await tx.upsert('records', {
+                await tx.upsert(TestRecord, {
                     _id: 'a',
                     user: 1,
                     value: 'a2',

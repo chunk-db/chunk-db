@@ -1,4 +1,8 @@
-import { demoStorage, IDemoRecord } from '../__tests__/chunks.demo';
+import {
+    demoStorage,
+    IDemoRecord,
+    TestRecord,
+} from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
 import { SpaceID } from './common.types';
@@ -8,21 +12,17 @@ import { Space } from './space';
 
 describe('ChunkDB', () => {
     describe('run', () => {
-        let db: ChunkDB<{ records: IDemoRecord }>;
+        let db: ChunkDB;
         let storage: InMemoryChunkStorage;
         beforeEach(async () => {
             storage = await demoStorage();
             db = new ChunkDB({
                 storage,
-                collections: {
-                    records: {
-                        factory(data: any): IDemoRecord {return data;},
-                    },
-                },
+                collections: [TestRecord],
             });
         });
 
-        async function increment(this: ScenarioContext<{ records: IDemoRecord }>, value: number): Promise<any> {
+        async function increment(this: ScenarioContext, value: number): Promise<any> {
             return value + 1;
         }
 
@@ -85,14 +85,14 @@ describe('ChunkDB', () => {
     describe('saving and restoring data', () => {
         it('save record, restart, find record', async () => {
             // arrange
-            const baseSpace = new Space<{ records: IDemoRecord }>({
+            const baseSpace = new Space({
                 id: 'base-space' as SpaceID,
                 name: 'initial',
                 refs: {
                     records: 'initial',
                 },
             });
-            const space = new Space<{ records: IDemoRecord }>({
+            const space = new Space({
                 id: 'test-space' as SpaceID,
                 name: 'a1',
                 refs: {
@@ -101,16 +101,10 @@ describe('ChunkDB', () => {
             });
 
             const driver = await demoStorage();
-            const db1: ChunkDB<{ records: IDemoRecord }> = new ChunkDB({
+            const db1: ChunkDB = new ChunkDB({
                 cache: null,
                 storage: driver,
-                collections: {
-                    records: {
-                        factory(data: any): IDemoRecord {
-                            return data;
-                        },
-                    },
-                },
+                collections: [TestRecord],
             });
             db1.spaces.create(baseSpace);
             await db1.spaces.save(baseSpace.id);
@@ -125,35 +119,29 @@ describe('ChunkDB', () => {
 
             // act 1: insert record
             const event1 = await db1.transaction(space.id, async tx => {
-                const insertedRecord = await tx.upsert('records', { ...record });
+                const insertedRecord = await tx.upsert(TestRecord, { ...record });
                 expect(insertedRecord).toEqual(record);
             });
 
             // assert
             const updatedSpace = db1.spaces.getLoaded(space.id)!;
-            expect(updatedSpace.refs['records']).not.toBe(space.refs['records']);
-            const chunk = db1.storage.getExists(updatedSpace.refs['records']);
+            expect(updatedSpace.refs[TestRecord.name]).not.toBe(space.refs[TestRecord.name]);
+            const chunk = db1.storage.getExists(updatedSpace.refs[TestRecord.name]);
             expect(chunk).toBeTruthy();
             expect(chunk!.parents).toHaveLength(1);
-            expect(chunk!.parents[0]).toBe(space.refs['records']);
+            expect(chunk!.parents[0]).toBe(space.refs[TestRecord.name]);
 
             // arrange
-            const db2: ChunkDB<{ records: IDemoRecord }> = new ChunkDB({
+            const db2: ChunkDB = new ChunkDB({
                 cache: null,
                 storage: driver,
-                collections: {
-                    records: {
-                        factory(data: any): IDemoRecord {
-                            return data;
-                        },
-                    },
-                },
+                collections:[TestRecord],
             });
 
             // act 2: find record
             await db2.connect();
             await db2.spaces.load('test-space');
-            const foundRecord = await db2.collection('records')
+            const foundRecord = await db2.collection(TestRecord)
                                          .space('test-space' as SpaceID)
                                          .findOne({ _id: '123' });
 
@@ -165,17 +153,13 @@ describe('ChunkDB', () => {
     });
 
     describe('getChain', () => {
-        let db: ChunkDB<{ records: IDemoRecord }>;
+        let db: ChunkDB;
         let storage: InMemoryChunkStorage;
         beforeEach(async () => {
             storage = await demoStorage();
             db = new ChunkDB({
                 storage,
-                collections: {
-                    records: {
-                        factory(data: any): IDemoRecord {return data;},
-                    },
-                },
+                collections: [TestRecord],
             });
         });
 

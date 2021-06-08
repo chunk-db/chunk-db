@@ -8,7 +8,7 @@ import { DelayedRef } from './delayed-ref';
  * Доступ к данным конкретной коллекции и пространства
  */
 export class SpaceReader<T extends IRecord = IRecord> {
-    constructor(private readonly db: ChunkDB<any>,
+    constructor(private readonly db: ChunkDB,
                 public readonly delayedRef: DelayedRef<T>) {
     }
 

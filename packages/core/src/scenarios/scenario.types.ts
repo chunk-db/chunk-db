@@ -11,16 +11,16 @@ export interface ScenarioAction {
 
 export type Scenario<T, ARGS extends any[]> = (...args: ARGS) => Generator<any, T, unknown>;
 
-export interface ScenarioContext<RECORDS extends ICollectionTypes>  {
+export interface ScenarioContext  {
     storage: ChunkStorage;
-    activeTransactions: Accessor<RECORDS>[];
-    updateSpaceRefs(spaceID: UUID, refs: Refs<RECORDS>): void;
-    spaces: Spaces<RECORDS>;
+    activeTransactions: Accessor[];
+    updateSpaceRefs(spaceID: UUID, refs: Refs): void;
+    spaces: Spaces;
 }
 
 const callSymbol = Symbol('Call');
 
-export function call<ARGS extends any[], T extends any>(action: (this: ScenarioContext<any>, ...args: ARGS) => Promise<T>, ...args: ARGS) {
+export function call<ARGS extends any[], T extends any>(action: (this: ScenarioContext, ...args: ARGS) => Promise<T>, ...args: ARGS) {
     return { [callSymbol]: true, action, args };
 }
 
@@ -28,6 +28,6 @@ export function isCall(value: any): value is ScenarioAction {
     return value && !!value[callSymbol];
 }
 
-export async function getStorage(this: ScenarioContext<any>): Promise<ChunkStorage> {
+export async function getStorage(this: ScenarioContext): Promise<ChunkStorage> {
     return this.storage;
 }
