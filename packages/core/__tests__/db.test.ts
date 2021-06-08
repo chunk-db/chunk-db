@@ -212,6 +212,42 @@ describe('ChunkDB e2e tests', () => {
                 });
             });
         });
+        describe('errors', () => {
+            test('find in null space', async () => {
+                // arrange
+
+                // act
+                const cursor = db
+                    .space('')
+                    .collection('records')
+                    .find({})
+                    .exec();
+
+                // assert
+                expect(cursor).toBeInstanceOf(Cursor);
+
+                const result = await cursor.all();
+
+                expect(result).toEqual([]);
+            });
+            test('find in unknown collection', async () => {
+                // arrange
+
+                // act
+                const cursor = db
+                    .space('test-space')
+                    .collection('unknown' as any)
+                    .find({})
+                    .exec();
+
+                // assert
+                expect(cursor).toBeInstanceOf(Cursor);
+
+                const result = await cursor.all();
+
+                expect(result).toEqual([]);
+            });
+        });
     });
     describe('change data', () => {
         describe('add records', () => {
@@ -313,7 +349,7 @@ describe('ChunkDB e2e tests', () => {
         test('first chunk must be Snapshot', async () => {
             // act
             const spaceId = db.spaces.create({ name: 'test' }).id;
-            db.spaces.save(spaceId)
+            db.spaces.save(spaceId);
             await db.transaction(spaceId, async tx => {
                 await tx.insert('records', {
                     _id: '123',

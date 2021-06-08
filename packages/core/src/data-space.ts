@@ -1,8 +1,8 @@
-import { ICollectionTypes, SpaceID } from './common.types';
 import { ChunkDB } from './ChunkDB';
+import { Collection } from './collection';
+import { ICollectionTypes, SpaceID } from './common.types';
 import { ISpace, Refs, Space } from './space';
 import { SpaceReader } from './space-reader';
-import { Collection } from './collection';
 
 /**
  * Представляет собой доступ к данным пространства и методам работы с ними

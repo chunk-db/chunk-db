@@ -1,10 +1,9 @@
 import { ChunkDB } from './ChunkDB';
 import { IQuery } from './ConditionValidator';
-import { ChunkID, SpaceID } from './common.types';
 import { Cursor } from './cursor';
+import { DelayedRef } from './delayed-ref';
 import { QuerySelector } from './query-selector';
 import { IRecord } from './record.types';
-import { DelayedRef } from './delayed-ref';
 
 /**
  * Создание и донастройка запроса к БД
