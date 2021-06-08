@@ -34,7 +34,7 @@ export function useSpace<RECORDS extends ICollectionTypes = any>(spaceID: UUID):
     const [space, setSpace] = useState<DataSpace<RECORDS> | undefined>(undefined);
 
     useEffect(() => {
-        if (!db)
+        if (!db || !spaceID)
             return;
         setSpace(new DataSpace(db, spaceID));
         return db.spaces.subscribe(spaceID, () => setSpace(new DataSpace(db, spaceID)));

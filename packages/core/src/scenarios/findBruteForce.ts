@@ -1,15 +1,14 @@
 import 'regenerator-runtime/runtime';
 import { buildQuery, ConditionValidator, IQuery } from '../ConditionValidator';
-import { AbstractChunk, ChunkType } from '../chunks/AbstractChunk';
-import { mapToArray } from '../chunks/utils';
+import { AbstractChunk, ChunkType, mapToArray } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
+import { DelayedRef } from '../delayed-ref';
 import { IRecord } from '../record.types';
 import { NotFoundChunkError } from '../storage.types';
 
 import { FindScenario } from './find.types';
 import { call } from './scenario.types';
 import { getChunk, resolveRelayedRef } from './utils';
-import { DelayedRef } from '../delayed-ref';
 
 export function* findBruteForce<T extends IRecord = IRecord>(delayedRef: DelayedRef<T>, query: IQuery = {}): FindScenario<T> {
     const map = new Map<UUID, IRecord>();
@@ -18,6 +17,13 @@ export function* findBruteForce<T extends IRecord = IRecord>(delayedRef: Delayed
 
     const headChunkID: ChunkID = yield call(resolveRelayedRef, delayedRef);
     let chunkID = headChunkID;
+
+    if (!headChunkID)
+        return {
+            chunkID,
+            records: [],
+        };
+
     while (true) {
         chunk = yield call(getChunk, chunkID);
         if (!chunk)
