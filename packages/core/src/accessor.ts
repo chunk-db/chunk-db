@@ -3,16 +3,18 @@ import { v4 } from 'uuid';
 
 import { ChunkDB } from './ChunkDB';
 import { TemporaryTransactionChunk } from './chunks/TemporaryTransactionChunk';
-import { ICollectionTypes, UUID } from './common.types';
+import { UUID } from './common.types';
 import { UpdateEvent } from './events';
 import { Refs, Space } from './space';
 import { SpaceReader } from './space-reader';
-import { DelayedRef, DelayedSpace } from './delayed-ref';
+import { DelayedRef } from './delayed-ref';
+import { IRecord } from './record.types';
+import { Model } from './Model';
 
-export class Accessor<RECORDS extends ICollectionTypes> {
-    public updatedRefs: { [NAME in keyof RECORDS]?: UUID; } = {};
+export class Accessor {
+    public updatedRefs: { [NAME: string]: UUID; } = {};
 
-    public get refs(): Refs<RECORDS> {
+    public get refs(): Refs {
         return {
             ...this.space.refs,
             ...this.updatedRefs,
@@ -26,10 +28,10 @@ export class Accessor<RECORDS extends ICollectionTypes> {
         upserted: [],
     };
 
-    public chunks: { [name in keyof RECORDS]?: TemporaryTransactionChunk } = {};
+    public chunks: { [name: string]: TemporaryTransactionChunk } = {};
 
-    constructor(private db: ChunkDB<RECORDS>,
-                private space: Space<RECORDS>) {}
+    constructor(private db: ChunkDB,
+                private space: Space) {}
 
     getDB() {
         return this.db;
@@ -43,38 +45,41 @@ export class Accessor<RECORDS extends ICollectionTypes> {
         return this.stats;
     }
 
-    public collection<NAME extends keyof RECORDS>(name: NAME): SpaceReader<RECORDS[NAME]> {
-        return new SpaceReader<any>(this.db, this.makeDelayedRef(name));
+    public collection<T extends IRecord>(scheme: Model<T>): SpaceReader<T> {
+        return new SpaceReader<any>(this.db, this.makeDelayedRef(scheme));
     }
 
-    async insert<NAME extends keyof RECORDS, T extends RECORDS[NAME]>(collection: NAME, record: Optional<T, '_id'>): Promise<T> {
-        this.writeIntoCollection(collection);
-        if (!record._id)
+    async insert<T extends IRecord>(scheme: Model<T>, record: Optional<T, Model<T>['uuid']>): Promise<T> {
+        const collection = scheme.name;
+        this.writeIntoCollection(scheme);
+        if (!record[scheme.uuid] as any)
             record = {
                 ...record,
-                _id: v4(),
+                [scheme.uuid]: v4(),
             };
-        this.chunks[collection]!.records.set(record._id!, record as T);
-        this.stats.inserted.push(record._id!);
-        this.stats.upserted.push(record._id!);
+        this.chunks[collection]!.records.set(record[scheme.uuid] as any, record as T);
+        this.stats.inserted.push(record[scheme.uuid] as any);
+        this.stats.upserted.push(record[scheme.uuid] as any);
 
         this.db.storage.saveTemporalChunk(this.chunks[collection]!);
 
         return record as T;
     }
 
-    async upsert<NAME extends keyof RECORDS, T extends RECORDS[NAME]>(collection: NAME, record: T): Promise<T> {
-        this.writeIntoCollection(collection);
-        if (!this.chunks[collection]!.records.has(record._id))
-            this.stats.upserted.push(record._id);
-        this.chunks[collection]!.records.set(record._id, record);
+    async upsert<T extends IRecord>(scheme: Model<T>, record: T): Promise<T> {
+        const collection = scheme.name;
+        this.writeIntoCollection(scheme);
+        if (!this.chunks[collection]!.records.has(record[scheme.uuid] as any))
+            this.stats.upserted.push(record[scheme.uuid] as any);
+        this.chunks[collection]!.records.set(record[scheme.uuid] as any, record);
 
         this.db.storage.saveTemporalChunk(this.chunks[collection]!);
 
         return record as T;
     }
 
-    private writeIntoCollection<NAME extends keyof RECORDS>(collection: NAME): void {
+    private writeIntoCollection<T extends IRecord>(scheme: Model<T>): void {
+        const collection = scheme.name;
         if (collection in this.updatedRefs)
             return;
         const chunkID = v4();
@@ -85,7 +90,7 @@ export class Accessor<RECORDS extends ICollectionTypes> {
         this.chunks[collection] = chunk;
     }
 
-    private makeDelayedRef<NAME extends keyof RECORDS>(name: NAME): DelayedRef {
-        return () => Promise.resolve(this.refs[name]);
+    private makeDelayedRef<T extends IRecord>(scheme: Model<T>): DelayedRef {
+        return () => Promise.resolve(this.refs[scheme.name]);
     }
 }

@@ -2,7 +2,7 @@ import {
     AbstractChunk,
     ChunkDB,
     DataSpace,
-    ICollectionTypes, ISpace,
+    ISpace,
     Query,
     UUID,
 } from '@chunk-db/core';
@@ -21,17 +21,17 @@ export function useForceReload() {
     return useCallback(() => updateState({}), []);
 }
 
-export const ChunkDBContext = createContext<ChunkDB<any>>(null as any);
+export const ChunkDBContext = createContext<ChunkDB>(null as any);
 
 export const ChunkDBProvider = ChunkDBContext.Provider;
 
-export function useChunkDB<RECORDS extends ICollectionTypes = any>(): ChunkDB<RECORDS> {
+export function useChunkDB(): ChunkDB {
     return useContext(ChunkDBContext);
 }
 
-export function useSpace<RECORDS extends ICollectionTypes = any>(spaceID: UUID): DataSpace<RECORDS> | undefined {
+export function useSpace(spaceID: UUID): DataSpace | undefined {
     const db = useChunkDB();
-    const [space, setSpace] = useState<DataSpace<RECORDS> | undefined>(undefined);
+    const [space, setSpace] = useState<DataSpace | undefined>(undefined);
 
     useEffect(() => {
         if (!db || !spaceID)
@@ -75,7 +75,7 @@ export function useFlatChain(spaceID: UUID, collection: string, maxDepth?: numbe
 
 export function useQueryAll<PARAMS extends any[]>(
     spaceID: UUID,
-    queryBuilder: (space: DataSpace<any>, ...params: PARAMS) => Query | Promise<any>,
+    queryBuilder: (space: DataSpace, ...params: PARAMS) => Query | Promise<any>,
     defaultValue: any = null,
     ...params: PARAMS
 ): QueryResult<any[]> {

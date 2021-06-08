@@ -50,8 +50,8 @@ export function* findBruteForce<T extends IRecord = IRecord>(delayedRef: Delayed
     }
 }
 
-function isNew<T extends IRecord>(map: Map<UUID, T>, filter: ConditionValidator) {
-    return (record: T) => {
+function isNew<T extends IRecord>(map: Map<UUID, T>, filter: ConditionValidator) { // todo
+    return (record: any) => {
         if (map.has(record._id))
             return false;
 

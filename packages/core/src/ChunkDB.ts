@@ -25,31 +25,32 @@ import {
 import { ISpace } from './space';
 import { Spaces } from './spaces';
 import { IStorageDriver } from './storage.types';
+import { Model } from './Model';
 
-export class ChunkDB<RECORDS extends ICollectionTypes> {
+export class ChunkDB {
     public storage: ChunkStorage;
-    public collections: { [NAME in keyof RECORDS]: Collection<RECORDS, NAME, RECORDS[NAME]> };
-    public readonly spaces: Spaces<RECORDS>;
+    public collections: { [key: string]: Collection<IRecord> };
+    public readonly spaces: Spaces;
 
     public ready = false;
 
     private readonly storageDriver: IStorageDriver;
-    private activeTransactions: Accessor<RECORDS>[] = [];
+    private activeTransactions: Accessor[] = [];
     private storeSubscriptions: Array<() => void> = [];
 
-    constructor(config: IChunkDBConfig<RECORDS>) {
+    constructor(config: IChunkDBConfig) {
         this.collections = {} as any;
-        Object.entries(config.collections)
-              .forEach(([name, cfg]) => {
-                  this.collections[name as keyof RECORDS] = new Collection(this, name, new CollectionConfig(name, cfg));
+        config.collections
+              .forEach(scheme => {
+                  this.collections[scheme.name] = new Collection(this, scheme);
               });
         this.storageDriver = config.storage;
         this.storage = new ChunkStorage(this.storageDriver);
 
-        this.spaces = new Spaces<RECORDS>(this.storage);
+        this.spaces = new Spaces(this.storage);
     }
 
-    public connect(): Promise<ChunkDB<RECORDS>> {
+    public connect(): Promise<ChunkDB> {
         return this.storage.connect()
                    .then(() => {this.ready = true;})
                    .then(() => this);
@@ -86,24 +87,24 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
      * Get [[DataSpace]]
      * @param spaceId
      */
-    public space(spaceId: string | ISpace): DataSpace<RECORDS> {
+    public space(spaceId: string | ISpace): DataSpace {
         if (!spaceId)
             throw new Error(`Invalid space ""`);
         if (typeof spaceId === 'object')
             spaceId = spaceId.id;
 
-        return new DataSpace<RECORDS>(this, spaceId);
+        return new DataSpace(this, spaceId);
     }
 
-    public collection<NAME extends keyof RECORDS>(name: NAME): Collection<RECORDS, NAME, RECORDS[NAME]> {
-        if (name in this.collections)
-            return this.collections[name];
+    public collection<T extends IRecord>(scheme: Model<T>): Collection<T> {
+        if (scheme.name in this.collections)
+            return this.collections[scheme.name] as any;
 
-        throw new Error(`Invalid collection "${name}"`);
+        throw new Error(`Invalid collection "${scheme.name}"`);
     }
 
     public run(scenario: any): any {
-        const context: ScenarioContext<RECORDS> = {
+        const context: ScenarioContext = {
             storage: this.storage,
             activeTransactions: this.activeTransactions,
             updateSpaceRefs: this.spaces.updateSpaceRefs,
@@ -141,10 +142,10 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
      * @param spaceID
      * @param transaction
      */
-    public async transaction(spaceID: SpaceID, transaction: Transaction<RECORDS>): Promise<UpdateEvent>;
-    public async transaction(spaceID: SpaceID, config: ITransactionConfig, transaction: Transaction<RECORDS>): Promise<UpdateEvent>;
-    public async transaction(spaceID: SpaceID, maybeConfig: ITransactionConfig | Transaction<RECORDS>, maybeTransaction?: Transaction<RECORDS>): Promise<UpdateEvent> {
-        let transaction: Transaction<RECORDS>;
+    public async transaction(spaceID: SpaceID, transaction: Transaction): Promise<UpdateEvent>;
+    public async transaction(spaceID: SpaceID, config: ITransactionConfig, transaction: Transaction): Promise<UpdateEvent>;
+    public async transaction(spaceID: SpaceID, maybeConfig: ITransactionConfig | Transaction, maybeTransaction?: Transaction): Promise<UpdateEvent> {
+        let transaction: Transaction;
         const config: ITransactionConfig = {
             restartOnFail: false,
         };
@@ -152,7 +153,7 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
             transaction = maybeTransaction;
             Object.assign(config, maybeConfig as ITransactionConfig);
         } else {
-            transaction = maybeConfig as Transaction<RECORDS>;
+            transaction = maybeConfig as Transaction;
         }
 
         const space = await this.spaces.load(spaceID);
@@ -192,7 +193,7 @@ export class ChunkDB<RECORDS extends ICollectionTypes> {
      * @param accessor
      * @private
      */
-    private async applyTransaction(spaceID: SpaceID, accessor: Accessor<RECORDS>): Promise<void> {
+    private async applyTransaction(spaceID: SpaceID, accessor: Accessor): Promise<void> {
         const chunks: AbstractChunk<IRecord>[] = Object.keys(accessor.chunks).map(key => accessor.chunks[key]!);
         if (!chunks)
             return;
@@ -220,7 +221,7 @@ export interface Runner<T> {
     next(): Promise<{ done: boolean, value: T }>;
 }
 
-function scenarioRunner<T>(context: ScenarioContext<any>, scenario: Generator<ScenarioAction | T, ScenarioAction, ScenarioAction>): Runner<T> {
+function scenarioRunner<T>(context: ScenarioContext, scenario: Generator<ScenarioAction | T, ScenarioAction, ScenarioAction>): Runner<T> {
     async function next(result?: any): Promise<{ done: boolean, value: T }> {
         for (; ;) {
             const tmp = scenario.next(result);

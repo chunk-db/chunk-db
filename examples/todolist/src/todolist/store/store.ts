@@ -3,15 +3,15 @@ import {
     InMemoryChunkStorage,
     Space,
 } from '@chunk-db/core';
-import { IDemoRecord } from '@chunk-db/core/__tests__/chunks.demo';
 
 import { IndexedDBDriver } from '@chunk-db/idb';
+import { todoScheme } from './store.types';
 
 const storage = process.browser
     ? new IndexedDBDriver('chunk-db-todolist-example')
     : new InMemoryChunkStorage();
 
-let space = new Space<{ todos: IDemoRecord }>({
+let space = new Space({
     id: 'space',
     name: 'a1',
     refs: {
@@ -19,14 +19,12 @@ let space = new Space<{ todos: IDemoRecord }>({
     },
 });
 
-export const db = new ChunkDB<any>({ // TODO
+export const db = new ChunkDB({ // TODO
     storage,
-    collections: {
-        todos: {},
-    },
+    collections: [todoScheme],
 });
 
-db.connect().then((db: ChunkDB<any>) => {
+db.connect().then((db: ChunkDB) => {
     console.log('connected');
     db.spaces.load(space.id)
       .catch(() => {

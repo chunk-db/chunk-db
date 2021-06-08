@@ -1,22 +1,24 @@
 import { ChunkDB } from './ChunkDB';
 import { Collection } from './collection';
-import { ICollectionTypes, SpaceID } from './common.types';
+import { SpaceID } from './common.types';
 import { ISpace, Refs, Space } from './space';
 import { SpaceReader } from './space-reader';
+import { IRecord } from './record.types';
+import { Model } from './Model';
 
 /**
  * Представляет собой доступ к данным пространства и методам работы с ними
  */
-export class DataSpace<RECORDS extends ICollectionTypes> implements ISpace {
-    constructor(private readonly db: ChunkDB<RECORDS>,
+export class DataSpace implements ISpace {
+    constructor(private readonly db: ChunkDB,
                 public readonly spaceId: SpaceID) {
     }
 
-    public collection<NAME extends keyof RECORDS>(name: NAME): SpaceReader<RECORDS[NAME]> {
-        if (!(name in this.db.collections))
+    public collection<T extends IRecord>(scheme: Model<T>): SpaceReader<T> {
+        if (!(scheme.name in this.db.collections))
             throw new Error(`Invalid collection "${name}"`);
 
-        const collection: Collection<RECORDS, NAME, RECORDS[NAME]> = this.db.collections[name];
+        const collection: Collection<T> = this.db.collections[scheme.name] as any;
         return collection.space(this.spaceId);
     }
 
@@ -36,7 +38,7 @@ export class DataSpace<RECORDS extends ICollectionTypes> implements ISpace {
         return this.space?.name || '';
     };
 
-    get refs(): Refs<any> {
+    get refs(): Refs {
         return this.space?.refs || {};
     };
 }

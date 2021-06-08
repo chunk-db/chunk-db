@@ -1,6 +1,6 @@
-import { demoStorage, IDemoRecord } from '../../__tests__/chunks.demo';
+import { demoStorage, TestRecord } from '../../__tests__/chunks.demo';
 import { ChunkDB } from '../ChunkDB';
-import { AbstractChunk } from '../chunks/AbstractChunk';
+import { AbstractChunk } from '../chunks';
 import { ChunkID } from '../common.types';
 import { NotFoundChunkError } from '../storage.types';
 
@@ -8,16 +8,12 @@ import { call } from './scenario.types';
 import { getChunk } from './utils';
 
 describe('scenarios/utils', () => {
-    let db: ChunkDB<{ records: IDemoRecord }>;
+    let db: ChunkDB;
 
     beforeEach(async () => {
         db = new ChunkDB({
             storage: await demoStorage(),
-            collections: {
-                records: {
-                    factory(data: any): IDemoRecord {return data;},
-                },
-            },
+            collections: [TestRecord],
         });
     });
 

@@ -3,6 +3,7 @@ import { Brand } from 'utility-types';
 import { Accessor } from './accessor';
 import { IRecord } from './record.types';
 import { IStorageCacheDriver, IStorageDriver } from './storage.types';
+import { Model } from './Model';
 
 export type ID = string;
 export type UUID = string;
@@ -16,9 +17,9 @@ export interface ICollectionTypes {
     [key: string]: IRecord;
 }
 
-export interface IChunkDBConfig<T extends ICollectionTypes> {
+export interface IChunkDBConfig {
     storage: IStorageDriver;
-    collections: { [key in keyof T]: ICollectionConfig<T[key]> };
+    collections: Model<any>[];
     cache?: IStorageCacheDriver | null;
 }
 
@@ -69,7 +70,7 @@ export interface IRefCollection {
     tags: { [name: string]: ChunkID },
 }
 
-export type Transaction<RECORDS extends ICollectionTypes> = (accessor: Accessor<RECORDS>) => Promise<void>;
+export type Transaction = (accessor: Accessor) => Promise<any>;
 
 export interface ITransactionConfig {
     restartOnFail: boolean; // TODO not working

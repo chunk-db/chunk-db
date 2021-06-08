@@ -14,7 +14,7 @@ import { ChunkList } from './ChunkList';
 import { SpaceCard } from './SpaceCard';
 
 interface IProps {
-    db?: ChunkDB<any>
+    db?: ChunkDB
 }
 
 const spaceID = 'space' as SpaceID;

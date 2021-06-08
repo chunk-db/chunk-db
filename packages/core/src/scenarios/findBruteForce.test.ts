@@ -1,20 +1,18 @@
-import { demoStorage, IDemoRecord } from '../../__tests__/chunks.demo';
+import {
+    demoStorage,
+    TestRecord,
+} from '../../__tests__/chunks.demo';
 import { ChunkDB } from '../ChunkDB';
 import { IQuery } from '../ConditionValidator';
 
 import { findBruteForce } from './findBruteForce';
 
-
 describe('findBruteForce', () => {
-    let db: ChunkDB<{ records: IDemoRecord }>;
+    let db: ChunkDB;
     beforeEach(async () => {
         db = new ChunkDB({
             storage: await demoStorage(),
-            collections: {
-                records: {
-                    factory(data: any): IDemoRecord {return data;},
-                },
-            },
+            collections: [TestRecord],
         });
     });
 
