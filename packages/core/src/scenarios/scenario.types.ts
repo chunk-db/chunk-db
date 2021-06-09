@@ -1,6 +1,6 @@
 import { ChunkStorage } from '../ChunkStorage';
 import { Accessor } from '../accessor';
-import { UUID } from '../common.types';
+import { ChunkID, SpaceID, UUID } from '../common.types';
 import { Refs } from '../space';
 import { Spaces } from '../spaces';
 
@@ -15,7 +15,7 @@ export interface ScenarioContext {
     storage: ChunkStorage;
     activeTransactions: Accessor[];
 
-    updateSpaceRefs(spaceID: UUID, refs: Refs): void;
+    updateSpaceRef(spaceID: SpaceID, ref: ChunkID): void;
 
     spaces: Spaces;
 }

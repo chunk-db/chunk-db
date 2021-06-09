@@ -1,4 +1,4 @@
-import { ChunkDB, SpaceID } from '@chunk-db/core';
+import { ChunkDB, makeSpaceID } from '@chunk-db/core';
 import {
     ChunkDBProvider,
     useChunkDB,
@@ -17,7 +17,7 @@ interface IProps {
     db?: ChunkDB
 }
 
-const spaceID = 'space' as SpaceID;
+const spaceID = makeSpaceID('space');
 
 export const DevToolsUI = ({ db }: IProps) => {
     db = db || useChunkDB();

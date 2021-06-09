@@ -22,13 +22,13 @@ interface IProps {
 }
 
 export function ChunkList({ chunks }: IProps) {
-    const classes = useStyles();
+    // const classes = useStyles();
 
     const rows = chunks.map(chunk => ({
         id: chunk.id,
         shortId: shortId(chunk.id),
         type: chunk.type,
-        size: chunk.records.size,
+        size: chunk.size,
     }));
 
     return (

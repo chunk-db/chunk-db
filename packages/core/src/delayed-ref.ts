@@ -1,11 +1,11 @@
-import { Spaces } from './spaces';
+import { Model } from './Model';
 import {
     ChunkID,
     SpaceID,
 } from './common.types';
 import { IRecord } from './record.types';
-import { Refs, Space } from './space';
-import { Model } from './Model';
+import { Space } from './space';
+import { Spaces } from './spaces';
 
 export class DelayedSpace {
     constructor(private readonly spaces: Spaces,
@@ -20,12 +20,8 @@ export class DelayedSpace {
         return this.spaces.load(this.spaceID);
     }
 
-    getRefs(): Promise<Refs> {
-        return this.getSpace().then(space => space.refs);
-    }
-
-    getRef(config: Model<any>): DelayedRef<any> { // todo types
-        return () => this.getSpace().then(space => space.refs[config.name]);
+    getRef(model: Model<any>): DelayedRef<any> { // todo types
+        return () => this.getSpace().then(space => space.ref);
     }
 }
 

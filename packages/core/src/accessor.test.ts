@@ -15,16 +15,12 @@ describe('accessor', () => {
     const baseSpace = new Space({
         id: makeSpaceID('base-space'),
         name: 'initial',
-        refs: {
-            records: 'initial',
-        },
+        ref: 'initial',
     });
     const space = new Space({
         id: makeSpaceID('test-space'),
         name: 'a1',
-        refs: {
-            records: 'a1',
-        },
+        ref: 'a1',
     });
     beforeEach(async () => {
         driver = new StorageTestDriver();
@@ -71,8 +67,10 @@ describe('accessor', () => {
             const action1 = driver.checkAction('saveChunk');
             const chunkID = action1.id;
             const chunk1: IGenericChunk = action1.value as any;
-            expect(chunk1.records).toEqual({
-                [recordToSave._id]: recordToSave,
+            expect(chunk1.data).toEqual({
+                records: {
+                    [recordToSave._id]: recordToSave,
+                },
             });
             await action1.resolve(chunk1);
 
@@ -81,12 +79,11 @@ describe('accessor', () => {
             // step 2: save empty chunk
             const action2 = driver.checkAction('saveSpace', space.id);
             const chunk2: ISpace = action2.value as any;
-            expect(chunk2.refs[TestRecord.name]).toEqual(chunkID);
+            expect(chunk2.ref).toEqual(chunkID);
             action2.resolve(chunk2);
 
             const newSpace = db.spaces.getLoaded(space.id)!;
-            expect(space.refs).not.toBe(newSpace.refs);
-            expect(space.refs).not.toEqual(newSpace.refs);
+            expect(space.ref).not.toEqual(newSpace.ref);
 
             const event = await eventPromise;
             expect(event).toEqual({
@@ -104,9 +101,7 @@ describe('accessor', () => {
             const space = new Space({
                 id: 'some-space' as SpaceID,
                 name: 'initial',
-                refs: {
-                    records: '',
-                },
+                ref: '',
             });
             db.spaces.create(space);
 
@@ -138,8 +133,10 @@ describe('accessor', () => {
             const chunkID = action1.id;
             const chunk1: IGenericChunk = action1.value as any;
             expect(chunk1.parents).toEqual([]);
-            expect(chunk1.records).toEqual({
-                [recordToSave._id]: recordToSave,
+            expect(chunk1.data).toEqual({
+                records: {
+                    [recordToSave._id]: recordToSave,
+                },
             });
             await action1.resolve(chunk1);
 
@@ -148,12 +145,11 @@ describe('accessor', () => {
             // step 2: save empty chunk
             const action2 = driver.checkAction('saveSpace', space.id);
             const chunk2: ISpace = action2.value as any;
-            expect(chunk2.refs[TestRecord.name]).toEqual(chunkID);
+            expect(chunk2.ref).toEqual(chunkID);
             action2.resolve(chunk2);
 
             const newSpace = db.spaces.getLoaded(space.id)!;
-            expect(space.refs).not.toBe(newSpace.refs);
-            expect(space.refs).not.toEqual(newSpace.refs);
+            expect(space.ref).not.toEqual(newSpace.ref);
 
             const event = await eventPromise;
             expect(event).toEqual({

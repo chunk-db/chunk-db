@@ -9,12 +9,12 @@ import { SpaceReader } from './space-reader';
  */
 export class Collection<T extends IRecord> {
     constructor(private readonly db: ChunkDB,
-                public readonly scheme: Model<T>) {
+                public readonly model: Model<T>) {
     }
 
     public space(space: SpaceID): SpaceReader<T> {
         const delayedSpace = this.db.spaces.getDelayedSpace(space);
-        const delayedRef = delayedSpace.getRef(this.scheme);
-        return new SpaceReader(this.db, delayedRef);
+        const delayedRef = delayedSpace.getRef(this.model);
+        return new SpaceReader(this.db, this.model, delayedRef);
     }
 }

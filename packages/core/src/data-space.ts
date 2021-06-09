@@ -1,10 +1,10 @@
 import { ChunkDB } from './ChunkDB';
-import { Collection } from './collection';
-import { SpaceID } from './common.types';
-import { ISpace, Refs, Space } from './space';
-import { SpaceReader } from './space-reader';
-import { IRecord } from './record.types';
 import { Model } from './Model';
+import { Collection } from './collection';
+import { ChunkID, makeChunkID, SpaceID } from './common.types';
+import { IRecord } from './record.types';
+import { ISpace, Space } from './space';
+import { SpaceReader } from './space-reader';
 
 /**
  * Представляет собой доступ к данным пространства и методам работы с ними
@@ -38,7 +38,7 @@ export class DataSpace implements ISpace {
         return this.space?.name || '';
     };
 
-    get refs(): Refs {
-        return this.space?.refs || {};
+    get ref(): ChunkID {
+        return this.space?.ref || makeChunkID('');
     };
 }

@@ -17,16 +17,12 @@ describe('ChunkDB e2e tests', () => {
     const baseSpace = new Space({
         id: 'base-space' as SpaceID,
         name: 'initial',
-        refs: {
-            records: 'initial',
-        },
+        ref: 'initial',
     });
     const space = new Space({
         id: 'test-space' as SpaceID,
         name: 'a1',
-        refs: {
-            records: 'a1',
-        },
+        ref: 'a1',
     });
     beforeEach(async () => {
         storage = new InMemoryChunkStorage();
@@ -252,7 +248,7 @@ describe('ChunkDB e2e tests', () => {
         describe('add records', () => {
             it('read and write one record (sync)', async () => {
                 // arrange
-                const refBefore = space.refs[TestRecord.name];
+                const refBefore = space.ref;
                 let id: UUID = '';
 
                 // act
@@ -274,10 +270,9 @@ describe('ChunkDB e2e tests', () => {
 
                 const records = await db.collection(TestRecord).space(space.id).findAll({ user: 3 });
                 const newSpace = db.spaces.getLoaded(space.id)!;
-                expect(space.refs).not.toBe(newSpace.refs);
-                expect(space.refs).not.toEqual(newSpace.refs);
-                expect(newSpace.refs[TestRecord.name]).not.toBe(refBefore);
-                expect(db.storage.getExists(newSpace.refs[TestRecord.name])).toBeTruthy();
+                expect(space.ref).not.toEqual(newSpace.ref);
+                expect(newSpace.ref).not.toBe(refBefore);
+                expect(db.storage.getExists(newSpace.ref)).toBeTruthy();
 
                 // assert
                 expect(records.length).toBe(1);
@@ -359,7 +354,7 @@ describe('ChunkDB e2e tests', () => {
 
             // assert
             const space = db.spaces.getLoaded(spaceId)!;
-            const chunk = db.storage.getExists(space.refs.records);
+            const chunk = db.storage.getExists(space.ref);
             expect(chunk?.type).toEqual(ChunkType.Snapshot);
         });
         test('small changes must made Incremental chunk', async () => {
@@ -374,7 +369,7 @@ describe('ChunkDB e2e tests', () => {
 
             // assert
             const updatedSpace = db.spaces.getLoaded(space.id)!;
-            const chunk = db.storage.getExists(updatedSpace.refs.records);
+            const chunk = db.storage.getExists(updatedSpace.ref);
             expect(chunk!.type).toEqual(ChunkType.Incremental);
         });
     });

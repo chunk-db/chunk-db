@@ -88,16 +88,12 @@ describe('ChunkDB', () => {
             const baseSpace = new Space({
                 id: 'base-space' as SpaceID,
                 name: 'initial',
-                refs: {
-                    records: 'initial',
-                },
+                ref: 'initial',
             });
             const space = new Space({
                 id: 'test-space' as SpaceID,
                 name: 'a1',
-                refs: {
-                    records: 'a1',
-                },
+                ref: 'a1',
             });
 
             const driver = await demoStorage();
@@ -125,11 +121,11 @@ describe('ChunkDB', () => {
 
             // assert
             const updatedSpace = db1.spaces.getLoaded(space.id)!;
-            expect(updatedSpace.refs[TestRecord.name]).not.toBe(space.refs[TestRecord.name]);
-            const chunk = db1.storage.getExists(updatedSpace.refs[TestRecord.name]);
+            expect(updatedSpace.ref).not.toBe(space.ref);
+            const chunk = db1.storage.getExists(updatedSpace.ref);
             expect(chunk).toBeTruthy();
             expect(chunk!.parents).toHaveLength(1);
-            expect(chunk!.parents[0]).toBe(space.refs[TestRecord.name]);
+            expect(chunk!.parents[0]).toBe(space.ref);
 
             // arrange
             const db2: ChunkDB = new ChunkDB({

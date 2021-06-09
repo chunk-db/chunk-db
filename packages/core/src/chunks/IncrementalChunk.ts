@@ -9,7 +9,7 @@ export class IncrementalChunk<T extends IRecord = IRecord> extends AbstractChunk
     constructor(data: IGenericChunk) {
         super(data);
 
-        if (!this.records.size)
+        if (!this.data.size)
             throw new Error("Incremental chunk can not be empty");
     }
 }

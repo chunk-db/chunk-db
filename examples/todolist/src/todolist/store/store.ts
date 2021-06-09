@@ -14,9 +14,7 @@ const storage = process.browser
 let space = new Space({
     id: 'space',
     name: 'a1',
-    refs: {
-        todos: null,
-    },
+    ref: null,
 });
 
 export const db = new ChunkDB({ // TODO

@@ -16,9 +16,7 @@ describe('SpaceReader', () => {
     const space = new Space({
         id: 'test-space' as SpaceID,
         name: 'test',
-        refs: {
-            records: 'a1',
-        },
+        ref: 'a1',
     });
 
     beforeEach(async () => {
