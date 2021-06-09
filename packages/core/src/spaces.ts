@@ -3,6 +3,7 @@ import { v4 } from 'uuid';
 import { ChunkStorage } from './ChunkStorage';
 import { makeSubscription } from './common';
 import {
+    ChunkID,
     makeSpaceID,
     SpaceID,
     Subscription,
@@ -26,7 +27,7 @@ export class Spaces {
             id: meta.id || makeSpaceID(v4()),
             name: meta.name || 'some name',
             description: meta.description,
-            refs: meta.refs || {},
+            ref: meta.ref || '',
         });
         this.spaces.set(space.id, space);
         return space;
@@ -73,14 +74,14 @@ export class Spaces {
         throw new Error('not implemented');
     }
 
-    async updateSpaceRefs(id: SpaceID, refs: Refs): Promise<void> {
+    async updateSpaceRef(id: SpaceID, ref: ChunkID): Promise<void> {
         const exists = this.spaces.get(id);
         if (!exists)
-            throw new Error(`Space "id" not loaded`);
+            throw new Error(`Space "${id}" not loaded`);
 
         this.spaces.set(id, {
             ...exists,
-            refs,
+            ref,
         });
         await this.storage.saveSpace(this.spaces.get(id) as ISpace);
         const subscribers = this.spaceSubscriptions.get(id);

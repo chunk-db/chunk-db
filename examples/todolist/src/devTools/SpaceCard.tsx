@@ -64,29 +64,26 @@ export function SpaceCard({ space }: IProps) {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                    <TableRow>
-                                        <TableCell component="th" scope="row">
-                                            <Skeleton animation="wave"
-                                                      component="span"
-                                                      height={20} width="40%"
-                                            />
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            <Skeleton animation="wave"
-                                                      component="span"
-                                                      height={20} width="90%"
-                                            />
-                                        </TableCell>
-                                    </TableRow>
+                                <TableRow>
+                                    <TableCell component="th" scope="row">
+                                        <Skeleton animation="wave"
+                                                  component="span"
+                                                  height={20} width="40%"
+                                        />
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <Skeleton animation="wave"
+                                                  component="span"
+                                                  height={20} width="90%"
+                                        />
+                                    </TableCell>
+                                </TableRow>
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </CardContent>
             </Card>
         );
-
-    const refs = Object.keys(space?.refs)
-                       .map(ref => ({ ref, chunk: space.refs[ref] }));
 
     return (
         <Card className={classes.root}>
@@ -115,22 +112,15 @@ export function SpaceCard({ space }: IProps) {
                         stickyHeader
                         aria-label="a dense table"
                     >
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Ref</TableCell>
-                                <TableCell align="right">Chunk</TableCell>
-                            </TableRow>
-                        </TableHead>
                         <TableBody>
-                            {refs.map((row) => (
-                                <TableRow key={row.ref}>
-                                    <TableCell component="th" scope="row">
-                                        {row.ref}
-                                    </TableCell>
-                                    <TableCell
-                                        align="right">{row.chunk}</TableCell>
-                                </TableRow>
-                            ))}
+                            <TableRow>
+                                <TableCell component="th" scope="row">
+                                    Ref:
+                                </TableCell>
+                                <TableCell align="right">
+                                    {space.ref}
+                                </TableCell>
+                            </TableRow>
                         </TableBody>
                     </Table>
                 </TableContainer>

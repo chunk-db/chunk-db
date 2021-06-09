@@ -8,11 +8,13 @@ describe("chunk factory", () => {
         const data = {
             type: ChunkType.Snapshot,
             parents: [],
-            records: {
-                "123": {
-                    _id: "123",
-                    name: "name"
-                }
+            data: {
+                records: {
+                    '123': {
+                        _id: '123',
+                        name: 'name',
+                    },
+                },
             }
         };
 
@@ -24,11 +26,13 @@ describe("chunk factory", () => {
         const data = {
             type: ChunkType.Incremental,
             parents: [],
-            records: {
-                "123": {
-                    _id: "123",
-                    name: "name 2"
-                }
+            data: {
+                records: {
+                    '123': {
+                        _id: '123',
+                        name: 'name 2',
+                    },
+                },
             }
         };
 

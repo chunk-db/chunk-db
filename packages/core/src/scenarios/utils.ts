@@ -18,8 +18,8 @@ export async function getChunk(this: ScenarioContext, chunkID: ChunkID): Promise
     return chunk;
 }
 
-export async function updateSpaceRefs(this: ScenarioContext, spaceID: UUID, refs: Refs): Promise<void> {
-    this.updateSpaceRefs(spaceID, refs);
+export async function updateSpaceRefs(this: ScenarioContext, spaceID: SpaceID, ref: ChunkID): Promise<void> {
+    this.updateSpaceRef(spaceID, ref);
 }
 
 export async function getSpace(this: ScenarioContext, spaceID: SpaceID): Promise<Space> {

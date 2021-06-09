@@ -4,22 +4,18 @@ import { v4 } from 'uuid';
 import { ChunkDB } from './ChunkDB';
 import { Model } from './Model';
 import { TemporaryTransactionChunk } from './chunks';
-import { ChunkID, makeChunkID } from './common.types';
+import { ChunkID, makeChunkID, SpaceID } from './common.types';
 import { DelayedRef } from './delayed-ref';
+import { InnerDBError } from './errors';
 import { UpdateEvent } from './events';
 import { IRecord } from './record.types';
-import { Refs, Space } from './space';
+import { Space } from './space';
 import { SpaceReader } from './space-reader';
 
 export class Accessor {
-    public updatedRefs: { [NAME: string]: ChunkID; } = {};
-
-    public get refs(): Refs {
-        return {
-            ...this.space.refs,
-            ...this.updatedRefs,
-        };
-    }
+    public readonly initialRefs: ReadonlyMap<SpaceID, ChunkID>;
+    public readonly updatedRefs = new Map<SpaceID, ChunkID>();
+    public readonly refs = new Map<SpaceID, ChunkID>();
 
     private stats: UpdateEvent = {
         deleted: [],
@@ -31,7 +27,10 @@ export class Accessor {
     public chunks: { [name: string]: TemporaryTransactionChunk } = {};
 
     constructor(private db: ChunkDB,
-                private space: Space) {}
+                private space: Space) {
+        this.initialRefs = new Map([[space.id, space.ref]]);
+        this.refs = new Map([[space.id, space.ref]]);
+    }
 
     getDB() {
         return this.db;
@@ -45,52 +44,66 @@ export class Accessor {
         return this.stats;
     }
 
-    public collection<T extends IRecord>(scheme: Model<T>): SpaceReader<T> {
-        return new SpaceReader<any>(this.db, this.makeDelayedRef(scheme));
+    public collection<T extends IRecord>(model: Model<T>): SpaceReader<T> {
+        return new SpaceReader<any>(this.db, model, this.makeDelayedRef(model));
     }
 
     async insert<T extends IRecord>(scheme: Model<T>, record: Optional<T, Model<T>['uuid']>): Promise<T> {
-        const collection = scheme.name;
-        this.writeIntoCollection(scheme);
+        this.prepareSpaceForWriting(this.space.id);
         if (!record[scheme.uuid] as any)
             record = {
                 ...record,
                 [scheme.uuid]: v4(),
             };
-        this.chunks[collection]!.records.set(record[scheme.uuid] as any, record as T);
+        this.chunks[this.space.id]!.setRecord(scheme, record[scheme.uuid] as any, record as T);
         this.stats.inserted.push(record[scheme.uuid] as any);
         this.stats.upserted.push(record[scheme.uuid] as any);
 
-        this.db.storage.saveTemporalChunk(this.chunks[collection]!);
+        this.db.storage.saveTemporalChunk(this.chunks[this.space.id]!);
 
         return record as T;
     }
 
     async upsert<T extends IRecord>(scheme: Model<T>, record: T): Promise<T> {
-        const collection = scheme.name;
-        this.writeIntoCollection(scheme);
-        if (!this.chunks[collection]!.records.has(record[scheme.uuid] as any))
+        this.prepareSpaceForWriting(this.space.id);
+        if (!this.chunks[this.space.id]!.hasRecords(scheme, record[scheme.uuid] as any)) {// todo
             this.stats.upserted.push(record[scheme.uuid] as any);
-        this.chunks[collection]!.records.set(record[scheme.uuid] as any, record);
+        }
+        this.chunks[this.space.id]!.setRecord(scheme, record[scheme.uuid] as any, record); // todo
 
-        this.db.storage.saveTemporalChunk(this.chunks[collection]!);
+        this.db.storage.saveTemporalChunk(this.chunks[this.space.id]!);
 
         return record as T;
     }
 
-    private writeIntoCollection<T extends IRecord>(scheme: Model<T>): void {
-        const collection = scheme.name;
-        if (collection in this.updatedRefs)
+    private prepareSpaceForWriting(space: SpaceID): void {
+        if (this.updatedRefs.has(space))
             return;
+
         const chunkID = makeChunkID(v4());
 
-        const chunk = new TemporaryTransactionChunk(chunkID, this.refs[collection]);
+        const chunk = new TemporaryTransactionChunk(chunkID, this.refs.get(space)!);
 
-        this.updatedRefs[collection] = chunkID;
-        this.chunks[collection] = chunk;
+        this.updateRef(this.space.id, chunkID);
+        this.chunks[space] = chunk;
     }
 
     private makeDelayedRef<T extends IRecord>(scheme: Model<T>): DelayedRef {
-        return () => Promise.resolve(this.refs[scheme.name]);
+        return () => Promise.resolve(this.refs.get(this.space.id)!);
+    }
+
+    private updateRef(space: SpaceID, chunk: ChunkID): boolean {
+        if (!this.initialRefs.has(space))
+            throw new InnerDBError(`Forbidden to write into not defined spaces`);
+
+        if (this.initialRefs.get(space) === chunk)
+            return false;
+
+        if (this.updatedRefs.get(space) === chunk)
+            return false;
+
+        this.updatedRefs.set(space, chunk);
+        this.refs.set(space, chunk);
+        return true;
     }
 }

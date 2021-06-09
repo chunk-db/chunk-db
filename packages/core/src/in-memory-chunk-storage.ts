@@ -59,13 +59,13 @@ export class InMemoryChunkStorage implements IStorageCacheDriver {
         return space;
     }
 
-    async updateSpace(id: SpaceID, refs: Refs): Promise<ISpace> {
+    async updateSpace(id: SpaceID, ref: ChunkID): Promise<ISpace> {
         const space = this.spaces.get(id);
         if (!space)
             throw new DBError(`Can not update space "${id}": not exists`);
         this.spaces.set(id, {
             ...space,
-            refs,
+            ref,
         });
         return space;
     }

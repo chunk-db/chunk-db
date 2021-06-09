@@ -1,5 +1,6 @@
 import { ChunkDB } from './ChunkDB';
 import { IQuery } from './ConditionValidator';
+import { Model } from './Model';
 import { DelayedRef } from './delayed-ref';
 import { IRecord } from './record.types';
 import { FindScenario, IFindResult } from './scenarios/find.types';
@@ -17,8 +18,9 @@ export class QuerySelector<T extends IRecord = IRecord> {
 
     constructor(private readonly db: ChunkDB,
                 private readonly delayedRef: DelayedRef<T>,
+                private readonly model: Model<T>,
                 private readonly query: IQuery) {
-        this.scenario = this.db.run(findBruteForce(this.delayedRef, this.query));
+        this.scenario = this.db.run(findBruteForce(this.delayedRef, this.model, this.query));
     }
 
     async next(): Promise<IFindResult<T>> {

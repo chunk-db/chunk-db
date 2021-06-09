@@ -3,7 +3,7 @@ import {
     ChunkDB,
     DataSpace,
     ISpace,
-    Query,
+    Query, SpaceID,
     UUID,
 } from '@chunk-db/core';
 import {
@@ -29,7 +29,7 @@ export function useChunkDB(): ChunkDB {
     return useContext(ChunkDBContext);
 }
 
-export function useSpace(spaceID: UUID): DataSpace | undefined {
+export function useSpace(spaceID: SpaceID): DataSpace | undefined {
     const db = useChunkDB();
     const [space, setSpace] = useState<DataSpace | undefined>(undefined);
 
@@ -53,20 +53,18 @@ export function useSpaces(): ISpace[] {
         setSpaces(db.spaces.getList());
 
         return db.spaces.subscribe(() => setSpaces(db.spaces.getList()));
-        // setSpaces(new DataSpace(db, spaceID));
-        // return db.spaces.subscribe(spaceID, () => setSpace(new DataSpace(db, spaceID)));
     }, [db]);
 
     return spaces;
 }
 
-export function useFlatChain(spaceID: UUID, collection: string, maxDepth?: number): Array<AbstractChunk> {
+export function useFlatChain(spaceID: SpaceID, collection: string, maxDepth?: number): Array<AbstractChunk> {
     const [chain, setChain] = useState<Array<AbstractChunk>>([]);
     const db = useChunkDB();
     const space = useSpace(spaceID);
     useEffect(() => {
         if (!space || !db.ready) return;
-        db.getFlatChain(space.refs[collection], maxDepth)
+        db.getFlatChain(space.ref, maxDepth)
           .then(list => setChain(list));
     }, [db, space, collection, maxDepth]);
 
@@ -74,7 +72,7 @@ export function useFlatChain(spaceID: UUID, collection: string, maxDepth?: numbe
 }
 
 export function useQueryAll<PARAMS extends any[]>(
-    spaceID: UUID,
+    spaceID: SpaceID,
     queryBuilder: (space: DataSpace, ...params: PARAMS) => Query | Promise<any>,
     defaultValue: any = null,
     ...params: PARAMS

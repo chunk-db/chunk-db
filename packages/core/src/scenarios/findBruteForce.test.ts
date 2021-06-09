@@ -4,9 +4,9 @@ import {
 } from '../../__tests__/chunks.demo';
 import { ChunkDB } from '../ChunkDB';
 import { IQuery } from '../ConditionValidator';
+import { makeChunkID } from '../common.types';
 
 import { findBruteForce } from './findBruteForce';
-import { makeChunkID } from '../common.types';
 
 describe('findBruteForce', () => {
     let db: ChunkDB;
@@ -21,7 +21,7 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('a1'))));
+        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('a1')), TestRecord));
 
         // assert
         expect(await gen.next()).toEqual({
@@ -48,7 +48,7 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('a1')), { user: 2 } as IQuery));
+        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('a1')), TestRecord, { user: 2 } as IQuery));
 
         // assert
         expect(await gen.next()).toEqual({
@@ -73,7 +73,7 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('a1')), { user: 10 } as IQuery));
+        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('a1')), TestRecord, { user: 10 } as IQuery));
 
         // assert
         expect(await gen.next()).toEqual({
@@ -96,7 +96,7 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('initial')), { user: 1 } as IQuery));
+        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('initial')), TestRecord, { user: 1 } as IQuery));
 
         // assert
         expect(await gen.next()).toEqual({

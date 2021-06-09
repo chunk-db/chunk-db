@@ -107,25 +107,11 @@ export class ChunkDB {
         const context: ScenarioContext = {
             storage: this.storage,
             activeTransactions: this.activeTransactions,
-            updateSpaceRefs: this.spaces.updateSpaceRefs,
+            updateSpaceRef: this.spaces.updateSpaceRef,
             spaces: this.spaces,
         };
 
         return scenarioRunner(context, scenario);
-
-        // const gen = scenario.apply(context, args);
-        //
-        // let result: any;
-        //
-        // while (true) {
-        //     const { done, value } = gen.next(result);
-        //     if (done)
-        //         return value as T;
-        //
-        //     const [action, ...callArgs] = value;
-        //
-        //     result = await action.apply(context, callArgs);
-        // }
     }
 
     /**
@@ -213,7 +199,7 @@ export class ChunkDB {
         await Promise.all(chunks.map(chunk => this.storage.saveChunk(chunk)));
         chunks.forEach(chunk => this.storage.removeTemporalChunk(chunk.id));
 
-        return this.spaces.updateSpaceRefs(space.id, accessor.refs);
+        return this.spaces.updateSpaceRef(space.id, accessor.refs.get(spaceID)!);
     }
 }
 
