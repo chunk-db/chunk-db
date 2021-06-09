@@ -1,7 +1,7 @@
 import { demoStorage, TestRecord } from '../../__tests__/chunks.demo';
 import { ChunkDB } from '../ChunkDB';
 import { AbstractChunk } from '../chunks';
-import { ChunkID } from '../common.types';
+import { ChunkID, makeChunkID } from '../common.types';
 import { NotFoundChunkError } from '../storage.types';
 
 import { call } from './scenario.types';
@@ -28,7 +28,7 @@ describe('scenarios/utils', () => {
 
         test('should return chunk', async () => {
             // act
-            const gen = db.run(testScenario('a1'));
+            const gen = db.run(testScenario(makeChunkID('a1')));
 
             // assert
             expect(await gen.next()).toEqual({
@@ -42,10 +42,10 @@ describe('scenarios/utils', () => {
 
         test('should throw exception because chunk not exists', async () => {
             // act
-            const gen = db.run(testScenario('unknown'));
+            const gen = db.run(testScenario(makeChunkID('unknown')));
             expect(gen.next())
                 .rejects
-                .toEqual(new NotFoundChunkError('unknown'));
+                .toEqual(new NotFoundChunkError(makeChunkID('unknown')));
         });
     });
 });

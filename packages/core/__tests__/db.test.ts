@@ -3,7 +3,7 @@ import {
     ChunkType,
     Cursor,
     delay,
-    InMemoryChunkStorage,
+    InMemoryChunkStorage, makeSpaceID,
     Space,
     SpaceID,
     UUID,
@@ -217,7 +217,7 @@ describe('ChunkDB e2e tests', () => {
 
                 // act
                 const cursor = db
-                    .space('')
+                    .space(makeSpaceID(''))
                     .collection(TestRecord)
                     .find({})
                     .exec();
@@ -234,7 +234,7 @@ describe('ChunkDB e2e tests', () => {
 
                 // act
                 const cursor = db
-                    .space('test-space')
+                    .space(makeSpaceID('test-space'))
                     .collection('unknown' as any)
                     .find({})
                     .exec();

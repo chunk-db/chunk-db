@@ -1,7 +1,7 @@
 import { AbstractChunk, chunkFactory, ChunkType } from './chunks';
-import { ChunkID, SpaceID, UUID } from './common.types';
+import { ChunkID, makeSpaceID, SpaceID } from './common.types';
 import { SpaceNotFoundError } from './errors';
-import { ISpace } from './space';
+import { ISpace, Space } from './space';
 import { IStorageDriver, NotFoundChunkError } from './storage.types';
 
 export class ChunkStorage {
@@ -38,7 +38,7 @@ export class ChunkStorage {
         return chunk;
     }
 
-    removeTemporalChunk(id: UUID): boolean {
+    removeTemporalChunk(id: ChunkID): boolean {
         const chunk = this.chunks.get(id);
         if (!chunk || 'then' in chunk)
             return true;
@@ -73,7 +73,7 @@ export class ChunkStorage {
     }
 
     saveSpace(space: ISpace): Promise<ISpace> {
-        this.spaces.set(space.id, space);
+        this.spaces.set(makeSpaceID(space.id), space);
         return this.driver.saveSpace(space);
     }
 

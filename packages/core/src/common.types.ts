@@ -5,11 +5,15 @@ import { IStorageCacheDriver, IStorageDriver } from './storage.types';
 
 export type ID = string;
 export type UUID = string;
-export type ChunkID = string;
-export type SpaceID = string;
+export type ChunkID = { _brand: 'ChunkID' } & string;
+export type SpaceID = { _brand: 'SpaceID' } & string;
 export type Primitive = string | number | boolean;
 
 export type CollectionType<T> = T extends ICollectionConfig<infer R> ? R : never;
+
+export function makeChunkID(uuid: UUID): ChunkID { return uuid as any;}
+
+export function makeSpaceID(uuid: UUID): SpaceID { return uuid as any;}
 
 export interface ICollectionTypes {
     [key: string]: IRecord;

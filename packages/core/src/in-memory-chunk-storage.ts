@@ -1,5 +1,5 @@
 import { IGenericChunk } from './chunks';
-import { ChunkID, SpaceID } from './common.types';
+import { ChunkID, makeChunkID, makeSpaceID, SpaceID } from './common.types';
 import { DBError } from './errors';
 import { ISpace, Refs } from './space';
 import { IStorageCacheDriver, NotFoundChunkError } from './storage.types';
@@ -17,7 +17,7 @@ export class InMemoryChunkStorage implements IStorageCacheDriver {
     }
 
     async saveChunk(chunk: IGenericChunk): Promise<IGenericChunk> {
-        this.chunks.set(chunk.id!, chunk);
+        this.chunks.set(makeChunkID(chunk.id!), chunk);
         return chunk;
     }
 
@@ -26,7 +26,7 @@ export class InMemoryChunkStorage implements IStorageCacheDriver {
     }
 
     setChunks(chunks: IGenericChunk[]): void {
-        chunks.forEach(chunk => this.chunks.set(chunk.id!, chunk));
+        chunks.forEach(chunk => this.chunks.set(makeChunkID(chunk.id!), chunk));
     }
 
     async clearChunks(): Promise<void> {
@@ -44,9 +44,9 @@ export class InMemoryChunkStorage implements IStorageCacheDriver {
 
     // spaces
     async createSpace<T extends ISpace>(space: T): Promise<T> {
-        if (this.spaces.has(space.id!))
+        if (this.spaces.has(makeSpaceID(space.id!)))
             throw new DBError(`Can not create space "${space.id}": already exists`);
-        this.spaces.set(space.id, space);
+        this.spaces.set(makeSpaceID(space.id), space);
         return space;
     }
 
@@ -55,7 +55,7 @@ export class InMemoryChunkStorage implements IStorageCacheDriver {
     }
 
     async saveSpace(space: ISpace): Promise<ISpace> {
-        this.spaces.set(space.id, space);
+        this.spaces.set(makeSpaceID(space.id), space);
         return space;
     }
 

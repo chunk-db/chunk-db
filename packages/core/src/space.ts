@@ -1,15 +1,14 @@
-import { SpaceID } from './common.types';
-import { UUID } from './common.types';
+import { ChunkID, makeSpaceID, SpaceID, UUID } from './common.types';
 
 export type Refs = {
-    [key: string]: UUID;
+    [key: string]: ChunkID;
 }
 
 export interface ISpace {
-    id: SpaceID;
+    id: string;
     name: string;
     description?: string;
-    refs: Refs;
+    refs: { [key: string]: UUID; };
 }
 
 export class Space {
@@ -19,10 +18,10 @@ export class Space {
     public refs: Refs;
 
     constructor(config: ISpace) {
-        this.id = config.id;
+        this.id = makeSpaceID(config.id);
         this.name = config.name;
         this.description = config.description || '';
-        this.refs = config.refs;
+        this.refs = (config.refs || {})as any;
     }
 }
 

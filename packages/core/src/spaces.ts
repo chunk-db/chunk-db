@@ -1,13 +1,15 @@
-import { ChunkStorage } from './ChunkStorage';
-import { ISpace, Refs, Space } from './space';
-import {
-    SpaceID,
-    Subscription, UUID,
-} from './common.types';
-import { makeSubscription } from './common';
 import { v4 } from 'uuid';
-import { SpaceNotFoundError } from './errors';
+
+import { ChunkStorage } from './ChunkStorage';
+import { makeSubscription } from './common';
+import {
+    makeSpaceID,
+    SpaceID,
+    Subscription,
+} from './common.types';
 import { DelayedSpace } from './delayed-ref';
+import { SpaceNotFoundError } from './errors';
+import { ISpace, Refs, Space } from './space';
 
 /**
  *
@@ -21,7 +23,7 @@ export class Spaces {
 
     create(meta: Partial<ISpace>): Space {
         const space = new Space({
-            id: meta.id || v4(),
+            id: meta.id || makeSpaceID(v4()),
             name: meta.name || 'some name',
             description: meta.description,
             refs: meta.refs || {},
@@ -30,15 +32,15 @@ export class Spaces {
         return space;
     }
 
-    isLoaded(id: string): boolean {
+    isLoaded(id: SpaceID): boolean {
         return this.spaces.has(id);
     }
 
-    getLoaded(id: string): Space | undefined {
+    getLoaded(id: SpaceID): Space | undefined {
         return this.spaces.get(id);
     }
 
-    getDelayedSpace(spaceId: UUID): DelayedSpace {
+    getDelayedSpace(spaceId: SpaceID): DelayedSpace {
         return new DelayedSpace(this, spaceId);
     }
 
@@ -46,7 +48,7 @@ export class Spaces {
         return Array.from(this.spaces.values());
     }
 
-    load(id: string): Promise<Space> {
+    load(id: SpaceID): Promise<Space> {
         return this.storage.loadSpace(id)
                    .then(data => {
                        const space = new Space(data);
@@ -58,7 +60,7 @@ export class Spaces {
                    });
     }
 
-    save(id: string): Promise<Space> {
+    save(id: SpaceID): Promise<Space> {
         const exists = this.spaces.get(id);
         if (!exists)
             throw new SpaceNotFoundError(id);
@@ -67,7 +69,7 @@ export class Spaces {
                    .then(() => exists);
     }
 
-    remove(id: string): Promise<void> {
+    remove(id: SpaceID): Promise<void> {
         throw new Error('not implemented');
     }
 
