@@ -1,8 +1,8 @@
 import { ChunkDB } from './ChunkDB';
-import { SpaceID } from './common.types';
-import { SpaceReader } from './space-reader';
 import { Model } from './Model';
+import { SpaceID } from './common.types';
 import { IRecord } from './record.types';
+import { SpaceReader } from './space-reader';
 
 /**
  * Представляет собой доступ к настройкам и данным коллекции

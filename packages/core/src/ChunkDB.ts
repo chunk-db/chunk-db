@@ -1,12 +1,11 @@
 import { ChunkStorage } from './ChunkStorage';
+import { Model } from './Model';
 import { Accessor } from './accessor';
 import { AbstractChunk, ChunkType } from './chunks';
 import { Collection } from './collection';
 import { makeSubscription } from './common';
 import {
-    CollectionConfig,
     IChunkDBConfig,
-    ICollectionTypes,
     ITransactionConfig,
     SpaceID,
     Subscription,
@@ -25,7 +24,6 @@ import {
 import { ISpace } from './space';
 import { Spaces } from './spaces';
 import { IStorageDriver } from './storage.types';
-import { Model } from './Model';
 
 export class ChunkDB {
     public storage: ChunkStorage;

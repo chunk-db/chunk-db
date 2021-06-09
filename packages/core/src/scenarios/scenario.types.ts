@@ -1,7 +1,7 @@
 import { ChunkStorage } from '../ChunkStorage';
 import { Accessor } from '../accessor';
-import { ICollectionTypes, UUID } from '../common.types';
-import { Refs, Space } from '../space';
+import { UUID } from '../common.types';
+import { Refs } from '../space';
 import { Spaces } from '../spaces';
 
 export interface ScenarioAction {
@@ -11,10 +11,12 @@ export interface ScenarioAction {
 
 export type Scenario<T, ARGS extends any[]> = (...args: ARGS) => Generator<any, T, unknown>;
 
-export interface ScenarioContext  {
+export interface ScenarioContext {
     storage: ChunkStorage;
     activeTransactions: Accessor[];
+
     updateSpaceRefs(spaceID: UUID, refs: Refs): void;
+
     spaces: Spaces;
 }
 

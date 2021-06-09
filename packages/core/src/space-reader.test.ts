@@ -5,7 +5,7 @@ import {
 } from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
-import { arrayToMap } from './chunks/utils';
+import { arrayToMap } from './chunks';
 import { SpaceID } from './common.types';
 import { Space } from './space';
 import { SpaceReader } from './space-reader';

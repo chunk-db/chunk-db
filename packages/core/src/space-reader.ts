@@ -1,8 +1,8 @@
 import { ChunkDB } from './ChunkDB';
 import { IQuery } from './ConditionValidator';
+import { DelayedRef } from './delayed-ref';
 import { Query } from './query';
 import { IRecord } from './record.types';
-import { DelayedRef } from './delayed-ref';
 
 /**
  * Доступ к данным конкретной коллекции и пространства
