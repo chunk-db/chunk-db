@@ -2,17 +2,17 @@ import { Optional } from 'utility-types';
 import { v4 } from 'uuid';
 
 import { ChunkDB } from './ChunkDB';
-import { TemporaryTransactionChunk } from './chunks/TemporaryTransactionChunk';
-import { UUID } from './common.types';
+import { Model } from './Model';
+import { TemporaryTransactionChunk } from './chunks';
+import { ChunkID, makeChunkID } from './common.types';
+import { DelayedRef } from './delayed-ref';
 import { UpdateEvent } from './events';
+import { IRecord } from './record.types';
 import { Refs, Space } from './space';
 import { SpaceReader } from './space-reader';
-import { DelayedRef } from './delayed-ref';
-import { IRecord } from './record.types';
-import { Model } from './Model';
 
 export class Accessor {
-    public updatedRefs: { [NAME: string]: UUID; } = {};
+    public updatedRefs: { [NAME: string]: ChunkID; } = {};
 
     public get refs(): Refs {
         return {
@@ -82,7 +82,7 @@ export class Accessor {
         const collection = scheme.name;
         if (collection in this.updatedRefs)
             return;
-        const chunkID = v4();
+        const chunkID = makeChunkID(v4());
 
         const chunk = new TemporaryTransactionChunk(chunkID, this.refs[collection]);
 

@@ -1,5 +1,5 @@
 import { AbstractChunk } from '../chunks';
-import { ChunkID, UUID } from '../common.types';
+import { ChunkID, SpaceID, UUID } from '../common.types';
 import { DelayedRef } from '../delayed-ref';
 import { IRecord } from '../record.types';
 import { Refs, Space } from '../space';
@@ -22,7 +22,7 @@ export async function updateSpaceRefs(this: ScenarioContext, spaceID: UUID, refs
     this.updateSpaceRefs(spaceID, refs);
 }
 
-export async function getSpace(this: ScenarioContext, spaceID: UUID): Promise<Space> {
+export async function getSpace(this: ScenarioContext, spaceID: SpaceID): Promise<Space> {
     const space = this.spaces.getLoaded(spaceID);
     if (space)
         return space;

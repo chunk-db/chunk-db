@@ -5,7 +5,7 @@ import {
 } from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
-import { SpaceID } from './common.types';
+import { makeChunkID, makeSpaceID, SpaceID } from './common.types';
 import { InMemoryChunkStorage } from './in-memory-chunk-storage';
 import { call, getStorage, ScenarioContext } from './scenarios/scenario.types';
 import { Space } from './space';
@@ -140,7 +140,7 @@ describe('ChunkDB', () => {
 
             // act 2: find record
             await db2.connect();
-            await db2.spaces.load('test-space');
+            await db2.spaces.load(makeSpaceID('test-space'));
             const foundRecord = await db2.collection(TestRecord)
                                          .space('test-space' as SpaceID)
                                          .findOne({ _id: '123' });
@@ -165,7 +165,7 @@ describe('ChunkDB', () => {
 
         test('get empty', async () => {
             // act
-            const chain = await db.getFlatChain('a1', 0);
+            const chain = await db.getFlatChain(makeChunkID('a1'), 0);
 
             // assert
             expect(chain).toHaveLength(0);
@@ -173,7 +173,7 @@ describe('ChunkDB', () => {
 
         test('get last one', async () => {
             // act
-            const chain = await db.getFlatChain('a1', 1);
+            const chain = await db.getFlatChain(makeChunkID('a1'), 1);
 
             // assert
             expect(chain).toHaveLength(1);
@@ -182,7 +182,7 @@ describe('ChunkDB', () => {
 
         test('get all chain (top)', async () => {
             // act
-            const chain = await db.getFlatChain('a1', Infinity);
+            const chain = await db.getFlatChain(makeChunkID('a1'), Infinity);
 
             // assert
             expect(chain).toHaveLength(2);
@@ -192,7 +192,7 @@ describe('ChunkDB', () => {
 
         test('get all chain (in middle)', async () => {
             // act
-            const chain = await db.getFlatChain('initial', Infinity);
+            const chain = await db.getFlatChain(makeChunkID('initial'), Infinity);
 
             // assert
             expect(chain).toHaveLength(1);

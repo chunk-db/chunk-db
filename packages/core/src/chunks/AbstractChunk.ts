@@ -1,4 +1,4 @@
-import { UUID } from '../common.types';
+import { ChunkID, makeChunkID, UUID } from '../common.types';
 import { IRecord } from '../record.types';
 
 import { IGenericChunk } from './ChunkFactory';
@@ -18,14 +18,14 @@ export enum ChunkType {
  * Чанк содержит информацию об одном одновлении в одной коллекции
  */
 export abstract class AbstractChunk<T extends IRecord = IRecord> {
-    public readonly id: UUID = '';
+    public readonly id: ChunkID = makeChunkID('');
     public abstract type: ChunkType;
     public readonly records: ReadonlyMap<UUID, T>;
-    public readonly parents: UUID[];
+    public readonly parents: ChunkID[];
 
     protected constructor(data: IGenericChunk) {
-        this.id = data.id!;
-        this.parents = data.parents;
+        this.id = makeChunkID(data.id!);
+        this.parents = data.parents.map(id => makeChunkID(id));
         this.records = objectToMap(data.records) as any;
     }
 

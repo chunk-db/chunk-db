@@ -5,12 +5,12 @@ import { AbstractChunk, ChunkType } from './chunks';
 import { Collection } from './collection';
 import { makeSubscription } from './common';
 import {
+    ChunkID,
     IChunkDBConfig,
     ITransactionConfig,
     SpaceID,
     Subscription,
     Transaction,
-    UUID,
 } from './common.types';
 import { DataSpace } from './data-space';
 import { SpaceNotFoundError } from './errors';
@@ -21,7 +21,7 @@ import {
     ScenarioAction,
     ScenarioContext,
 } from './scenarios/scenario.types';
-import { ISpace } from './space';
+import { Space } from './space';
 import { Spaces } from './spaces';
 import { IStorageDriver } from './storage.types';
 
@@ -83,15 +83,17 @@ export class ChunkDB {
 
     /**
      * Get [[DataSpace]]
-     * @param spaceId
      */
-    public space(spaceId: string | ISpace): DataSpace {
-        if (!spaceId)
+    public space(space: SpaceID | Space): DataSpace {
+        let spaceID: SpaceID;
+        if (!space)
             throw new Error(`Invalid space ""`);
-        if (typeof spaceId === 'object')
-            spaceId = spaceId.id;
+        if (typeof space === 'object')
+            spaceID = (space as Space).id;
+        else
+            spaceID = space;
 
-        return new DataSpace(this, spaceId);
+        return new DataSpace(this, spaceID);
     }
 
     public collection<T extends IRecord>(scheme: Model<T>): Collection<T> {
@@ -163,14 +165,14 @@ export class ChunkDB {
         return accessor.getStats();
     }
 
-    public async getFlatChain(head: string, maxDepth = 3): Promise<AbstractChunk[]> {
+    public async getFlatChain(head: ChunkID, maxDepth = 3): Promise<AbstractChunk[]> {
         if (!maxDepth || !head)
             return [];
 
         const chain = [];
-        let lastChunksIds: UUID[] = [head];
+        let lastChunksIds: ChunkID[] = [head];
         for (let depth = 0; depth < maxDepth && lastChunksIds.length; depth++) {
-            const chunksIds = [];
+            const chunksIds: ChunkID[] = [];
 
             for (const chunkId of lastChunksIds) {
                 const chunk = await this.storage.loadChunk(chunkId);

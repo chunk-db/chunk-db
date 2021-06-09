@@ -3,7 +3,7 @@ import { IDemoRecord, TestRecord } from '../__tests__/chunks.demo';
 import { ChunkDB } from './ChunkDB';
 import { IGenericChunk } from './chunks';
 import { delay } from './common';
-import { SpaceID } from './common.types';
+import { makeSpaceID, SpaceID } from './common.types';
 import { ISpace, Space } from './space';
 import { StorageTestDriver } from './storage-test';
 
@@ -13,14 +13,14 @@ describe('accessor', () => {
     let driver: StorageTestDriver;
     let db: ChunkDB;
     const baseSpace = new Space({
-        id: 'base-space' as SpaceID,
+        id: makeSpaceID('base-space'),
         name: 'initial',
         refs: {
             records: 'initial',
         },
     });
     const space = new Space({
-        id: 'test-space' as SpaceID,
+        id: makeSpaceID('test-space'),
         name: 'a1',
         refs: {
             records: 'a1',
