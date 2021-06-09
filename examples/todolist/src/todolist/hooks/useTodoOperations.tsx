@@ -1,5 +1,6 @@
-import { useCallback } from 'react';
 import { useChunkDB } from '@chunk-db/react';
+import { useCallback } from 'react';
+
 import { ITodo, todoScheme } from '../store/store.types';
 
 export function useAddTodo() {

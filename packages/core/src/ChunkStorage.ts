@@ -1,7 +1,6 @@
-import { AbstractChunk, ChunkType } from './chunks/AbstractChunk';
-import { chunkFactory } from './chunks/ChunkFactory';
+import { AbstractChunk, chunkFactory, ChunkType } from './chunks';
 import { ChunkID, SpaceID, UUID } from './common.types';
-import { DBError, SpaceNotFoundError } from './errors';
+import { SpaceNotFoundError } from './errors';
 import { ISpace } from './space';
 import { IStorageDriver, NotFoundChunkError } from './storage.types';
 

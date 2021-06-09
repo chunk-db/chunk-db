@@ -1,9 +1,7 @@
-import { Brand } from 'utility-types';
-
+import { Model } from './Model';
 import { Accessor } from './accessor';
 import { IRecord } from './record.types';
 import { IStorageCacheDriver, IStorageDriver } from './storage.types';
-import { Model } from './Model';
 
 export type ID = string;
 export type UUID = string;

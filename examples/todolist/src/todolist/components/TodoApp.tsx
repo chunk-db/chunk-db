@@ -6,10 +6,10 @@ import Alert from '@material-ui/lab/Alert';
 import React from 'react';
 
 import { useAddTodo, useDeleteTodo } from '../hooks/useTodoOperations';
+import { todoScheme } from '../store/store.types';
 
 import { TodoForm } from './TodoForm';
 import { TodoList } from './TodoList';
-import { todoScheme } from '../store/store.types';
 
 export const TodoApp = () => {
     const addTodo = useAddTodo();

@@ -3,8 +3,8 @@ import {
     InMemoryChunkStorage,
     Space,
 } from '@chunk-db/core';
-
 import { IndexedDBDriver } from '@chunk-db/idb';
+
 import { todoScheme } from './store.types';
 
 const storage = process.browser

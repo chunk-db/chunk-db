@@ -8,5 +8,6 @@ export * from './storage.types';
 export * from './chunks';
 export * from './record.types';
 export * from './query';
+export * from './cursor';
 export * from './Model';
 export * from './cursor';

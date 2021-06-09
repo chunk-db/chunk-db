@@ -1,11 +1,11 @@
-import { AbstractChunk } from '../chunks/AbstractChunk';
+import { AbstractChunk } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
+import { DelayedRef } from '../delayed-ref';
+import { IRecord } from '../record.types';
 import { Refs, Space } from '../space';
 import { NotFoundChunkError } from '../storage.types';
 
 import { ScenarioContext } from './scenario.types';
-import { DelayedRef } from '../delayed-ref';
-import { IRecord } from '../record.types';
 
 export function resolveRelayedRef<T extends IRecord>(this: ScenarioContext, delayedRef: DelayedRef<T>): Promise<UUID> {
     return delayedRef();
