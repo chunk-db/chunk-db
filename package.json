@@ -12,6 +12,8 @@
   "scripts": {
     "dev": "lerna run --parallel dev",
     "build": "lerna run build",
+    "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",
+    "prettier": "prettier --write './**/*.{js,jsx,ts,tsx}'",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -40,7 +42,7 @@
     "gh-pages": "^3.1.0",
     "jest": "^26.6.3",
     "lerna": "^3.20.2",
-    "prettier": "^2.1.2",
+    "prettier": "2.3.1",
     "prettier-eslint": "^11.0.0",
     "react-scripts": "4.0.2",
     "ts-jest": "^26.4.1",
