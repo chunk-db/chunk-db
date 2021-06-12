@@ -1,6 +1,6 @@
 import { IGenericChunk } from './chunks/ChunkFactory';
 import { ChunkID, SpaceID } from './common.types';
-import { ISpace, Refs } from './space';
+import { ISpace } from './space';
 import { IStorageCacheDriver } from './storage.types';
 
 export type ActionType = keyof IStorageCacheDriver;

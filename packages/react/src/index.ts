@@ -1,4 +1,4 @@
-import { AbstractChunk, ChunkDB, DataSpace, ISpace, Query, SpaceID, UUID } from '@chunk-db/core';
+import { AbstractChunk, ChunkDB, DataSpace, ISpace, Query, SpaceID } from '@chunk-db/core';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export type QueryResult<T> = [T, boolean]; // FIXME: [result: T, loading: boolean];

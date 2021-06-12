@@ -63,7 +63,7 @@ export class IndexedDBDriver implements IStorageDriver {
             if (!this.db) return reject(new Error('DB not init'));
             const tx = this.db.transaction(this.chunkStorageName, 'readwrite');
             const req = tx.objectStore(this.chunkStorageName).get(id);
-            req.addEventListener('success', event => resolve(req.result), { once: true });
+            req.addEventListener('success', () => resolve(req.result), { once: true });
             req.addEventListener('error', reject, { once: true });
         });
     }
@@ -92,7 +92,7 @@ export class IndexedDBDriver implements IStorageDriver {
             if (!this.db) return reject(new Error('DB not init'));
             const tx = this.db.transaction([this.spacesCollection], 'readwrite');
             const req = tx.objectStore(this.spacesCollection).get(id);
-            req.addEventListener('success', event => resolve(req.result), { once: true });
+            req.addEventListener('success', () => resolve(req.result), { once: true });
             req.addEventListener('error', reject, { once: true });
         });
     }
