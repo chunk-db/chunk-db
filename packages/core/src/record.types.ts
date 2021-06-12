@@ -1,1 +1,1 @@
-export type IRecord = object;
+export type IRecord = Record<string, any>;

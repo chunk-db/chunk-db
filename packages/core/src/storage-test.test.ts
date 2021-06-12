@@ -97,15 +97,11 @@ describe('StorageTestDriver', () => {
             it('not one action', () => {
                 // arrange
                 const driver = new StorageTestDriver();
-                let status = 'pending';
 
                 // act
                 driver.loadSpace('test-id 2' as SpaceID);
                 driver.loadSpace('test-id' as SpaceID);
-                driver.loadSpace('test-id' as SpaceID).then(
-                    () => (status = 'resolve'),
-                    () => (status = 'reject')
-                );
+                driver.loadSpace('test-id' as SpaceID);
 
                 // assert
                 expect(() => driver.checkAction('loadSpace', 'test-id')).toThrow();
@@ -115,15 +111,11 @@ describe('StorageTestDriver', () => {
             it('no actions', () => {
                 // arrange
                 const driver = new StorageTestDriver();
-                let status = 'pending';
 
                 // act
                 driver.loadSpace('test-id 2' as SpaceID);
                 driver.loadSpace('test-id' as SpaceID);
-                driver.loadSpace('test-id' as SpaceID).then(
-                    () => (status = 'resolve'),
-                    () => (status = 'reject')
-                );
+                driver.loadSpace('test-id' as SpaceID);
 
                 // assert
                 expect(() => driver.checkActions('saveChunk', 'test-id')).toThrow();
