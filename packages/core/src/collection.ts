@@ -8,9 +8,7 @@ import { SpaceReader } from './space-reader';
  * Представляет собой доступ к настройкам и данным коллекции
  */
 export class Collection<T extends IRecord> {
-    constructor(private readonly db: ChunkDB,
-                public readonly model: Model<T>) {
-    }
+    constructor(private readonly db: ChunkDB, public readonly model: Model<T>) {}
 
     public space(space: SpaceID): SpaceReader<T> {
         const delayedSpace = this.db.spaces.getDelayedSpace(space);

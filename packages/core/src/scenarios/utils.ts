@@ -13,8 +13,7 @@ export function resolveRelayedRef<T extends IRecord>(this: ScenarioContext, dela
 
 export async function getChunk(this: ScenarioContext, chunkID: ChunkID): Promise<AbstractChunk> {
     const chunk = await this.storage.loadChunk(chunkID);
-    if (!chunk)
-        throw new NotFoundChunkError(chunkID);
+    if (!chunk) throw new NotFoundChunkError(chunkID);
     return chunk;
 }
 
@@ -24,7 +23,6 @@ export async function updateSpaceRefs(this: ScenarioContext, spaceID: SpaceID, r
 
 export async function getSpace(this: ScenarioContext, spaceID: SpaceID): Promise<Space> {
     const space = this.spaces.getLoaded(spaceID);
-    if (space)
-        return space;
+    if (space) return space;
     throw new Error(`Space "${spaceID}" not defined`);
 }

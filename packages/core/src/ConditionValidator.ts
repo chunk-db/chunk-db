@@ -14,17 +14,16 @@ export const QueryOperators = {
     $lte: (condition: string | number) => (value: any) => value <= condition,
 };
 
-type Condition = { [key in keyof typeof QueryOperators]?: any }
+type Condition = { [key in keyof typeof QueryOperators]?: any };
 
 export type IQuery = {
     [key: string]: Primitive | Condition;
-}
+};
 
 export type ConditionValidator<T extends IRecord = IRecord> = (record: T) => boolean;
 
 export function buildQuery(query: IQuery): ConditionValidator {
-    if (typeof query !== 'object')
-        throw new Error('ConditionValidator must be an object');
+    if (typeof query !== 'object') throw new Error('ConditionValidator must be an object');
 
     const byFields = Object.keys(query).map(path => {
         const getter = getFieldByPath(path);
@@ -45,10 +44,9 @@ export function buildQuery(query: IQuery): ConditionValidator {
 
 function makeConditionChecker(rule: Condition | number | string | boolean) {
     const condition: Condition = typeof rule === 'object' ? rule : { $eq: rule };
-    return Object.keys(condition).map((attr) => {
+    return Object.keys(condition).map(attr => {
         const operator = attr as keyof typeof QueryOperators;
-        if (!(operator in QueryOperators))
-            throw new InvalidQueryError(`Unknown operator "${operator}"`);
+        if (!(operator in QueryOperators)) throw new InvalidQueryError(`Unknown operator "${operator}"`);
 
         return QueryOperators[operator](condition[operator]);
     });

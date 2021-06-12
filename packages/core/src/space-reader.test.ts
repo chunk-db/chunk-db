@@ -1,8 +1,4 @@
-import {
-    demoStorage,
-    IDemoRecord,
-    TestRecord,
-} from '../__tests__/chunks.demo';
+import { demoStorage, IDemoRecord, TestRecord } from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
 import { arrayToMap } from './chunks';

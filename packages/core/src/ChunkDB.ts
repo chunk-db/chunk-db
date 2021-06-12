@@ -4,23 +4,12 @@ import { Accessor } from './accessor';
 import { AbstractChunk, ChunkType } from './chunks';
 import { Collection } from './collection';
 import { makeSubscription } from './common';
-import {
-    ChunkID,
-    IChunkDBConfig,
-    ITransactionConfig,
-    SpaceID,
-    Subscription,
-    Transaction,
-} from './common.types';
+import { ChunkID, IChunkDBConfig, ITransactionConfig, SpaceID, Subscription, Transaction } from './common.types';
 import { DataSpace } from './data-space';
 import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';
 import { IRecord } from './record.types';
-import {
-    isCall,
-    ScenarioAction,
-    ScenarioContext,
-} from './scenarios/scenario.types';
+import { isCall, ScenarioAction, ScenarioContext } from './scenarios/scenario.types';
 import { Space } from './space';
 import { Spaces } from './spaces';
 import { IStorageDriver } from './storage.types';
@@ -38,10 +27,9 @@ export class ChunkDB {
 
     constructor(config: IChunkDBConfig) {
         this.collections = {} as any;
-        config.collections
-              .forEach(scheme => {
-                  this.collections[scheme.name] = new Collection(this, scheme);
-              });
+        config.collections.forEach(scheme => {
+            this.collections[scheme.name] = new Collection(this, scheme);
+        });
         this.storageDriver = config.storage;
         this.storage = new ChunkStorage(this.storageDriver);
 
@@ -49,9 +37,12 @@ export class ChunkDB {
     }
 
     public connect(): Promise<ChunkDB> {
-        return this.storage.connect()
-                   .then(() => {this.ready = true;})
-                   .then(() => this);
+        return this.storage
+            .connect()
+            .then(() => {
+                this.ready = true;
+            })
+            .then(() => this);
     }
 
     /**
@@ -73,12 +64,12 @@ export class ChunkDB {
         if (typeof spaceID === 'function') {
             this.storeSubscriptions.push(spaceID);
 
-            return makeSubscription(() => this.storeSubscriptions = this.storeSubscriptions.filter(
-                item => item !== spaceID,
-            ));
+            return makeSubscription(
+                () => (this.storeSubscriptions = this.storeSubscriptions.filter(item => item !== spaceID))
+            );
         }
 
-        return this.spaces.subscribe(spaceID, cb as (() => void));
+        return this.spaces.subscribe(spaceID, cb as () => void);
     }
 
     /**
@@ -86,19 +77,15 @@ export class ChunkDB {
      */
     public space(space: SpaceID | Space): DataSpace {
         let spaceID: SpaceID;
-        if (!space)
-            throw new Error(`Invalid space ""`);
-        if (typeof space === 'object')
-            spaceID = (space as Space).id;
-        else
-            spaceID = space;
+        if (!space) throw new Error(`Invalid space ""`);
+        if (typeof space === 'object') spaceID = (space as Space).id;
+        else spaceID = space;
 
         return new DataSpace(this, spaceID);
     }
 
     public collection<T extends IRecord>(scheme: Model<T>): Collection<T> {
-        if (scheme.name in this.collections)
-            return this.collections[scheme.name] as any;
+        if (scheme.name in this.collections) return this.collections[scheme.name] as any;
 
         throw new Error(`Invalid collection "${scheme.name}"`);
     }
@@ -129,8 +116,16 @@ export class ChunkDB {
      * @param transaction
      */
     public async transaction(spaceID: SpaceID, transaction: Transaction): Promise<UpdateEvent>;
-    public async transaction(spaceID: SpaceID, config: ITransactionConfig, transaction: Transaction): Promise<UpdateEvent>;
-    public async transaction(spaceID: SpaceID, maybeConfig: ITransactionConfig | Transaction, maybeTransaction?: Transaction): Promise<UpdateEvent> {
+    public async transaction(
+        spaceID: SpaceID,
+        config: ITransactionConfig,
+        transaction: Transaction
+    ): Promise<UpdateEvent>;
+    public async transaction(
+        spaceID: SpaceID,
+        maybeConfig: ITransactionConfig | Transaction,
+        maybeTransaction?: Transaction
+    ): Promise<UpdateEvent> {
         let transaction: Transaction;
         const config: ITransactionConfig = {
             restartOnFail: false,
@@ -152,8 +147,7 @@ export class ChunkDB {
     }
 
     public async getFlatChain(head: ChunkID, maxDepth = 3): Promise<AbstractChunk[]> {
-        if (!maxDepth || !head)
-            return [];
+        if (!maxDepth || !head) return [];
 
         const chain = [];
         let lastChunksIds: ChunkID[] = [head];
@@ -181,19 +175,17 @@ export class ChunkDB {
      */
     private async applyTransaction(spaceID: SpaceID, accessor: Accessor): Promise<void> {
         const chunks: AbstractChunk<IRecord>[] = Object.keys(accessor.chunks).map(key => accessor.chunks[key]!);
-        if (!chunks)
-            return;
+        if (!chunks) return;
 
         const space = this.spaces.getLoaded(spaceID);
-        if (!space)
-            throw new SpaceNotFoundError(spaceID);
+        if (!space) throw new SpaceNotFoundError(spaceID);
 
         const isFirstChunk = chunks.some(chunk => !chunk.parents.length);
 
         if (isFirstChunk) {
-            chunks.forEach(chunk => chunk.type = ChunkType.Snapshot);
+            chunks.forEach(chunk => (chunk.type = ChunkType.Snapshot));
         } else {
-            chunks.forEach(chunk => chunk.type = ChunkType.Incremental);
+            chunks.forEach(chunk => (chunk.type = ChunkType.Incremental));
         }
 
         await Promise.all(chunks.map(chunk => this.storage.saveChunk(chunk)));
@@ -204,20 +196,22 @@ export class ChunkDB {
 }
 
 export interface Runner<T> {
-    next(): Promise<{ done: boolean, value: T }>;
+    next(): Promise<{ done: boolean; value: T }>;
 }
 
-function scenarioRunner<T>(context: ScenarioContext, scenario: Generator<ScenarioAction | T, ScenarioAction, ScenarioAction>): Runner<T> {
-    async function next(result?: any): Promise<{ done: boolean, value: T }> {
-        for (; ;) {
+function scenarioRunner<T>(
+    context: ScenarioContext,
+    scenario: Generator<ScenarioAction | T, ScenarioAction, ScenarioAction>
+): Runner<T> {
+    async function next(result?: any): Promise<{ done: boolean; value: T }> {
+        for (;;) {
             const tmp = scenario.next(result);
             const done = !!tmp.done;
             const value: any = tmp.value;
             if (isCall(value)) {
                 const { action, args } = value;
                 result = await action.apply(context, args);
-                if (done)
-                    return { done, value: result };
+                if (done) return { done, value: result };
             } else {
                 return { done, value };
             }

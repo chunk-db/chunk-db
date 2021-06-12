@@ -10,8 +10,7 @@ export class Cursor<T extends IRecord = IRecord> {
         return this._done;
     }
 
-    constructor(private querySelector: QuerySelector<T>) {
-    }
+    constructor(private querySelector: QuerySelector<T>) {}
 
     // public async next(): Promise<T> {
     //
@@ -30,8 +29,7 @@ export class Cursor<T extends IRecord = IRecord> {
     }
 
     public async all(): Promise<T[]> {
-        if (this._done)
-            throw new Error('Cursor already complete');
+        if (this._done) throw new Error('Cursor already complete');
         const allRecords: T[] = [];
         while (!this.querySelector.done) {
             const { records } = await this.querySelector.next();
@@ -42,13 +40,12 @@ export class Cursor<T extends IRecord = IRecord> {
     }
 
     public async reduce<R>(reducer: (acc: R, record: T) => R, initialValue: R): Promise<R> {
-        if (this._done)
-            throw new Error('Cursor already complete');
+        if (this._done) throw new Error('Cursor already complete');
 
         let result = initialValue;
         while (!this.querySelector.done) {
             const { records } = await this.querySelector.next();
-            records.forEach(record => result = reducer(result, record));
+            records.forEach(record => (result = reducer(result, record)));
         }
         this._done = true;
         return result;

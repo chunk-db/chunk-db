@@ -10,10 +10,8 @@ export class InMemoryChunkStorage implements IStorageCacheDriver {
 
     // chunks
     async loadChunk(id: ChunkID): Promise<IGenericChunk> {
-        if (this.chunks.has(id))
-            return this.chunks.get(id)!;
-        else
-            throw new NotFoundChunkError(id);
+        if (this.chunks.has(id)) return this.chunks.get(id)!;
+        else throw new NotFoundChunkError(id);
     }
 
     async saveChunk(chunk: IGenericChunk): Promise<IGenericChunk> {
@@ -61,8 +59,7 @@ export class InMemoryChunkStorage implements IStorageCacheDriver {
 
     async updateSpace(id: SpaceID, ref: ChunkID): Promise<ISpace> {
         const space = this.spaces.get(id);
-        if (!space)
-            throw new DBError(`Can not update space "${id}": not exists`);
+        if (!space) throw new DBError(`Can not update space "${id}": not exists`);
         this.spaces.set(id, {
             ...space,
             ref,

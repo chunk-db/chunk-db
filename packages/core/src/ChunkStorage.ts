@@ -20,10 +20,8 @@ export class ChunkStorage {
 
     getExists(id: ChunkID): AbstractChunk | null {
         const chunk = this.chunks.get(id);
-        if (!chunk)
-            return null;
-        if ('then' in chunk)
-            return null;
+        if (!chunk) return null;
+        if ('then' in chunk) return null;
         return chunk;
     }
 
@@ -40,34 +38,27 @@ export class ChunkStorage {
 
     removeTemporalChunk(id: ChunkID): boolean {
         const chunk = this.chunks.get(id);
-        if (!chunk || 'then' in chunk)
-            return true;
+        if (!chunk || 'then' in chunk) return true;
 
-        if (chunk.type !== ChunkType.TemporaryTransaction)
-            return false;
+        if (chunk.type !== ChunkType.TemporaryTransaction) return false;
 
         this.chunks.delete(id);
         return true;
     }
 
     async loadChunk(id: ChunkID): Promise<AbstractChunk> {
-        if (!id)
-            throw new NotFoundChunkError(id);
+        if (!id) throw new NotFoundChunkError(id);
         const existsChunk = this.chunks.get(id);
         if (existsChunk) {
-            if ('then' in existsChunk)
-                return existsChunk;
-            else
-                return existsChunk;
+            if ('then' in existsChunk) return existsChunk;
+            else return existsChunk;
         }
 
-        const promise = this.driver
-                            .loadChunk(id)
-                            .then(genericChunk => {
-                                const chunk = chunkFactory(genericChunk);
-                                this.chunks.set(id, chunk);
-                                return chunk;
-                            });
+        const promise = this.driver.loadChunk(id).then(genericChunk => {
+            const chunk = chunkFactory(genericChunk);
+            this.chunks.set(id, chunk);
+            return chunk;
+        });
         this.chunks.set(id, promise);
         return promise;
     }
@@ -79,8 +70,7 @@ export class ChunkStorage {
 
     async loadSpace(id: SpaceID): Promise<ISpace> {
         const space = await this.driver.loadSpace(id);
-        if (!space)
-            throw new SpaceNotFoundError(id);
+        if (!space) throw new SpaceNotFoundError(id);
         return space;
     }
 }

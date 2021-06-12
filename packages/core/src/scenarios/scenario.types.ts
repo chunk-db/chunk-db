@@ -22,7 +22,10 @@ export interface ScenarioContext {
 
 const callSymbol = Symbol('Call');
 
-export function call<ARGS extends any[], T extends any>(action: (this: ScenarioContext, ...args: ARGS) => Promise<T>, ...args: ARGS) {
+export function call<ARGS extends any[], T extends any>(
+    action: (this: ScenarioContext, ...args: ARGS) => Promise<T>,
+    ...args: ARGS
+) {
     return { [callSymbol]: true, action, args };
 }
 

@@ -33,30 +33,17 @@ export function SpaceCard({ space }: IProps) {
         return (
             <Card className={classes.root}>
                 <CardHeader
-                    avatar={
-                        <Skeleton animation="wave"
-                                  variant="circle"
-                                  width={40} height={40} />
-                    }
-                    title={<Skeleton animation="wave"
-                                     height={20} width="40%" />}
-                    subheader={<Skeleton animation="wave"
-                                         height={20} width="50%" />}
+                    avatar={<Skeleton animation="wave" variant="circle" width={40} height={40} />}
+                    title={<Skeleton animation="wave" height={20} width="40%" />}
+                    subheader={<Skeleton animation="wave" height={20} width="50%" />}
                 />
                 <CardContent>
                     <Typography gutterBottom>
-                        Description: <Skeleton animation="wave"
-                                               component="span"
-                                               height={24} width="100px"
-                    />
+                        Description: <Skeleton animation="wave" component="span" height={24} width="100px" />
                     </Typography>
 
                     <TableContainer component={Paper}>
-                        <Table
-                            size="small"
-                            stickyHeader
-                            aria-label="a dense table"
-                        >
+                        <Table size="small" stickyHeader aria-label="a dense table">
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Ref</TableCell>
@@ -66,16 +53,10 @@ export function SpaceCard({ space }: IProps) {
                             <TableBody>
                                 <TableRow>
                                     <TableCell component="th" scope="row">
-                                        <Skeleton animation="wave"
-                                                  component="span"
-                                                  height={20} width="40%"
-                                        />
+                                        <Skeleton animation="wave" component="span" height={20} width="40%" />
                                     </TableCell>
                                     <TableCell align="right">
-                                        <Skeleton animation="wave"
-                                                  component="span"
-                                                  height={20} width="90%"
-                                        />
+                                        <Skeleton animation="wave" component="span" height={20} width="90%" />
                                     </TableCell>
                                 </TableRow>
                             </TableBody>
@@ -87,39 +68,27 @@ export function SpaceCard({ space }: IProps) {
 
     return (
         <Card className={classes.root}>
-            <CardHeader
-                avatar={
-                    <Avatar aria-label="recipe">
-                        S
-                    </Avatar>
-                }
-                title={space.name}
-                subheader={space.id}
-            />
+            <CardHeader avatar={<Avatar aria-label="recipe">S</Avatar>} title={space.name} subheader={space.id} />
             <CardContent>
-                <Typography gutterBottom
-                            component="div">
+                <Typography gutterBottom component="div">
                     Description:
-                    {space.description
-                        ? <Box>{space.description}</Box>
-                        : <Box><i>(empty)</i></Box>
-                    }
+                    {space.description ? (
+                        <Box>{space.description}</Box>
+                    ) : (
+                        <Box>
+                            <i>(empty)</i>
+                        </Box>
+                    )}
                 </Typography>
 
                 <TableContainer component={Paper}>
-                    <Table
-                        size="small"
-                        stickyHeader
-                        aria-label="a dense table"
-                    >
+                    <Table size="small" stickyHeader aria-label="a dense table">
                         <TableBody>
                             <TableRow>
                                 <TableCell component="th" scope="row">
                                     Ref:
                                 </TableCell>
-                                <TableCell align="right">
-                                    {space.ref}
-                                </TableCell>
+                                <TableCell align="right">{space.ref}</TableCell>
                             </TableRow>
                         </TableBody>
                     </Table>

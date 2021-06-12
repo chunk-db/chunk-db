@@ -33,9 +33,7 @@ export function ChunkList({ chunks }: IProps) {
 
     return (
         <TableContainer component={Paper}>
-            <Table size="small"
-                   stickyHeader
-                   aria-label="a dense table">
+            <Table size="small" stickyHeader aria-label="a dense table">
                 <TableHead>
                     <TableRow>
                         <TableCell>UUID</TableCell>
@@ -44,16 +42,11 @@ export function ChunkList({ chunks }: IProps) {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {rows.map((row) => (
+                    {rows.map(row => (
                         <TableRow key={row.id}>
                             <TableCell component="th" scope="row">
-                                <Box
-                                    display="flex"
-                                    flexDirection="row"
-                                    justifyContent="space-between"
-                                >
-                                    <Tooltip title={row.id}
-                                             aria-label="Chunk ID">
+                                <Box display="flex" flexDirection="row" justifyContent="space-between">
+                                    <Tooltip title={row.id} aria-label="Chunk ID">
                                         <span>{row.shortId}</span>
                                     </Tooltip>
                                     <IconButton
@@ -62,9 +55,7 @@ export function ChunkList({ chunks }: IProps) {
                                         edge="end"
                                         onClick={() => copyToClipboard(row.id)}
                                     >
-                                        <CopyIcon
-                                            fontSize="small"
-                                        />
+                                        <CopyIcon fontSize="small" />
                                     </IconButton>
                                 </Box>
                             </TableCell>
@@ -79,8 +70,7 @@ export function ChunkList({ chunks }: IProps) {
 }
 
 function shortId(id: UUID): string {
-    if (!id)
-        return id;
+    if (!id) return id;
 
     return id.substr(0, 13) + '...' + id.substr(28);
 }

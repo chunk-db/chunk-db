@@ -12,10 +12,12 @@ import { IRecord } from './record.types';
 export class Query<T extends IRecord = IRecord> {
     private _query: IQuery;
 
-    constructor(public readonly db: ChunkDB,
-                public readonly delayedRef: DelayedRef<T>,
-                public readonly model: Model<T>,
-                query: IQuery) {
+    constructor(
+        public readonly db: ChunkDB,
+        public readonly delayedRef: DelayedRef<T>,
+        public readonly model: Model<T>,
+        query: IQuery
+    ) {
         this._query = query;
     }
 

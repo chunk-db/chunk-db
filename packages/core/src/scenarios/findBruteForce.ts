@@ -11,7 +11,11 @@ import { FindScenario } from './find.types';
 import { call } from './scenario.types';
 import { getChunk, resolveRelayedRef } from './utils';
 
-export function* findBruteForce<T extends IRecord = IRecord>(delayedRef: DelayedRef<T>, model: Model<T>, query: IQuery = {}): FindScenario<T> {
+export function* findBruteForce<T extends IRecord = IRecord>(
+    delayedRef: DelayedRef<T>,
+    model: Model<T>,
+    query: IQuery = {}
+): FindScenario<T> {
     const map = new Map<UUID, IRecord>();
     const builtQuery = buildQuery(query);
     let chunk: AbstractChunk;
@@ -27,8 +31,7 @@ export function* findBruteForce<T extends IRecord = IRecord>(delayedRef: Delayed
 
     while (true) {
         chunk = yield call(getChunk, chunkID);
-        if (!chunk)
-            throw new NotFoundChunkError(chunkID);
+        if (!chunk) throw new NotFoundChunkError(chunkID);
         const records: any = mapToArray(chunk.data.get(model.name)).filter(isNew(map, builtQuery));
 
         switch (chunk.type) {
@@ -51,13 +54,12 @@ export function* findBruteForce<T extends IRecord = IRecord>(delayedRef: Delayed
     }
 }
 
-function isNew<T extends IRecord>(map: Map<UUID, T>, filter: ConditionValidator) { // todo
+function isNew<T extends IRecord>(map: Map<UUID, T>, filter: ConditionValidator) {
+    // todo
     return (record: any) => {
-        if (map.has(record._id))
-            return false;
+        if (map.has(record._id)) return false;
 
-        if (!filter(record))
-            return false;
+        if (!filter(record)) return false;
 
         map.set(record._id, record);
         return true;

@@ -1,7 +1,4 @@
-import {
-    demoStorage,
-    TestRecord,
-} from '../../__tests__/chunks.demo';
+import { demoStorage, TestRecord } from '../../__tests__/chunks.demo';
 import { ChunkDB } from '../ChunkDB';
 import { IQuery } from '../ConditionValidator';
 import { makeChunkID } from '../common.types';
@@ -28,18 +25,14 @@ describe('findBruteForce', () => {
             done: false,
             value: {
                 chunkID: 'a1',
-                records: [
-                    { _id: 'a', user: 1, value: 'a1' },
-                ],
+                records: [{ _id: 'a', user: 1, value: 'a1' }],
             },
         });
         expect(await gen.next()).toEqual({
             done: true,
             value: {
                 chunkID: 'initial',
-                records: [
-                    { _id: 'd', user: 2, value: 'd0' },
-                ],
+                records: [{ _id: 'd', user: 2, value: 'd0' }],
             },
         });
     });
@@ -62,9 +55,7 @@ describe('findBruteForce', () => {
             done: true,
             value: {
                 chunkID: 'initial',
-                records: [
-                    { _id: 'd', user: 2, value: 'd0' },
-                ],
+                records: [{ _id: 'd', user: 2, value: 'd0' }],
             },
         });
     });
@@ -73,7 +64,9 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('a1')), TestRecord, { user: 10 } as IQuery));
+        const gen = db.run(
+            findBruteForce(() => Promise.resolve(makeChunkID('a1')), TestRecord, { user: 10 } as IQuery)
+        );
 
         // assert
         expect(await gen.next()).toEqual({
@@ -96,16 +89,16 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce(() => Promise.resolve(makeChunkID('initial')), TestRecord, { user: 1 } as IQuery));
+        const gen = db.run(
+            findBruteForce(() => Promise.resolve(makeChunkID('initial')), TestRecord, { user: 1 } as IQuery)
+        );
 
         // assert
         expect(await gen.next()).toEqual({
             done: true,
             value: {
                 chunkID: 'initial',
-                records: [
-                    { _id: 'a', user: 1, value: 'a0' },
-                ],
+                records: [{ _id: 'a', user: 1, value: 'a0' }],
             },
         });
     });

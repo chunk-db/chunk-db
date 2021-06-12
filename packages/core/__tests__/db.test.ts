@@ -1,13 +1,4 @@
-import {
-    ChunkDB,
-    ChunkType,
-    Cursor,
-    delay,
-    InMemoryChunkStorage, makeSpaceID,
-    Space,
-    SpaceID,
-    UUID,
-} from '../src';
+import { ChunkDB, ChunkType, Cursor, delay, InMemoryChunkStorage, makeSpaceID, Space, SpaceID, UUID } from '../src';
 
 import { allDemoChunks, IDemoRecord, TestRecord } from './chunks.demo';
 
@@ -31,9 +22,7 @@ describe('ChunkDB e2e tests', () => {
         storage.saveSpace(space);
         db = new ChunkDB({
             storage,
-            collections: [
-                TestRecord,
-            ],
+            collections: [TestRecord],
         });
     });
 
@@ -74,9 +63,7 @@ describe('ChunkDB e2e tests', () => {
                         .one();
 
                     // assert
-                    expect(result).toEqual(
-                        { _id: 'd', user: 2, value: 'd0' },
-                    );
+                    expect(result).toEqual({ _id: 'd', user: 2, value: 'd0' });
                 });
                 test('query on another head', async () => {
                     // arrange
@@ -90,9 +77,7 @@ describe('ChunkDB e2e tests', () => {
                         .one();
 
                     // assert
-                    expect(result).toEqual(
-                        { _id: 'a', user: 1, value: 'a0' },
-                    );
+                    expect(result).toEqual({ _id: 'a', user: 1, value: 'a0' });
                 });
                 test('no results', async () => {
                     // arrange
@@ -146,9 +131,7 @@ describe('ChunkDB e2e tests', () => {
                         .one();
 
                     // assert
-                    expect(result).toEqual(
-                        { _id: 'd', user: 2, value: 'd0' },
-                    );
+                    expect(result).toEqual({ _id: 'd', user: 2, value: 'd0' });
                 });
                 test('query on another head', async () => {
                     // arrange
@@ -162,9 +145,7 @@ describe('ChunkDB e2e tests', () => {
                         .one();
 
                     // assert
-                    expect(result).toEqual(
-                        { _id: 'a', user: 1, value: 'a0' },
-                    );
+                    expect(result).toEqual({ _id: 'a', user: 1, value: 'a0' });
                 });
                 test('no results', async () => {
                     // arrange
@@ -196,10 +177,13 @@ describe('ChunkDB e2e tests', () => {
                 // assert
                 expect(cursor).toBeInstanceOf(Cursor);
 
-                const result = await cursor.reduce((acc, record) => ({
-                    users: acc.users.add(record.user),
-                    values: acc.values.concat(record.value),
-                }), { users: new Set<number>(), values: <string[]>[] });
+                const result = await cursor.reduce(
+                    (acc, record) => ({
+                        users: acc.users.add(record.user),
+                        values: acc.values.concat(record.value),
+                    }),
+                    { users: new Set<number>(), values: <string[]>[] }
+                );
 
                 expect(result).toEqual({
                     users: new Set([1, 2]),
@@ -212,11 +196,7 @@ describe('ChunkDB e2e tests', () => {
                 // arrange
 
                 // act
-                const cursor = db
-                    .space(makeSpaceID(''))
-                    .collection(TestRecord)
-                    .find({})
-                    .exec();
+                const cursor = db.space(makeSpaceID('')).collection(TestRecord).find({}).exec();
 
                 // assert
                 expect(cursor).toBeInstanceOf(Cursor);
@@ -307,11 +287,13 @@ describe('ChunkDB e2e tests', () => {
 
                     // query in the transaction
                     const recordsFromTx = await tx.collection(TestRecord).findAll({ user: 8 });
-                    expect(recordsFromTx).toEqual([{
-                        _id: record._id,
-                        user: 8,
-                        value: 'value',
-                    }]);
+                    expect(recordsFromTx).toEqual([
+                        {
+                            _id: record._id,
+                            user: 8,
+                            value: 'value',
+                        },
+                    ]);
 
                     await delay(10);
 

@@ -22,16 +22,12 @@ export class StorageTestDriver implements IStorageCacheDriver {
      * @param id
      */
     checkAction(type: ActionType, id?: IAction['id']): IAction {
-        const found = this.actions.filter(
-            action => action.type === type && (id == null ? true : action.id === id),
-        );
+        const found = this.actions.filter(action => action.type === type && (id == null ? true : action.id === id));
         if (!found.length)
             if (this.actions.length)
                 throw new Error(`No found action "${type}". The first action is "${this.actions[0].type}"`);
-            else
-                throw new Error(`No found action "${type}". No any actions fired`);
-        if (found.length > 1)
-            throw new Error(`Found actions "${type}" more then one`);
+            else throw new Error(`No found action "${type}". No any actions fired`);
+        if (found.length > 1) throw new Error(`Found actions "${type}" more then one`);
         const index = this.actions.indexOf(found[0]);
         this.actions.splice(index, 1);
         return found[0];
@@ -41,14 +37,9 @@ export class StorageTestDriver implements IStorageCacheDriver {
      * Check for 1 or more found actions
      */
     checkActions(type: ActionType, id?: IAction['id']): IAction[] {
-        const found = this.actions.filter(
-            action => action.type === type && (id == null ? true : action.id === id),
-        );
-        if (!found.length)
-            throw new Error(`No found action "${type}"`);
-        found.forEach(item =>
-            this.actions.splice(this.actions.indexOf(item), 1),
-        );
+        const found = this.actions.filter(action => action.type === type && (id == null ? true : action.id === id));
+        if (!found.length) throw new Error(`No found action "${type}"`);
+        found.forEach(item => this.actions.splice(this.actions.indexOf(item), 1));
         return found;
     }
 
@@ -56,8 +47,7 @@ export class StorageTestDriver implements IStorageCacheDriver {
      * Throw error if actions exists
      */
     verify(): void {
-        if (!this.actions.length)
-            return;
+        if (!this.actions.length) return;
 
         const list = this.actions.map((action, index) => ` #${index + 1}: action "${action.type}", id "${action.id}"`);
         throw new Error(`Not all actions checks.\n` + list.join('\n'));

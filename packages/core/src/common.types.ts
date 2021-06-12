@@ -11,9 +11,13 @@ export type Primitive = string | number | boolean;
 
 export type CollectionType<T> = T extends ICollectionConfig<infer R> ? R : never;
 
-export function makeChunkID(uuid: UUID): ChunkID { return uuid as any;}
+export function makeChunkID(uuid: UUID): ChunkID {
+    return uuid as any;
+}
 
-export function makeSpaceID(uuid: UUID): SpaceID { return uuid as any;}
+export function makeSpaceID(uuid: UUID): SpaceID {
+    return uuid as any;
+}
 
 export interface ICollectionTypes {
     [key: string]: IRecord;
@@ -26,7 +30,7 @@ export interface IChunkDBConfig {
 }
 
 interface Type<T> {
-    new(data: any): T;
+    new (data: any): T;
 }
 
 export enum Priority {
@@ -48,8 +52,7 @@ interface IClassCollectionConfig<T extends IRecord = IRecord> extends IBaseColle
     constructor?: Type<T>;
 }
 
-export type ICollectionConfig<T extends IRecord = IRecord> =
-    IFactoryCollectionConfig<T> | IClassCollectionConfig<T>;
+export type ICollectionConfig<T extends IRecord = IRecord> = IFactoryCollectionConfig<T> | IClassCollectionConfig<T>;
 
 export class CollectionConfig<T extends IRecord = IRecord> {
     indexedFields: (keyof T)[] = [];
@@ -59,17 +62,15 @@ export class CollectionConfig<T extends IRecord = IRecord> {
     constructor(public readonly name: string, config: ICollectionConfig<T>) {
         this.indexedFields = config.indexedFields || this.indexedFields;
         this.priority = config.priority || this.priority;
-        if ('factory' in config)
-            this.factory = config.factory!;
-        else if ('constructor' in config)
-            this.factory = data => new (config.constructor as Type<T>)(data);
+        if ('factory' in config) this.factory = config.factory!;
+        else if ('constructor' in config) this.factory = data => new (config.constructor as Type<T>)(data);
         else throw new Error('Invalid collection config');
     }
 }
 
 export interface IRefCollection {
-    branches: { [name: string]: ChunkID },
-    tags: { [name: string]: ChunkID },
+    branches: { [name: string]: ChunkID };
+    tags: { [name: string]: ChunkID };
 }
 
 export type Transaction = (accessor: Accessor) => Promise<any>;

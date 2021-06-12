@@ -1,20 +1,7 @@
-import {
-    AbstractChunk,
-    ChunkDB,
-    DataSpace,
-    ISpace,
-    Query, SpaceID,
-    UUID,
-} from '@chunk-db/core';
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useState,
-} from 'react';
+import { AbstractChunk, ChunkDB, DataSpace, ISpace, Query, SpaceID, UUID } from '@chunk-db/core';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
-export type QueryResult<T> = [T, boolean];// FIXME: [result: T, loading: boolean];
+export type QueryResult<T> = [T, boolean]; // FIXME: [result: T, loading: boolean];
 
 export function useForceReload() {
     const [, updateState] = useState<any>();
@@ -34,8 +21,7 @@ export function useSpace(spaceID: SpaceID): DataSpace | undefined {
     const [space, setSpace] = useState<DataSpace | undefined>(undefined);
 
     useEffect(() => {
-        if (!db || !spaceID)
-            return;
+        if (!db || !spaceID) return;
         setSpace(new DataSpace(db, spaceID));
         return db.spaces.subscribe(spaceID, () => setSpace(new DataSpace(db, spaceID)));
     }, [db, spaceID]);
@@ -48,8 +34,7 @@ export function useSpaces(): ISpace[] {
     const [spaces, setSpaces] = useState<ISpace[]>([]);
 
     useEffect(() => {
-        if (!db)
-            return;
+        if (!db) return;
         setSpaces(db.spaces.getList());
 
         return db.spaces.subscribe(() => setSpaces(db.spaces.getList()));
@@ -64,8 +49,7 @@ export function useFlatChain(spaceID: SpaceID, collection: string, maxDepth?: nu
     const space = useSpace(spaceID);
     useEffect(() => {
         if (!space || !db.ready) return;
-        db.getFlatChain(space.ref, maxDepth)
-          .then(list => setChain(list));
+        db.getFlatChain(space.ref, maxDepth).then(list => setChain(list));
     }, [db, space, collection, maxDepth]);
 
     return chain;
@@ -86,9 +70,11 @@ export function useQueryAll<PARAMS extends any[]>(
         if (!space || !db.ready) return;
         const query = queryBuilder(space, ...params);
         if (query instanceof Query)
-            query.exec().all().then(list => setResult([list, false]));
-        else
-            query.then(res => setResult([res, false]));
+            query
+                .exec()
+                .all()
+                .then(list => setResult([list, false]));
+        else query.then(res => setResult([res, false]));
     }, [space, ...params]);
 
     return result;
