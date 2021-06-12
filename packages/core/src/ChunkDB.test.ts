@@ -1,8 +1,4 @@
-import {
-    demoStorage,
-    IDemoRecord,
-    TestRecord,
-} from '../__tests__/chunks.demo';
+import { demoStorage, IDemoRecord, TestRecord } from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
 import { makeChunkID, makeSpaceID, SpaceID } from './common.types';
@@ -131,15 +127,16 @@ describe('ChunkDB', () => {
             const db2: ChunkDB = new ChunkDB({
                 cache: null,
                 storage: driver,
-                collections:[TestRecord],
+                collections: [TestRecord],
             });
 
             // act 2: find record
             await db2.connect();
             await db2.spaces.load(makeSpaceID('test-space'));
-            const foundRecord = await db2.collection(TestRecord)
-                                         .space('test-space' as SpaceID)
-                                         .findOne({ _id: '123' });
+            const foundRecord = await db2
+                .collection(TestRecord)
+                .space('test-space' as SpaceID)
+                .findOne({ _id: '123' });
 
             // assert
             expect(foundRecord).toEqual(record);

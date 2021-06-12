@@ -26,8 +26,7 @@ export class Accessor {
 
     public chunks: { [name: string]: TemporaryTransactionChunk } = {};
 
-    constructor(private db: ChunkDB,
-                private space: Space) {
+    constructor(private db: ChunkDB, private space: Space) {
         this.initialRefs = new Map([[space.id, space.ref]]);
         this.refs = new Map([[space.id, space.ref]]);
     }
@@ -66,7 +65,8 @@ export class Accessor {
 
     async upsert<T extends IRecord>(scheme: Model<T>, record: T): Promise<T> {
         this.prepareSpaceForWriting(this.space.id);
-        if (!this.chunks[this.space.id]!.hasRecords(scheme, record[scheme.uuid] as any)) {// todo
+        if (!this.chunks[this.space.id]!.hasRecords(scheme, record[scheme.uuid] as any)) {
+            // todo
             this.stats.upserted.push(record[scheme.uuid] as any);
         }
         this.chunks[this.space.id]!.setRecord(scheme, record[scheme.uuid] as any, record); // todo
@@ -77,8 +77,7 @@ export class Accessor {
     }
 
     private prepareSpaceForWriting(space: SpaceID): void {
-        if (this.updatedRefs.has(space))
-            return;
+        if (this.updatedRefs.has(space)) return;
 
         const chunkID = makeChunkID(v4());
 
@@ -93,14 +92,11 @@ export class Accessor {
     }
 
     private updateRef(space: SpaceID, chunk: ChunkID): boolean {
-        if (!this.initialRefs.has(space))
-            throw new InnerDBError(`Forbidden to write into not defined spaces`);
+        if (!this.initialRefs.has(space)) throw new InnerDBError(`Forbidden to write into not defined spaces`);
 
-        if (this.initialRefs.get(space) === chunk)
-            return false;
+        if (this.initialRefs.get(space) === chunk) return false;
 
-        if (this.updatedRefs.get(space) === chunk)
-            return false;
+        if (this.updatedRefs.get(space) === chunk) return false;
 
         this.updatedRefs.set(space, chunk);
         this.refs.set(space, chunk);

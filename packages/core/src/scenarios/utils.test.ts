@@ -43,9 +43,7 @@ describe('scenarios/utils', () => {
         test('should throw exception because chunk not exists', async () => {
             // act
             const gen = db.run(testScenario(makeChunkID('unknown')));
-            expect(gen.next())
-                .rejects
-                .toEqual(new NotFoundChunkError(makeChunkID('unknown')));
+            expect(gen.next()).rejects.toEqual(new NotFoundChunkError(makeChunkID('unknown')));
         });
     });
 });

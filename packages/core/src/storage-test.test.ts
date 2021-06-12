@@ -12,14 +12,14 @@ describe('StorageTestDriver', () => {
 
             // act
             driver.loadSpace('test-id' as SpaceID).then(
-                (value) => {
+                value => {
                     status = 'resolved';
                     result = value;
                 },
-                (value) => {
+                value => {
                     status = 'rejected';
                     result = value;
-                },
+                }
             );
 
             // assert
@@ -46,14 +46,14 @@ describe('StorageTestDriver', () => {
 
             // act
             driver.loadSpace('test-id' as SpaceID).then(
-                (value) => {
+                value => {
                     status = 'resolve';
                     result = value;
                 },
-                (value) => {
+                value => {
                     status = 'reject';
                     result = value;
-                },
+                }
             );
 
             // assert
@@ -81,8 +81,8 @@ describe('StorageTestDriver', () => {
                 driver.loadSpace('test-id 2' as SpaceID);
                 driver.loadChunk('test-id' as SpaceID);
                 driver.loadSpace('test-id' as SpaceID).then(
-                    () => status = 'resolve',
-                    () => status = 'reject',
+                    () => (status = 'resolve'),
+                    () => (status = 'reject')
                 );
 
                 // assert
@@ -103,13 +103,12 @@ describe('StorageTestDriver', () => {
                 driver.loadSpace('test-id 2' as SpaceID);
                 driver.loadSpace('test-id' as SpaceID);
                 driver.loadSpace('test-id' as SpaceID).then(
-                    () => status = 'resolve',
-                    () => status = 'reject',
+                    () => (status = 'resolve'),
+                    () => (status = 'reject')
                 );
 
                 // assert
-                expect(() => driver.checkAction('loadSpace', 'test-id'))
-                    .toThrow();
+                expect(() => driver.checkAction('loadSpace', 'test-id')).toThrow();
             });
         });
         describe('checkActions', () => {
@@ -122,13 +121,12 @@ describe('StorageTestDriver', () => {
                 driver.loadSpace('test-id 2' as SpaceID);
                 driver.loadSpace('test-id' as SpaceID);
                 driver.loadSpace('test-id' as SpaceID).then(
-                    () => status = 'resolve',
-                    () => status = 'reject',
+                    () => (status = 'resolve'),
+                    () => (status = 'reject')
                 );
 
                 // assert
-                expect(() => driver.checkActions('saveChunk', 'test-id'))
-                    .toThrow();
+                expect(() => driver.checkActions('saveChunk', 'test-id')).toThrow();
             });
             it('more actions', () => {
                 // arrange

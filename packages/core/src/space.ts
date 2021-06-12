@@ -1,14 +1,8 @@
-import {
-    ChunkID,
-    makeChunkID,
-    makeSpaceID,
-    SpaceID,
-    UUID,
-} from './common.types';
+import { ChunkID, makeChunkID, makeSpaceID, SpaceID, UUID } from './common.types';
 
 export type Refs = {
     [key: string]: ChunkID;
-}
+};
 
 export interface ISpace {
     id: string;
@@ -30,4 +24,3 @@ export class Space {
         this.ref = makeChunkID(config.ref);
     }
 }
-

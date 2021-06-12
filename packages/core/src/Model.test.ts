@@ -9,8 +9,7 @@ class TestEntity {
     public category: UUID = '';
 
     constructor(data?: any) {
-        if (data)
-            Object.assign(this, data);
+        if (data) Object.assign(this, data);
     }
 }
 

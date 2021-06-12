@@ -43,7 +43,7 @@ export abstract class AbstractChunk<T extends IRecord = IRecord> {
         const data: { [collection: string]: { [key: string]: T } } = {};
         this.data.forEach((records, collection) => {
             const list: { [key: string]: T } = {};
-            records.forEach((record, id) => list[id] = record);
+            records.forEach((record, id) => (list[id] = record));
             data[collection] = list;
         });
         return {

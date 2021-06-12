@@ -16,10 +16,12 @@ export class QuerySelector<T extends IRecord = IRecord> {
         return this._done;
     }
 
-    constructor(private readonly db: ChunkDB,
-                private readonly delayedRef: DelayedRef<T>,
-                private readonly model: Model<T>,
-                private readonly query: IQuery) {
+    constructor(
+        private readonly db: ChunkDB,
+        private readonly delayedRef: DelayedRef<T>,
+        private readonly model: Model<T>,
+        private readonly query: IQuery
+    ) {
         this.scenario = this.db.run(findBruteForce(this.delayedRef, this.model, this.query));
     }
 

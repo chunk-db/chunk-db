@@ -3,9 +3,11 @@ import { IRecord } from '../record.types';
 
 import { IGenericChunk } from './ChunkFactory';
 
-export function chunkDataToMap(data: { [collection: string]: { [key: string]: IRecord } }): Map<string, Map<UUID, IRecord>> {
+export function chunkDataToMap(data: {
+    [collection: string]: { [key: string]: IRecord };
+}): Map<string, Map<UUID, IRecord>> {
     const result = new Map<string, Map<UUID, IRecord>>();
-    Object.keys(data).forEach((collection) => result.set(collection, objectToMap(data[collection])));
+    Object.keys(data).forEach(collection => result.set(collection, objectToMap(data[collection])));
     return result;
 }
 
@@ -22,35 +24,31 @@ export function arrayToMap<T extends IRecord = IRecord>(data: T[]): Map<UUID, T>
 }
 
 export function mapToArray<T extends IRecord = IRecord>(map?: ReadonlyMap<UUID, T>): T[] {
-    if (!map)
-        return [];
+    if (!map) return [];
     return Array.from(map.values());
 }
 
 export function arrayToObject<T extends IRecord = IRecord>(data: T[]): { [key: string]: T } {
     const obj: any = {};
-    data.forEach((record: any) => obj[record._id] = record); // TODO
+    data.forEach((record: any) => (obj[record._id] = record)); // TODO
     return obj;
 }
 
 export function isGenericChunk(target: any): target is IGenericChunk {
-    if (typeof target !== 'object' || !target)
-        return false;
+    if (typeof target !== 'object' || !target) return false;
 
     const { parents, data } = target;
 
-    if (!Array.isArray(parents))
-        return false;
+    if (!Array.isArray(parents)) return false;
 
-    if (typeof data !== 'object')
-        return false;
+    if (typeof data !== 'object') return false;
 
     return true;
 }
 
 export function calculateSizes(data: ReadonlyMap<string, ReadonlyMap<UUID, any>>): {
-    size: number,
-    sizes: { [collection: string]: number },
+    size: number;
+    sizes: { [collection: string]: number };
 } {
     let size = 0;
     const sizes: { [collection: string]: number } = {};

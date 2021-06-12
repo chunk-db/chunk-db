@@ -24,11 +24,7 @@ interface IProps {
 export const TodoList = ({ todos, deleteTodo, loading }: IProps) => (
     <Box m={1}>
         <TableContainer component={Paper}>
-            <Table
-                size="small"
-                aria-labelledby="tableTitle"
-                aria-label="enhanced table"
-            >
+            <Table size="small" aria-labelledby="tableTitle" aria-label="enhanced table">
                 <TableHead>
                     <TableRow>
                         <TableCell />
@@ -37,66 +33,54 @@ export const TodoList = ({ todos, deleteTodo, loading }: IProps) => (
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {!loading && todos.map(todo => <TableRow key={todo._id}>
-                        <TableCell padding="checkbox">
-                            <Checkbox
-                                checked={false}
-                                inputProps={{ 'aria-labelledby': 'labelId' }}
-                            />
-                        </TableCell>
-                        <TableCell>{todo.title}</TableCell>
-                        <TableCell align="right">
-                            <IconButton
-                                size="small"
-                                aria-label="Edit"
-                                onClick={() => {
-                                    deleteTodo(todo._id);
-                                }}
-                            >
-                                <EditIcon />
-                            </IconButton>
-                            <IconButton
-                                size="small"
-                                aria-label="Delete"
-                                onClick={() => {
-                                    deleteTodo(todo._id);
-                                }}
-                            >
-                                <DeleteIcon />
-                            </IconButton>
-                        </TableCell>
-                    </TableRow>)}
-                    {loading && [0, 1, 2, 3, 4].map(i => <TableRow key={i}>
-                        <TableCell padding="checkbox">
-                            <Checkbox
-                                checked={true}
-                                inputProps={{ 'aria-labelledby': 'labelId' }}
-                                disabled
-                            />
-                        </TableCell>
-                        <TableCell>
-                            <Skeleton animation="wave"
-                                      component="span"
-                                      height={24} width="40%"
-                            />
-                        </TableCell>
-                        <TableCell align="right">
-                            <IconButton
-                                size="small"
-                                aria-label="Edit"
-                                disabled
-                            >
-                                <EditIcon />
-                            </IconButton>
-                            <IconButton
-                                size="small"
-                                aria-label="Delete"
-                                disabled
-                            >
-                                <DeleteIcon />
-                            </IconButton>
-                        </TableCell>
-                    </TableRow>)}
+                    {!loading &&
+                        todos.map(todo => (
+                            <TableRow key={todo._id}>
+                                <TableCell padding="checkbox">
+                                    <Checkbox checked={false} inputProps={{ 'aria-labelledby': 'labelId' }} />
+                                </TableCell>
+                                <TableCell>{todo.title}</TableCell>
+                                <TableCell align="right">
+                                    <IconButton
+                                        size="small"
+                                        aria-label="Edit"
+                                        onClick={() => {
+                                            deleteTodo(todo._id);
+                                        }}
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        size="small"
+                                        aria-label="Delete"
+                                        onClick={() => {
+                                            deleteTodo(todo._id);
+                                        }}
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    {loading &&
+                        [0, 1, 2, 3, 4].map(i => (
+                            <TableRow key={i}>
+                                <TableCell padding="checkbox">
+                                    <Checkbox checked={true} inputProps={{ 'aria-labelledby': 'labelId' }} disabled />
+                                </TableCell>
+                                <TableCell>
+                                    <Skeleton animation="wave" component="span" height={24} width="40%" />
+                                </TableCell>
+                                <TableCell align="right">
+                                    <IconButton size="small" aria-label="Edit" disabled>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton size="small" aria-label="Delete" disabled>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                 </TableBody>
             </Table>
         </TableContainer>

@@ -4,7 +4,7 @@ type IndexType = 'auto';
 
 type IIndexConfiguration<T extends IRecord> = {
     [key in keyof Partial<T>]: IndexType;
-}
+};
 
 interface IModel<T extends IRecord> {
     uuid: keyof T;

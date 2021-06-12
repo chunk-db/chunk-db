@@ -1,10 +1,10 @@
-import { ChunkType } from "./AbstractChunk";
-import { chunkFactory } from "./ChunkFactory";
-import { IncrementalChunk } from "./IncrementalChunk";
-import { SnapshotChunk } from "./SnapshotChunk";
+import { ChunkType } from './AbstractChunk';
+import { chunkFactory } from './ChunkFactory';
+import { IncrementalChunk } from './IncrementalChunk';
+import { SnapshotChunk } from './SnapshotChunk';
 
-describe("chunk factory", () => {
-    it("snapshot chunk", () => {
+describe('chunk factory', () => {
+    it('snapshot chunk', () => {
         const data = {
             type: ChunkType.Snapshot,
             parents: [],
@@ -15,14 +15,14 @@ describe("chunk factory", () => {
                         name: 'name',
                     },
                 },
-            }
+            },
         };
 
         const chunk = chunkFactory(data);
 
         expect(chunk).toBeInstanceOf(SnapshotChunk);
     });
-    it("incremental chunk", () => {
+    it('incremental chunk', () => {
         const data = {
             type: ChunkType.Incremental,
             parents: [],
@@ -33,7 +33,7 @@ describe("chunk factory", () => {
                         name: 'name 2',
                     },
                 },
-            }
+            },
         };
 
         const chunk = chunkFactory(data);

@@ -14,8 +14,7 @@ export interface IGenericChunk<T extends IRecord = IRecord> {
 }
 
 export function chunkFactory(data: unknown): AbstractChunk {
-    if (!isGenericChunk(data))
-        throw new Error('Invalid chunk');
+    if (!isGenericChunk(data)) throw new Error('Invalid chunk');
     switch (data.type) {
         case ChunkType.Snapshot:
             return new SnapshotChunk(data);

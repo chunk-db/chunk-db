@@ -1,11 +1,4 @@
-import {
-    ChunkType,
-    IGenericChunk,
-    InMemoryChunkStorage,
-    IRecord,
-    Model,
-    UUID,
-} from '../src';
+import { ChunkType, IGenericChunk, InMemoryChunkStorage, IRecord, Model, UUID } from '../src';
 
 export interface IDemoRecord extends IRecord {
     _id: UUID;
@@ -27,8 +20,8 @@ export const chunkABC1: IGenericChunk<IDemoRecord> = {
     type: ChunkType.Snapshot,
     data: {
         records: {
-            'a': { _id: 'a', user: 1, value: 'a0' },
-            'd': { _id: 'd', user: 2, value: 'd0' },
+            a: { _id: 'a', user: 1, value: 'a0' },
+            d: { _id: 'd', user: 2, value: 'd0' },
         },
     },
 };
@@ -39,15 +32,12 @@ export const chunkA1: IGenericChunk<IDemoRecord> = {
     type: ChunkType.Incremental,
     data: {
         records: {
-            'a': { _id: 'a', user: 1, value: 'a1' },
+            a: { _id: 'a', user: 1, value: 'a1' },
         },
     },
 };
 
-export const allDemoChunks = [
-    chunkABC1,
-    chunkA1,
-];
+export const allDemoChunks = [chunkABC1, chunkA1];
 
 export async function demoStorage() {
     const storage = new InMemoryChunkStorage();

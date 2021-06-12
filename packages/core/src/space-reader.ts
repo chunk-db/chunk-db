@@ -9,10 +9,11 @@ import { IRecord } from './record.types';
  * Доступ к данным конкретной коллекции и пространства
  */
 export class SpaceReader<T extends IRecord = IRecord> {
-    constructor(private readonly db: ChunkDB,
-                public readonly model: Model<T>,
-                public readonly delayedRef: DelayedRef<T>) {
-    }
+    constructor(
+        private readonly db: ChunkDB,
+        public readonly model: Model<T>,
+        public readonly delayedRef: DelayedRef<T>
+    ) {}
 
     find(query: IQuery): Query<T> {
         return new Query<T>(this.db, this.delayedRef, this.model, query);

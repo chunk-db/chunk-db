@@ -14,51 +14,37 @@ export default function Home() {
                     Welcome to <a href="https://chunk-db.github.io">ChunkDB!</a>
                 </h1>
 
-                <p className="description">
-                    Powerful library for client DB
-                </p>
+                <p className="description">Powerful library for client DB</p>
 
-                <h2>
-                    Examples
-                </h2>
+                <h2>Examples</h2>
 
                 <div className="grid">
-                    <a href="./todolist"
-                       className="card"
-                    >
+                    <a href="./todolist" className="card">
                         <h3>TodoList &rarr;</h3>
                         <p>Simple example, based on this library</p>
                     </a>
                 </div>
 
-                <h2>
-                    Documentation
-                </h2>
+                <h2>Documentation</h2>
 
                 <div className="grid">
                     <a href="core" className="card">
                         <h3>Core &rarr;</h3>
-                        <p>
-                            API for core package of DB
-                        </p>
+                        <p>API for core package of DB</p>
                         <p>
                             <code>@chunk-db/core</code>
                         </p>
                     </a>
                     <a href="idb" className="card">
                         <h3>IndexedDB &rarr;</h3>
-                        <p>
-                            IndexedDB storage adapter
-                        </p>
+                        <p>IndexedDB storage adapter</p>
                         <p>
                             <code>@chunk-db/idb</code>
                         </p>
                     </a>
                     <a href="react" className="card">
                         <h3>React &rarr;</h3>
-                        <p>
-                            React bindings
-                        </p>
+                        <p>React bindings</p>
                         <p>
                             <code>@chunk-db/react</code>
                         </p>
@@ -72,8 +58,7 @@ export default function Home() {
                     target="_blank"
                     rel="noopener noreferrer"
                 >
-                    Powered by{' '}
-                    <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
+                    Powered by <img src="/vercel.svg" alt="Vercel Logo" className="logo" />
                 </a>
             </footer>
 
@@ -152,8 +137,8 @@ export default function Home() {
                     border-radius: 5px;
                     padding: 0.75rem;
                     font-size: 1.1rem;
-                    font-family: Menlo, Monaco, Lucida Console, Liberation Mono,
-                    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace;
+                    font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
+                        Bitstream Vera Sans Mono, Courier New, monospace;
                 }
 
                 h2 {
@@ -219,9 +204,8 @@ export default function Home() {
                 body {
                     padding: 0;
                     margin: 0;
-                    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
-                    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue,
-                    sans-serif;
+                    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
+                        Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
                 }
 
                 * {

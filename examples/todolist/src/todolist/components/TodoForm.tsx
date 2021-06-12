@@ -13,31 +13,18 @@ interface IProps {
 export const TodoForm = ({ saveTodo }: IProps) => {
     const { value, reset, onChange } = useInputState();
 
-    const saveTodoHandler = (event) => {
+    const saveTodoHandler = event => {
         event.preventDefault();
-        if (value.trim())
-            saveTodo(value);
+        if (value.trim()) saveTodo(value);
         reset();
     };
 
     return (
-        <form
-            onSubmit={saveTodoHandler}
-        >
+        <form onSubmit={saveTodoHandler}>
             <Box alignItems="bottom">
-                <TextField
-                    size="small"
-                    placeholder="Add todo"
-                    margin="normal"
-                    onChange={onChange}
-                    value={value}
-                />
+                <TextField size="small" placeholder="Add todo" margin="normal" onChange={onChange} value={value} />
 
-                <IconButton
-                    aria-label="Delete"
-                    type="submit"
-                    disabled={!value.trim()}
-                >
+                <IconButton aria-label="Delete" type="submit" disabled={!value.trim()}>
                     <AddIcon />
                 </IconButton>
             </Box>

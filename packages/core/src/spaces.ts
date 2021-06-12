@@ -2,12 +2,7 @@ import { v4 } from 'uuid';
 
 import { ChunkStorage } from './ChunkStorage';
 import { makeSubscription } from './common';
-import {
-    ChunkID,
-    makeSpaceID,
-    SpaceID,
-    Subscription,
-} from './common.types';
+import { ChunkID, makeSpaceID, SpaceID, Subscription } from './common.types';
 import { DelayedSpace } from './delayed-ref';
 import { SpaceNotFoundError } from './errors';
 import { ISpace, Refs, Space } from './space';
@@ -50,24 +45,20 @@ export class Spaces {
     }
 
     load(id: SpaceID): Promise<Space> {
-        return this.storage.loadSpace(id)
-                   .then(data => {
-                       const space = new Space(data);
-                       this.spaces.set(space.id, space);
-                       const subscriptions = this.spaceSubscriptions.get(space.id);
-                       if (subscriptions)
-                           subscriptions.forEach(cb => cb());
-                       return space;
-                   });
+        return this.storage.loadSpace(id).then(data => {
+            const space = new Space(data);
+            this.spaces.set(space.id, space);
+            const subscriptions = this.spaceSubscriptions.get(space.id);
+            if (subscriptions) subscriptions.forEach(cb => cb());
+            return space;
+        });
     }
 
     save(id: SpaceID): Promise<Space> {
         const exists = this.spaces.get(id);
-        if (!exists)
-            throw new SpaceNotFoundError(id);
+        if (!exists) throw new SpaceNotFoundError(id);
 
-        return this.storage.saveSpace(exists)
-                   .then(() => exists);
+        return this.storage.saveSpace(exists).then(() => exists);
     }
 
     remove(id: SpaceID): Promise<void> {
@@ -76,8 +67,7 @@ export class Spaces {
 
     async updateSpaceRef(id: SpaceID, ref: ChunkID): Promise<void> {
         const exists = this.spaces.get(id);
-        if (!exists)
-            throw new Error(`Space "${id}" not loaded`);
+        if (!exists) throw new Error(`Space "${id}" not loaded`);
 
         this.spaces.set(id, {
             ...exists,
@@ -85,8 +75,7 @@ export class Spaces {
         });
         await this.storage.saveSpace(this.spaces.get(id) as ISpace);
         const subscribers = this.spaceSubscriptions.get(id);
-        if (subscribers)
-            subscribers.forEach(cb => cb());
+        if (subscribers) subscribers.forEach(cb => cb());
     }
 
     /**
@@ -117,7 +106,10 @@ export class Spaces {
             this.spaceSubscriptions.set(spaceID, list);
             return makeSubscription(() => {
                 const list: Array<() => void> = this.spaceSubscriptions.get(spaceID) || [];
-                this.spaceSubscriptions.set(spaceID, list.filter(item => item !== cb));
+                this.spaceSubscriptions.set(
+                    spaceID,
+                    list.filter(item => item !== cb)
+                );
             });
         }
     }
