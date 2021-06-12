@@ -2,6 +2,7 @@ import { useChunkDB } from '@chunk-db/react';
 import { useCallback } from 'react';
 
 import { ITodo, todoScheme } from '../store/store.types';
+import { makeSpaceID } from '@chunk-db/core';
 
 export function useAddTodo() {
     const db = useChunkDB();
@@ -14,7 +15,7 @@ export function useAddTodo() {
             _id: Math.random().toString(16).substring(2),
             title: trimmedText,
         };
-        db.transaction('space', tx => tx.insert(todoScheme, todo))
+        db.transaction(makeSpaceID('space'), tx => tx.insert(todoScheme, todo))
           .then(() => console.log('transaction complete'));
     }, [db]);
 }

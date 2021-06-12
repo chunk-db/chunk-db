@@ -10,18 +10,19 @@ import { todoScheme } from '../store/store.types';
 
 import { TodoForm } from './TodoForm';
 import { TodoList } from './TodoList';
+import { makeSpaceID } from '@chunk-db/core';
 
 export const TodoApp = () => {
     const addTodo = useAddTodo();
     const deleteTodo = useDeleteTodo();
 
     const [todos, loading] = useQueryAll(
-        'space',
-        space => space.collection(todoScheme).find({}),
+        makeSpaceID('space'),
+        space => space.collection(todoScheme).find({}) as any,
     );
 
     const [symbols, calculating] = useQueryAll(
-        'space',
+        makeSpaceID('space'),
         space => space
             .collection(todoScheme).find({}).exec()
             .reduce((len, todo) => len + todo.title.length, 0),
