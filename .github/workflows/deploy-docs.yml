@@ -6,7 +6,9 @@ name: CI
 on:
     # Triggers the workflow on push or pull request events but only for the main branch
     push:
-        branches: [ master, docs, "github-actions" ]
+        branches: [ master, dev ]
+
+    pull_request:
 
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
@@ -53,6 +55,9 @@ jobs:
 
             -   name: Build examples
                 run: yarn run build:examples
+
+            -   name: Testing
+                run: yarn test
 
             -   name: Generate docs
                 run: yarn run docs
