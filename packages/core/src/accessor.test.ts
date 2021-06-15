@@ -95,8 +95,6 @@ describe('accessor', () => {
             });
         });
         // test('update exists', () => { fail('Test is not implements'); });
-    });
-    describe('insert', () => {
         test('insert record in first chunk', async () => {
             const space = new Space({
                 id: makeSpaceID('some-space'),
@@ -115,7 +113,7 @@ describe('accessor', () => {
 
             // act
             const eventPromise = db.transaction(space.id, async tx => {
-                insertedRecord = await tx.insert(TestRecord, recordToSave);
+                insertedRecord = await tx.upsert(TestRecord, recordToSave);
             });
 
             // assert
@@ -155,7 +153,7 @@ describe('accessor', () => {
             expect(event).toEqual({
                 deleted: [],
                 // inserted: [],
-                inserted: [insertedRecord!._id],
+                inserted: [],
                 updated: [],
                 upserted: [insertedRecord!._id],
             });
