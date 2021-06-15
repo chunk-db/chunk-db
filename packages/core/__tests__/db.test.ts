@@ -228,7 +228,8 @@ describe('ChunkDB e2e tests', () => {
                         value: 'a1',
                     });
 
-                    const insertedRecord = await tx.insert(TestRecord, {
+                    const insertedRecord = await tx.upsert(TestRecord, {
+                        _id: 'c',
                         user: 3,
                         value: 'some value',
                     });
@@ -247,7 +248,7 @@ describe('ChunkDB e2e tests', () => {
                 expect(records[0].value).toBe('some value');
                 expect(event).toEqual({
                     deleted: [],
-                    inserted: [id],
+                    inserted: [],
                     updated: [],
                     upserted: [id],
                 });
@@ -261,7 +262,8 @@ describe('ChunkDB e2e tests', () => {
                 // act
                 const event = await db.transaction(space.id, async tx => {
                     // insert record
-                    const record = await tx.insert(TestRecord, {
+                    const record = await tx.upsert(TestRecord, {
+                        _id: 'c',
                         user: 8,
                         value: 'value',
                     });
@@ -298,7 +300,7 @@ describe('ChunkDB e2e tests', () => {
                 expect(records[0].value).toBe('new value');
                 expect(event).toEqual({
                     deleted: [],
-                    inserted: [id],
+                    inserted: [],
                     updated: [],
                     upserted: [id],
                 });
@@ -315,7 +317,7 @@ describe('ChunkDB e2e tests', () => {
             const spaceId = db.spaces.create({ name: 'test' }).id;
             db.spaces.save(spaceId);
             await db.transaction(spaceId, async tx => {
-                await tx.insert(TestRecord, {
+                await tx.upsert(TestRecord, {
                     _id: '123',
                     value: '102',
                     user: 101,

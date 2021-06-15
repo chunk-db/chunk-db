@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { ChunkDB } from './ChunkDB';
 import { Model } from './Model';
 import { TemporaryTransactionChunk } from './chunks';
-import { ChunkID, makeChunkID, SpaceID } from './common.types';
+import { ChunkID, makeChunkID, SpaceID, UUID } from './common.types';
 import { DelayedRef } from './delayed-ref';
 import { InnerDBError } from './errors';
 import { UpdateEvent } from './events';
@@ -45,22 +45,6 @@ export class Accessor {
 
     public collection<T extends IRecord>(model: Model<T>): SpaceReader<T> {
         return new SpaceReader<any>(this.db, model, this.makeDelayedRef(model));
-    }
-
-    async insert<T extends IRecord>(scheme: Model<T>, record: Optional<T, Model<T>['uuid']>): Promise<T> {
-        this.prepareSpaceForWriting(this.space.id);
-        if (!record[scheme.uuid] as any)
-            record = {
-                ...record,
-                [scheme.uuid]: v4(),
-            };
-        this.chunks[this.space.id]!.setRecord(scheme, record[scheme.uuid] as any, record as T);
-        this.stats.inserted.push(record[scheme.uuid] as any);
-        this.stats.upserted.push(record[scheme.uuid] as any);
-
-        this.db.storage.saveTemporalChunk(this.chunks[this.space.id]!);
-
-        return record as T;
     }
 
     async upsert<T extends IRecord>(scheme: Model<T>, record: T): Promise<T> {
