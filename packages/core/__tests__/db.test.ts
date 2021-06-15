@@ -1,4 +1,4 @@
-import { ChunkDB, ChunkType, Cursor, delay, InMemoryChunkStorage, makeSpaceID, Space, UUID } from '../src';
+import { ChunkDB, ChunkType, Cursor, delay, InMemoryChunkStorage, makeSpaceID, Model, Space, UUID } from '../src';
 
 import { allDemoChunks, IDemoRecord, TestRecord } from './chunks.demo';
 
@@ -181,34 +181,29 @@ describe('ChunkDB e2e tests', () => {
         });
         describe('errors', () => {
             test('find in null space', async () => {
-                // arrange
-
-                // act
-                const cursor = db.space(makeSpaceID('')).collection(TestRecord).find({}).exec();
-
-                // assert
-                expect(cursor).toBeInstanceOf(Cursor);
-
-                const result = await cursor.all();
-
-                expect(result).toEqual([]);
+                expect(() => db.space(makeSpaceID('')).collection(TestRecord).find({}).exec()).toThrowError(
+                    `Invalid space ""`
+                );
             });
-            test('find in unknown collection', async () => {
-                // arrange
+            test('find in unregistered collection', async () => {
+                const UnregisteredModel = new Model<any>('unknown', {
+                    uuid: '_id',
+                    factory: data => data,
+                    indexes: {},
+                });
 
-                // act
-                const cursor = db
-                    .space(makeSpaceID('test-space'))
-                    .collection('unknown' as any)
-                    .find({})
-                    .exec();
-
-                // assert
-                expect(cursor).toBeInstanceOf(Cursor);
-
-                const result = await cursor.all();
-
-                expect(result).toEqual([]);
+                expect(() =>
+                    db.space(makeSpaceID('test-space')).collection(UnregisteredModel).find({}).exec()
+                ).toThrowError(`Unregistered collection "unknown"`);
+            });
+            test('find in invalid collection', async () => {
+                expect(() =>
+                    db
+                        .space(makeSpaceID('test-space'))
+                        .collection('unknown' as any)
+                        .find({})
+                        .exec()
+                ).toThrowError(`Scheme must be instance of Model`);
             });
         });
     });
