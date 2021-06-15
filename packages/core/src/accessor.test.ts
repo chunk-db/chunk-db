@@ -99,7 +99,7 @@ describe('accessor', () => {
     describe('insert', () => {
         test('insert record in first chunk', async () => {
             const space = new Space({
-                id: 'some-space' as SpaceID,
+                id: makeSpaceID('some-space'),
                 name: 'initial',
                 ref: '',
             });

@@ -2,7 +2,7 @@ import { demoStorage, IDemoRecord, TestRecord } from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
 import { arrayToMap } from './chunks';
-import { SpaceID } from './common.types';
+import { makeSpaceID } from './common.types';
 import { Space } from './space';
 import { SpaceReader } from './space-reader';
 
@@ -10,7 +10,7 @@ describe('SpaceReader', () => {
     let db: ChunkDB;
     let reader: SpaceReader<IDemoRecord>;
     const space = new Space({
-        id: 'test-space' as SpaceID,
+        id: makeSpaceID('test-space'),
         name: 'test',
         ref: 'a1',
     });
@@ -27,7 +27,7 @@ describe('SpaceReader', () => {
 
     it('findAll', async () => {
         // arrange
-        reader = db.collection(TestRecord).space('test-space' as SpaceID);
+        reader = db.collection(TestRecord).space(makeSpaceID('test-space'));
 
         // act
         const result = await reader.findAll({});
