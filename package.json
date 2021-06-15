@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "dev": "lerna run --parallel dev",
-    "build": "yarn run build",
+    "build": "lerna run build",
     "build:packages": "lerna run build:package",
     "build:examples": "lerna run build:example",
     "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",
@@ -30,7 +30,8 @@
     "docs:export": "lerna run docs:export",
     "predocs:publish": "touch _docs/.nojekyll && touch _docs/_next/.nojekyll",
     "docs:publish": "gh-pages -d _docs -r git@github.com:chunk-db/chunk-db.github.io.git -b master --dotfiles",
-    "install": "lerna bootstrap"
+    "install": "lerna bootstrap",
+    "check": "yarn test && yarn run prettier:check && yarn run lint"
   },
   "devDependencies": {
     "@babel/core": "^7.12.0",
