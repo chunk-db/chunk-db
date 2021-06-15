@@ -13,7 +13,10 @@ export class DataSpace implements ISpace {
     constructor(private readonly db: ChunkDB, public readonly spaceId: SpaceID) {}
 
     public collection<T extends IRecord>(scheme: Model<T>): SpaceReader<T> {
-        if (!(scheme.name in this.db.collections)) throw new Error(`Invalid collection "${name}"`);
+        if (!(scheme instanceof Model)) {
+            throw new Error(`Scheme must be instance of Model`);
+        }
+        if (!(scheme.name in this.db.collections)) throw new Error(`Unregistered collection "${scheme.name}"`);
 
         const collection: Collection<T> = this.db.collections[scheme.name] as any;
         return collection.space(this.spaceId);
