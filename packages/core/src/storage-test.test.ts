@@ -1,5 +1,5 @@
 import { delay } from './common';
-import { SpaceID } from './common.types';
+import { makeChunkID, makeSpaceID } from './common.types';
 import { StorageTestDriver } from './storage-test';
 
 describe('StorageTestDriver', () => {
@@ -11,7 +11,7 @@ describe('StorageTestDriver', () => {
             let result: any;
 
             // act
-            driver.loadSpace('test-id' as SpaceID).then(
+            driver.loadSpace(makeSpaceID('test-id')).then(
                 value => {
                     status = 'resolved';
                     result = value;
@@ -45,7 +45,7 @@ describe('StorageTestDriver', () => {
             let result: any;
 
             // act
-            driver.loadSpace('test-id' as SpaceID).then(
+            driver.loadSpace(makeSpaceID('test-id')).then(
                 value => {
                     status = 'resolve';
                     result = value;
@@ -78,9 +78,9 @@ describe('StorageTestDriver', () => {
                 let status = 'pending';
 
                 // act
-                driver.loadSpace('test-id 2' as SpaceID);
-                driver.loadChunk('test-id' as SpaceID);
-                driver.loadSpace('test-id' as SpaceID).then(
+                driver.loadSpace(makeSpaceID('test-id 2'));
+                driver.loadChunk(makeChunkID('test-id'));
+                driver.loadSpace(makeSpaceID('test-id')).then(
                     () => (status = 'resolve'),
                     () => (status = 'reject')
                 );
@@ -99,9 +99,9 @@ describe('StorageTestDriver', () => {
                 const driver = new StorageTestDriver();
 
                 // act
-                driver.loadSpace('test-id 2' as SpaceID);
-                driver.loadSpace('test-id' as SpaceID);
-                driver.loadSpace('test-id' as SpaceID);
+                driver.loadSpace(makeSpaceID('test-id 2'));
+                driver.loadSpace(makeSpaceID('test-id'));
+                driver.loadSpace(makeSpaceID('test-id'));
 
                 // assert
                 expect(() => driver.checkAction('loadSpace', 'test-id')).toThrow();
@@ -113,9 +113,9 @@ describe('StorageTestDriver', () => {
                 const driver = new StorageTestDriver();
 
                 // act
-                driver.loadSpace('test-id 2' as SpaceID);
-                driver.loadSpace('test-id' as SpaceID);
-                driver.loadSpace('test-id' as SpaceID);
+                driver.loadSpace(makeSpaceID('test-id 2'));
+                driver.loadSpace(makeSpaceID('test-id'));
+                driver.loadSpace(makeSpaceID('test-id'));
 
                 // assert
                 expect(() => driver.checkActions('saveChunk', 'test-id')).toThrow();
@@ -125,9 +125,9 @@ describe('StorageTestDriver', () => {
                 const driver = new StorageTestDriver();
 
                 // act
-                driver.loadSpace('test-id 2' as SpaceID);
-                driver.loadChunk('test-id' as SpaceID);
-                driver.loadSpace('test-id' as SpaceID);
+                driver.loadSpace(makeSpaceID('test-id 2'));
+                driver.loadChunk(makeChunkID('test-id'));
+                driver.loadSpace(makeSpaceID('test-id'));
 
                 // assert
                 const actions = driver.checkActions('loadSpace');

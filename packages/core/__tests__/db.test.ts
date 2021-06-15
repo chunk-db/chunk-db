@@ -1,4 +1,4 @@
-import { ChunkDB, ChunkType, Cursor, delay, InMemoryChunkStorage, makeSpaceID, Space, SpaceID, UUID } from '../src';
+import { ChunkDB, ChunkType, Cursor, delay, InMemoryChunkStorage, makeSpaceID, Space, UUID } from '../src';
 
 import { allDemoChunks, IDemoRecord, TestRecord } from './chunks.demo';
 
@@ -6,12 +6,12 @@ describe('ChunkDB e2e tests', () => {
     let storage: InMemoryChunkStorage;
     let db: ChunkDB;
     const baseSpace = new Space({
-        id: 'base-space' as SpaceID,
+        id: makeSpaceID('base-space'),
         name: 'initial',
         ref: 'initial',
     });
     const space = new Space({
-        id: 'test-space' as SpaceID,
+        id: makeSpaceID('test-space'),
         name: 'a1',
         ref: 'a1',
     });
@@ -33,11 +33,7 @@ describe('ChunkDB e2e tests', () => {
                     // arrange
 
                     // act
-                    const cursor = db
-                        .collection(TestRecord)
-                        .space('test-space' as SpaceID)
-                        .find({})
-                        .exec();
+                    const cursor = db.collection(TestRecord).space(makeSpaceID('test-space')).find({}).exec();
 
                     // assert
                     expect(cursor).toBeInstanceOf(Cursor);
@@ -57,7 +53,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .collection(TestRecord)
-                        .space('test-space' as SpaceID)
+                        .space(makeSpaceID('test-space'))
                         .find({ user: 2 })
                         .exec()
                         .one();
@@ -71,7 +67,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .collection(TestRecord)
-                        .space('base-space' as SpaceID)
+                        .space(makeSpaceID('base-space'))
                         .find({ user: 1 })
                         .exec()
                         .one();
@@ -85,7 +81,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .collection(TestRecord)
-                        .space('test-space' as SpaceID)
+                        .space(makeSpaceID('test-space'))
                         .find({ user: 10 })
                         .exec()
                         .all();
@@ -101,11 +97,7 @@ describe('ChunkDB e2e tests', () => {
                     // arrange
 
                     // act
-                    const cursor = db
-                        .space('test-space' as SpaceID)
-                        .collection(TestRecord)
-                        .find({})
-                        .exec();
+                    const cursor = db.space(makeSpaceID('test-space')).collection(TestRecord).find({}).exec();
 
                     // assert
                     expect(cursor).toBeInstanceOf(Cursor);
@@ -124,7 +116,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .space('test-space' as SpaceID)
+                        .space(makeSpaceID('test-space'))
                         .collection(TestRecord)
                         .find({ user: 2 })
                         .exec()
@@ -139,7 +131,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .collection(TestRecord)
-                        .space('base-space' as SpaceID)
+                        .space(makeSpaceID('base-space'))
                         .find({ user: 1 })
                         .exec()
                         .one();
@@ -153,7 +145,7 @@ describe('ChunkDB e2e tests', () => {
                     // act
                     const result = await db
                         .collection(TestRecord)
-                        .space('test-space' as SpaceID)
+                        .space(makeSpaceID('test-space'))
                         .find({ user: 10 })
                         .exec()
                         .all();
@@ -168,11 +160,7 @@ describe('ChunkDB e2e tests', () => {
                 // arrange
 
                 // act
-                const cursor = db
-                    .collection(TestRecord)
-                    .space('test-space' as SpaceID)
-                    .find({})
-                    .exec<IDemoRecord>();
+                const cursor = db.collection(TestRecord).space(makeSpaceID('test-space')).find({}).exec<IDemoRecord>();
 
                 // assert
                 expect(cursor).toBeInstanceOf(Cursor);

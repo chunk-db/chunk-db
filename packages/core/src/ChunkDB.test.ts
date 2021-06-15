@@ -82,12 +82,12 @@ describe('ChunkDB', () => {
         it('save record, restart, find record', async () => {
             // arrange
             const baseSpace = new Space({
-                id: 'base-space' as SpaceID,
+                id: makeSpaceID('base-space'),
                 name: 'initial',
                 ref: 'initial',
             });
             const space = new Space({
-                id: 'test-space' as SpaceID,
+                id: makeSpaceID('test-space'),
                 name: 'a1',
                 ref: 'a1',
             });
@@ -135,7 +135,7 @@ describe('ChunkDB', () => {
             await db2.spaces.load(makeSpaceID('test-space'));
             const foundRecord = await db2
                 .collection(TestRecord)
-                .space('test-space' as SpaceID)
+                .space(makeSpaceID('test-space'))
                 .findOne({ _id: '123' });
 
             // assert
