@@ -60,6 +60,16 @@ export class Accessor {
         return record as T;
     }
 
+    async remove<T extends IRecord>(scheme: Model<T>, id: UUID): Promise<void> {
+        this.prepareSpaceForWriting(this.space.id);
+        if (!this.chunks[this.space.id]!.hasRecords(scheme, id)) {
+            this.stats.deleted.push(id);
+        }
+        this.chunks[this.space.id]!.setRecord(scheme, id, null);
+
+        this.db.storage.saveTemporalChunk(this.chunks[this.space.id]!);
+    }
+
     private prepareSpaceForWriting(space: SpaceID): void {
         if (this.updatedRefs.has(space)) return;
 

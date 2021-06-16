@@ -26,7 +26,7 @@ export class TemporaryTransactionChunk<T extends IRecord = IRecord> extends Abst
         return !!collection && collection.has(uuid);
     }
 
-    public setRecord<T extends IRecord>(scheme: Model<T>, uuid: UUID, record: T): void {
+    public setRecord<T extends IRecord>(scheme: Model<T>, uuid: UUID, record: T | null): void {
         const collection = this.data.get(scheme.name) || new Map<UUID, T>();
         collection.set(uuid, record as any); // TODO
         this.data.set(scheme.name, collection as any); // TODO

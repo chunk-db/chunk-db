@@ -1,5 +1,6 @@
 import { QuerySelector } from './query-selector';
 import { IRecord } from './record.types';
+import { UUID } from './common.types';
 
 /**
  * Предоставляет возможность получения данных по конкретному запросу
@@ -22,7 +23,9 @@ export class Cursor<T extends IRecord = IRecord> {
         let record: T | null = null;
         while (!this.querySelector.done || !record) {
             const { records } = await this.querySelector.next();
-            record = records[0] || null;
+            if (records && records.size) {
+                record = Array.from(records.values())[0];
+            }
         }
         this._done = true;
         return record;
@@ -30,13 +33,15 @@ export class Cursor<T extends IRecord = IRecord> {
 
     public async all(): Promise<T[]> {
         if (this._done) throw new Error('Cursor already complete');
-        const allRecords: T[] = [];
+        const allRecords = new Map<UUID, T | null>();
         while (!this.querySelector.done) {
             const { records } = await this.querySelector.next();
-            allRecords.push(...records);
+            if (records) {
+                records.forEach((value, key) => !allRecords.has(key) && allRecords.set(key, value));
+            }
         }
         this._done = true;
-        return allRecords;
+        return Array.from(allRecords.values()).filter(record => !!record) as T[];
     }
 
     public async reduce<R>(reducer: (acc: R, record: T) => R, initialValue: R): Promise<R> {
@@ -45,7 +50,11 @@ export class Cursor<T extends IRecord = IRecord> {
         let result = initialValue;
         while (!this.querySelector.done) {
             const { records } = await this.querySelector.next();
-            records.forEach(record => (result = reducer(result, record)));
+            if (records) {
+                records.forEach(record => {
+                    if (record) result = reducer(result, record);
+                });
+            }
         }
         this._done = true;
         return result;

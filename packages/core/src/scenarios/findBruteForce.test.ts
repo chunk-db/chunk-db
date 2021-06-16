@@ -25,14 +25,14 @@ describe('findBruteForce', () => {
             done: false,
             value: {
                 chunkID: 'a1',
-                records: [{ _id: 'a', user: 1, value: 'a1' }],
+                records: new Map([['a', { _id: 'a', user: 1, value: 'a1' }]]),
             },
         });
         expect(await gen.next()).toEqual({
             done: true,
             value: {
                 chunkID: 'initial',
-                records: [{ _id: 'd', user: 2, value: 'd0' }],
+                records: new Map([['d', { _id: 'd', user: 2, value: 'd0' }]]),
             },
         });
     });
@@ -48,14 +48,14 @@ describe('findBruteForce', () => {
             done: false,
             value: {
                 chunkID: 'a1',
-                records: [],
+                records: new Map(),
             },
         });
         expect(await gen.next()).toEqual({
             done: true,
             value: {
                 chunkID: 'initial',
-                records: [{ _id: 'd', user: 2, value: 'd0' }],
+                records: new Map([['d', { _id: 'd', user: 2, value: 'd0' }]]),
             },
         });
     });
@@ -73,14 +73,14 @@ describe('findBruteForce', () => {
             done: false,
             value: {
                 chunkID: 'a1',
-                records: [],
+                records: new Map(),
             },
         });
         expect(await gen.next()).toEqual({
             done: true,
             value: {
                 chunkID: 'initial',
-                records: [],
+                records: new Map(),
             },
         });
     });
@@ -98,7 +98,7 @@ describe('findBruteForce', () => {
             done: true,
             value: {
                 chunkID: 'initial',
-                records: [{ _id: 'a', user: 1, value: 'a0' }],
+                records: new Map([['a', { _id: 'a', user: 1, value: 'a0' }]]),
             },
         });
     });

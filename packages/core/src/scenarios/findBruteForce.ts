@@ -1,7 +1,7 @@
 import 'regenerator-runtime/runtime';
 import { buildQuery, ConditionValidator, IQuery } from '../ConditionValidator';
 import { Model } from '../Model';
-import { AbstractChunk, ChunkType, mapToArray } from '../chunks';
+import { AbstractChunk, ChunkType } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
 import { DelayedRef } from '../delayed-ref';
 import { IRecord } from '../record.types';
@@ -12,11 +12,11 @@ import { call } from './scenario.types';
 import { getChunk, resolveRelayedRef } from './utils';
 
 export function* findBruteForce<T extends IRecord = IRecord>(
-    delayedRef: DelayedRef<T>,
+    delayedRef: DelayedRef<any>,
     model: Model<T>,
     query: IQuery = {}
 ): FindScenario<T> {
-    const map = new Map<UUID, IRecord>();
+    const allFound = new Map<UUID, T | null>();
     const builtQuery = buildQuery(query);
     let chunk: AbstractChunk;
 
@@ -26,13 +26,19 @@ export function* findBruteForce<T extends IRecord = IRecord>(
     if (!headChunkID)
         return {
             chunkID,
-            records: [],
         };
+
+    const isNew = isNewFactory(allFound, builtQuery);
 
     while (true) {
         chunk = yield call(getChunk, chunkID);
         if (!chunk) throw new NotFoundChunkError(chunkID);
-        const records: any = mapToArray(chunk.data.get(model.name)).filter(isNew(map, builtQuery));
+
+        const data: ReadonlyMap<UUID, T> | undefined = chunk.data.get(model.name) as any;
+        const records = new Map<UUID, T>();
+        if (data) {
+            data.forEach((record, key) => isNew(record) && records.set(key, record));
+        }
 
         switch (chunk.type) {
             case ChunkType.Snapshot:
@@ -54,9 +60,11 @@ export function* findBruteForce<T extends IRecord = IRecord>(
     }
 }
 
-function isNew<T extends IRecord>(map: Map<UUID, T>, filter: ConditionValidator) {
+function isNewFactory<T extends IRecord>(map: Map<UUID, T | null>, filter: ConditionValidator) {
     // todo
     return (record: any) => {
+        if (!record) return true;
+
         if (map.has(record._id)) return false;
 
         if (!filter(record)) return false;

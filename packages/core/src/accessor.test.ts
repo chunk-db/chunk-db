@@ -161,10 +161,6 @@ describe('accessor', () => {
         // test('insert new', () => { fail('Test is not implements'); });
         // test('failed to update exists', () => { fail('Test is not implements'); });
     });
-    describe('update', () => {
-        // test('failed to insert new', () => { fail('Test is not implements'); });
-        // test('update exists', () => { fail('Test is not implements'); });
-    });
     describe('conflicts', () => {
         // test('2 transactions run at same time and change 1 record', () => { fail('Test is not implements'); });
     });
