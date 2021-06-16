@@ -305,6 +305,33 @@ describe('ChunkDB e2e tests', () => {
 
             // conflict in transactions
         });
+        describe('remove records', () => {
+            it('remove record by UUID', async () => {
+                // arrange
+                const refBefore = space.ref;
+
+                // act
+                const event = await db.transaction(space.id, async tx => {
+                    await tx.remove(TestRecord, 'd');
+                });
+
+                const records = await db.collection(TestRecord).space(space.id).findAll({});
+                const newSpace = db.spaces.getLoaded(space.id)!;
+                expect(space.ref).not.toEqual(newSpace.ref);
+                expect(newSpace.ref).not.toBe(refBefore);
+                expect(db.storage.getExists(newSpace.ref)).toBeTruthy();
+
+                // assert
+                expect(records.length).toBe(1);
+                expect(records[0].value).toBe('a1');
+                expect(event).toEqual({
+                    deleted: ['d'],
+                    inserted: [],
+                    updated: [],
+                    upserted: [],
+                });
+            });
+        });
     });
     describe('chunks', () => {
         test('first chunk must be Snapshot', async () => {

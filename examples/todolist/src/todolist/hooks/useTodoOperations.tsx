@@ -15,9 +15,9 @@ export function useAddTodo() {
                 _id: Math.random().toString(16).substring(2),
                 title: trimmedText,
             };
-            db.transaction(makeSpaceID('space'), tx => tx.upsert(todoScheme, todo)).then(() =>
-                console.log('transaction complete')
-            );
+            db.transaction(makeSpaceID('space'), tx => {
+                return tx.upsert(todoScheme, todo);
+            }).then(() => console.log('transaction complete'));
         },
         [db]
     );
@@ -29,9 +29,9 @@ export function useDeleteTodo() {
     return useCallback(
         (id: string) => {
             if (!id) return;
-            alert('delete todo ' + id);
-            // db.transaction('space', tx => tx.remove('todos', id))
-            //   .then(() => console.log('transaction complete'));
+            db.transaction(makeSpaceID('space'), tx => {
+                return tx.remove(todoScheme, id);
+            }).then(() => console.log('transaction complete'));
         },
         [db]
     );
