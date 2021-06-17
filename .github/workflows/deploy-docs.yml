@@ -13,16 +13,11 @@ on:
     # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-    # This workflow contains a single job called "build"
-    main:
-        # The type of runner that the job will run on
+    prepare:
         runs-on: ubuntu-latest
 
-        # Steps represent a sequence of tasks that will be executed as part of the job
         steps:
-            # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             -   name: Checkout
                 uses: actions/checkout@v2
 
@@ -43,6 +38,31 @@ jobs:
 
             -   name: Install
                 run: yarn install
+
+    build:
+        runs-on: ubuntu-latest
+
+        needs:
+            - prepare
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Setup node
+                uses: actions/setup-node@v2
+                with:
+                    node-version: '14'
+
+            -   name: Cache node modules
+                uses: actions/cache@v2
+                env:
+                    cache-name: cache-node-modules
+                with:
+                    path: |
+                        node_modules
+                        */*/node_modules
+                    key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
             -   name: Lint
                 run: yarn run lint
@@ -69,3 +89,31 @@ jobs:
                     publish_dir: ./_docs
                     publish_branch: master
                     external_repository: chunk-db/chunk-db.github.io
+
+    test-release:
+        runs-on: ubuntu-latest
+
+        needs:
+            - prepare
+
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v2
+
+            -   name: Setup node
+                uses: actions/setup-node@v2
+                with:
+                    node-version: '14'
+
+            -   name: Cache node modules
+                uses: actions/cache@v2
+                env:
+                    cache-name: cache-node-modules
+                with:
+                    path: |
+                        node_modules
+                        */*/node_modules
+                    key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+            -   name: Next version
+                run: yarn run next-version:check
