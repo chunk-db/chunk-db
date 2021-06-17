@@ -1,7 +1,7 @@
 import { ChunkDB } from './ChunkDB';
 import { IQuery } from './ConditionValidator';
 import { Model } from './Model';
-import { DelayedRef } from './delayed-ref';
+import { DelayedRefs } from './delayed-ref';
 import { Query } from './query';
 import { IRecord } from './record.types';
 
@@ -12,11 +12,11 @@ export class SpaceReader<T extends IRecord = IRecord> {
     constructor(
         private readonly db: ChunkDB,
         public readonly model: Model<T>,
-        public readonly delayedRef: DelayedRef<T>
+        public readonly delayedRefs: DelayedRefs<T>
     ) {}
 
     find(query: IQuery): Query<T> {
-        return new Query<T>(this.db, this.delayedRef, this.model, query);
+        return new Query<T>(this.db, this.delayedRefs, this.model, query);
     }
 
     async findOne(query: IQuery): Promise<T | null> {

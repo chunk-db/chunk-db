@@ -2,7 +2,7 @@ import { ChunkID, UUID } from '../common.types';
 import { IRecord } from '../record.types';
 
 export interface IFindResult<T extends IRecord = IRecord> {
-    chunkID: ChunkID;
+    chunkIDs: ChunkID[];
     records?: ReadonlyMap<UUID, T | null>;
 }
 

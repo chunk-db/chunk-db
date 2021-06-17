@@ -1,11 +1,10 @@
-import { Optional } from 'utility-types';
 import { v4 } from 'uuid';
 
 import { ChunkDB } from './ChunkDB';
 import { Model } from './Model';
 import { TemporaryTransactionChunk } from './chunks';
 import { ChunkID, makeChunkID, SpaceID, UUID } from './common.types';
-import { DelayedRef } from './delayed-ref';
+import { DelayedRefs } from './delayed-ref';
 import { InnerDBError } from './errors';
 import { UpdateEvent } from './events';
 import { IRecord } from './record.types';
@@ -44,7 +43,7 @@ export class Accessor {
     }
 
     public collection<T extends IRecord>(model: Model<T>): SpaceReader<T> {
-        return new SpaceReader<any>(this.db, model, this.makeDelayedRef(model));
+        return new SpaceReader<any>(this.db, model, this.makeDelayedRefs(model));
     }
 
     async upsert<T extends IRecord>(scheme: Model<T>, record: T): Promise<T> {
@@ -81,8 +80,8 @@ export class Accessor {
         this.chunks[space] = chunk;
     }
 
-    private makeDelayedRef<T extends IRecord>(scheme: Model<T>): DelayedRef {
-        return () => Promise.resolve(this.refs.get(this.space.id)!);
+    private makeDelayedRefs<T extends IRecord>(scheme: Model<T>): DelayedRefs {
+        return () => Promise.resolve([this.refs.get(this.space.id)!]);
     }
 
     private updateRef(space: SpaceID, chunk: ChunkID): boolean {

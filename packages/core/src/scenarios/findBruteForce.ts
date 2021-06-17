@@ -3,59 +3,67 @@ import { buildQuery, ConditionValidator, IQuery } from '../ConditionValidator';
 import { Model } from '../Model';
 import { AbstractChunk, ChunkType } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
-import { DelayedRef } from '../delayed-ref';
+import { DelayedRefs } from '../delayed-ref';
 import { IRecord } from '../record.types';
 import { NotFoundChunkError } from '../storage.types';
 
 import { FindScenario } from './find.types';
 import { call } from './scenario.types';
-import { getChunk, resolveRelayedRef } from './utils';
+import { getChunks, resolveRelayedRefs } from './utils';
 
 export function* findBruteForce<T extends IRecord = IRecord>(
-    delayedRef: DelayedRef<any>,
+    delayedRefs: DelayedRefs<any>,
     model: Model<T>,
     query: IQuery = {}
 ): FindScenario<T> {
     const allFound = new Map<UUID, T | null>();
     const builtQuery = buildQuery(query);
-    let chunk: AbstractChunk;
+    let chunks: AbstractChunk[];
 
-    const headChunkID: ChunkID = yield call(resolveRelayedRef, delayedRef);
-    let chunkID = headChunkID;
+    let chunkIDs = yield call(resolveRelayedRefs, delayedRefs);
 
-    if (!headChunkID)
+    if (!chunkIDs)
         return {
-            chunkID,
+            chunkIDs,
         };
 
     const isNew = isNewFactory(allFound, builtQuery);
 
     while (true) {
-        chunk = yield call(getChunk, chunkID);
-        if (!chunk) throw new NotFoundChunkError(chunkID);
+        chunks = yield call(getChunks, chunkIDs);
+        const nextChunkIDs: ChunkID[] = [];
 
-        const data: ReadonlyMap<UUID, T> | undefined = chunk.data.get(model.name) as any;
         const records = new Map<UUID, T>();
-        if (data) {
-            data.forEach((record, key) => isNew(record) && records.set(key, record));
-        }
+        chunks.forEach(chunk => {
+            const data: ReadonlyMap<UUID, T> | undefined = chunk.data.get(model.name) as any;
+            if (data) {
+                data.forEach((record, key) => isNew(record) && records.set(key, record));
+            }
 
-        switch (chunk.type) {
-            case ChunkType.Snapshot:
-                return {
-                    chunkID,
-                    records,
-                };
-            case ChunkType.TemporaryTransaction:
-            case ChunkType.Incremental:
-                yield {
-                    chunkID,
-                    records,
-                };
-                chunkID = chunk.parents[0];
-                break;
-            default:
-                throw new Error(`Unsupported chunk type "${chunk.type}"`);
+            switch (chunk.type) {
+                case ChunkType.Snapshot:
+                    // nothing to do in this chain
+                    break;
+                case ChunkType.TemporaryTransaction:
+                case ChunkType.Incremental:
+                    nextChunkIDs.push(...chunk.parents);
+                    break;
+                default:
+                    throw new Error(`Unsupported chunk type "${chunk.type}"`);
+            }
+        });
+
+        if (nextChunkIDs.length) {
+            yield {
+                chunkIDs,
+                records,
+            };
+            chunkIDs = nextChunkIDs;
+        } else {
+            return {
+                chunkIDs,
+                records,
+            };
         }
     }
 }
