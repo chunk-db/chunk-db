@@ -1,6 +1,6 @@
 {
   "name": "@chunk-db/idb",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "IndexedDB storage for ChunkDB",
   "author": "Arswarog <arswarog@yandex.ru>",
   "homepage": "",
@@ -24,7 +24,7 @@
     "docs:export": "cp -r _docs/* ../../_docs/idb"
   },
   "devDependencies": {
-    "@chunk-db/core": "^0.0.0",
+    "@chunk-db/core": "^0.1.0",
     "microbundle": "^0.12.4"
   },
   "peerDependencies": {

@@ -1,5 +1,6 @@
 {
   "name": "chunk-db",
+  "version": "0.2.0",
   "private": true,
   "repository": {
     "url": "https://github.com/chunk-db/chunk-db.git"
@@ -31,7 +32,8 @@
     "predocs:publish": "touch _docs/.nojekyll && touch _docs/_next/.nojekyll",
     "docs:publish": "gh-pages -d _docs -r git@github.com:chunk-db/chunk-db.github.io.git -b master --dotfiles",
     "install": "lerna bootstrap",
-    "check": "yarn test && yarn run prettier:check && yarn run lint"
+    "check": "yarn test && yarn run prettier:check && yarn run lint",
+    "next-version:check": "simple-semver-release check"
   },
   "devDependencies": {
     "@babel/core": "^7.12.0",
@@ -54,6 +56,7 @@
     "prettier": "2.3.1",
     "prettier-eslint": "^11.0.0",
     "react-scripts": "4.0.2",
+    "simple-semver-release": "^0.2.3",
     "ts-jest": "^26.4.1",
     "typedoc": "^0.20.36",
     "typescript": "<4.2.0"

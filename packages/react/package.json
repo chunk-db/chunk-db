@@ -1,6 +1,6 @@
 {
   "name": "@chunk-db/react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "React binding for ChunkDB",
   "author": "Arswarog <arswarog@yandex.ru>",
   "homepage": "",
@@ -24,7 +24,7 @@
     "docs:export": "cp -r _docs/* ../../_docs/react"
   },
   "devDependencies": {
-    "@chunk-db/core": "^0.0.0",
+    "@chunk-db/core": "^0.1.0",
     "@types/react": "^17.0.5",
     "microbundle": "^0.12.4"
   },
