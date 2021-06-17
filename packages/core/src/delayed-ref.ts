@@ -5,20 +5,26 @@ import { Space } from './space';
 import { Spaces } from './spaces';
 
 export class DelayedSpace {
-    constructor(private readonly spaces: Spaces, public readonly spaceID: SpaceID) {}
+    constructor(private readonly spaces: Spaces, public readonly spaceIDs: SpaceID[]) {}
 
-    getSpace(): Promise<Space> {
-        if (this.spaces.isLoaded(this.spaceID)) return Promise.resolve(this.spaces.getLoaded(this.spaceID)!);
-
-        return this.spaces.load(this.spaceID);
+    getSpaces(): Promise<Space[]> {
+        return Promise.all(
+            this.spaceIDs.map(spaceID => {
+                if (this.spaces.isLoaded(spaceID)) {
+                    return Promise.resolve(this.spaces.getLoaded(spaceID)!);
+                } else {
+                    return this.spaces.load(spaceID);
+                }
+            })
+        );
     }
 
-    getRef(model: Model<any>): DelayedRef<any> {
+    getRefs(model: Model<any>): DelayedRefs<any> {
         // todo types
-        return () => this.getSpace().then(space => space.ref);
+        return () => this.getSpaces().then(spaces => spaces.map(space => space.ref));
     }
 }
 
-export interface DelayedRef<T extends IRecord = IRecord> {
-    (): Promise<ChunkID>;
+export interface DelayedRefs<T extends IRecord = IRecord> {
+    (): Promise<ChunkID[]>;
 }

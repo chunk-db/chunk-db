@@ -36,8 +36,8 @@ export class Spaces {
         return this.spaces.get(id);
     }
 
-    getDelayedSpace(spaceId: SpaceID): DelayedSpace {
-        return new DelayedSpace(this, spaceId);
+    getDelayedSpaces(spaceIds: SpaceID[]): DelayedSpace {
+        return new DelayedSpace(this, spaceIds);
     }
 
     getList(): Readonly<ISpace>[] {

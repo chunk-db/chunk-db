@@ -15,11 +15,17 @@ describe('ChunkDB e2e tests', () => {
         name: 'a1',
         ref: 'a1',
     });
+    const spaceX = new Space({
+        id: makeSpaceID('space-x'),
+        name: 'x1',
+        ref: 'x1',
+    });
     beforeEach(async () => {
         storage = new InMemoryChunkStorage();
         storage.reset(allDemoChunks);
         storage.saveSpace(baseSpace);
         storage.saveSpace(space);
+        storage.saveSpace(spaceX);
         db = new ChunkDB({
             storage,
             collections: [TestRecord],
@@ -205,6 +211,27 @@ describe('ChunkDB e2e tests', () => {
                         .exec()
                 ).toThrowError(`Scheme must be instance of Model`);
             });
+        });
+    });
+    describe('fetch from multi sid', () => {
+        test('some records from multi sid', async () => {
+            // arrange
+            const space1 = makeSpaceID('test-space');
+            const space2 = makeSpaceID('space-x');
+
+            // act
+            const cursor = db.collection(TestRecord).space([space1, space2]).find({}).exec();
+
+            // assert
+            expect(cursor).toBeInstanceOf(Cursor);
+
+            const result = await cursor.all();
+
+            expect(result).toEqual([
+                { _id: 'a', user: 1, value: 'a1' },
+                { _id: 'x', user: 101, value: 'x1' },
+                { _id: 'd', user: 2, value: 'd0' },
+            ]);
         });
     });
     describe('change data', () => {

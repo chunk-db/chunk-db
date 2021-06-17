@@ -37,7 +37,18 @@ export const chunkA1: IGenericChunk<IDemoRecord> = {
     },
 };
 
-export const allDemoChunks = [chunkABC1, chunkA1];
+export const chunkX1: IGenericChunk<IDemoRecord> = {
+    id: 'x1',
+    parents: [],
+    type: ChunkType.Snapshot,
+    data: {
+        records: {
+            x: { _id: 'x', user: 101, value: 'x1' },
+        },
+    },
+};
+
+export const allDemoChunks = [chunkABC1, chunkA1, chunkX1];
 
 export async function demoStorage() {
     const storage = new InMemoryChunkStorage();
