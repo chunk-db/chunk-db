@@ -1,3 +1,4 @@
+import { makeSpaceID } from '@chunk-db/core';
 import { useQueryAll } from '@chunk-db/react';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -5,23 +6,33 @@ import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import React from 'react';
 
+import { TodoForm } from '../components/TodoForm';
+import { TodoList } from '../components/TodoList';
 import { useAddTodo, useDeleteTodo } from '../hooks/useTodoOperations';
-import { todoScheme } from '../store/store.types';
+import { ListID, todoScheme } from '../store/store.types';
 
-import { TodoForm } from './TodoForm';
-import { TodoList } from './TodoList';
-import { makeSpaceID } from '@chunk-db/core';
+interface IProps {
+    lists: ListID[];
+}
 
-export const TodoApp = () => {
+export const TodoPanel = ({ lists }: IProps) => {
     const addTodo = useAddTodo();
     const deleteTodo = useDeleteTodo();
 
-    const [todos, loading] = useQueryAll(makeSpaceID('space'), space => space.collection(todoScheme).find({}) as any);
+    const [todos, loading] = useQueryAll(
+        makeSpaceID('space'),
+        space =>
+            space.collection(todoScheme).find({
+                listId: { $in: lists },
+            }) as any
+    );
 
     const [symbols, calculating] = useQueryAll(makeSpaceID('space'), space =>
         space
             .collection(todoScheme)
-            .find({})
+            .find({
+                listId: { $in: lists },
+            })
             .exec()
             .reduce((len, todo) => len + todo.title.length, 0)
     );
@@ -29,7 +40,7 @@ export const TodoApp = () => {
     return (
         <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
             <Box m={1}>
-                <Typography component="h1" variant="h2">
+                <Typography component="h5" variant="h5">
                     Todos
                 </Typography>
 
