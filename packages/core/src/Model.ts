@@ -9,7 +9,7 @@ type IIndexConfiguration<T extends IRecord> = {
 interface IModel<T extends IRecord> {
     uuid: keyof T;
     sid?: keyof T;
-    factory: (data: any) => T;
+    factory?: (data: any) => T;
     indexes: IIndexConfiguration<T>;
     defaults?: {
         [key in keyof T]?: T[key];
@@ -34,6 +34,6 @@ export class Model<T extends IRecord> {
         this.sid = scheme.sid || null;
         this.indexes = scheme.indexes;
         this.defaults = scheme.defaults || {};
-        this.factory = scheme.factory;
+        this.factory = scheme.factory || (data => data);
     }
 }
