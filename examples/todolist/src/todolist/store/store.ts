@@ -1,7 +1,7 @@
 import { ChunkDB, InMemoryChunkStorage, Space } from '@chunk-db/core';
 import { IndexedDBDriver } from '@chunk-db/idb';
 
-import { todoScheme } from './store.types';
+import { listScheme, todoScheme } from './store.types';
 
 const storage = process.browser ? new IndexedDBDriver('chunk-db-todolist-example') : new InMemoryChunkStorage();
 
@@ -14,7 +14,7 @@ let space = new Space({
 export const db = new ChunkDB({
     // TODO
     storage,
-    collections: [todoScheme],
+    collections: [todoScheme, listScheme],
 });
 
 db.connect().then((db: ChunkDB) => {
