@@ -40,7 +40,7 @@ export class Spaces {
         return new DelayedSpace(this, spaceIds);
     }
 
-    getList(): Readonly<ISpace>[] {
+    getList(): Readonly<Space>[] {
         return Array.from(this.spaces.values());
     }
 

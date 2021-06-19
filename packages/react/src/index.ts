@@ -1,4 +1,4 @@
-import { AbstractChunk, ChunkDB, DataSpace, ISpace, Query, SpaceID } from '@chunk-db/core';
+import { AbstractChunk, ChunkDB, DataSpace, Query, Space, SpaceID } from '@chunk-db/core';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 export type QueryResult<T> = [T, boolean]; // FIXME: [result: T, loading: boolean];
@@ -29,9 +29,9 @@ export function useSpace(spaceID: SpaceID): DataSpace | undefined {
     return space;
 }
 
-export function useSpaces(): ISpace[] {
+export function useSpaces(): Space[] {
     const db = useChunkDB();
-    const [spaces, setSpaces] = useState<ISpace[]>([]);
+    const [spaces, setSpaces] = useState<Space[]>([]);
 
     useEffect(() => {
         if (!db) return;
