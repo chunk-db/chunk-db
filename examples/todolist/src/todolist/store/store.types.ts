@@ -1,13 +1,25 @@
 import { Model } from '@chunk-db/core';
 
+export type TodoID = { _brand: 'TodoID' } & string;
+export type ListID = { _brand: 'ListID' } & string;
+
 export interface ITodo {
-    _id: string;
+    _id: TodoID;
+    title: string;
+    listId: ListID;
+}
+
+export const todoScheme = new Model<ITodo>('todos', {
+    uuid: '_id',
+    indexes: {},
+});
+
+export interface IList {
+    _id: ListID;
     title: string;
 }
 
-export const todoScheme = new Model('todos', {
+export const listScheme = new Model<IList>('lists', {
     uuid: '_id',
-    sid: null,
     indexes: {},
-    factory: data => data as ITodo,
 });
