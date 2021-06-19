@@ -12,6 +12,7 @@ export const QueryOperators = {
     $gte: (condition: string | number) => (value: any) => value >= condition,
     $lt: (condition: string | number) => (value: any) => value < condition,
     $lte: (condition: string | number) => (value: any) => value <= condition,
+    $in: (condition: (string | number)[]) => (value: any) => condition.indexOf(value) !== -1,
 };
 
 type Condition = { [key in keyof typeof QueryOperators]?: any };
