@@ -20,9 +20,11 @@ export function* findBruteForce<T extends IRecord = IRecord>(
     const builtQuery = buildQuery(query);
     let chunks: AbstractChunk[];
 
-    let chunkIDs = yield call(resolveRelayedRefs, delayedRefs);
+    let chunkIDs: ChunkID[] = yield call(resolveRelayedRefs, delayedRefs);
 
-    if (!chunkIDs)
+    chunkIDs = chunkIDs.filter(item => !!item);
+
+    if (!chunkIDs.length)
         return {
             chunkIDs,
         };
