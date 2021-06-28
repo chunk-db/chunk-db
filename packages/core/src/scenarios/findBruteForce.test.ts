@@ -104,4 +104,17 @@ describe('findBruteForce', () => {
             },
         });
     });
+
+    test('empty space', async () => {
+        // act
+        const gen = db.run(findBruteForce(() => Promise.resolve([makeChunkID('')]), TestRecord));
+
+        // assert
+        expect(await gen.next()).toEqual({
+            done: true,
+            value: {
+                chunkIDs: [],
+            },
+        });
+    });
 });
