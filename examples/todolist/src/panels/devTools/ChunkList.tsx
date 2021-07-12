@@ -9,21 +9,16 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Tooltip from '@material-ui/core/Tooltip';
-import { makeStyles } from '@material-ui/core/styles';
 import CopyIcon from '@material-ui/icons/FilterNone';
 import React from 'react';
 
-import { copyToClipboard } from '../todolist/utils';
-
-const useStyles = makeStyles({});
+import { copyToClipboard } from '../../utils';
 
 interface IProps {
     chunks: AbstractChunk[];
 }
 
 export function ChunkList({ chunks }: IProps) {
-    // const classes = useStyles();
-
     const rows = chunks.map(chunk => ({
         id: chunk.id,
         shortId: shortId(chunk.id),

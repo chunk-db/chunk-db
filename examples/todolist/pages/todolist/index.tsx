@@ -1,8 +1,8 @@
 import { ChunkDBProvider } from '@chunk-db/react';
 import React, { useEffect } from 'react';
 
-import { TodoApp } from '../../src/todolist';
-import { db } from '../../src/todolist/store/store';
+import { TodoApp } from '../../src';
+import { db } from '../../src/store/store';
 
 const App = () => {
     useEffect(() => {
