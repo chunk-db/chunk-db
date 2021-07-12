@@ -1,6 +1,8 @@
 {
   "entryPoints": [
-    "packages/core/src"
+    "packages/core/src",
+    "packages/react/src",
+    "packages/idb/src"
   ],
   "excludeExternals": true,
   "externalPattern": [

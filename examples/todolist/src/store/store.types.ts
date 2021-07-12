@@ -3,6 +3,14 @@ import { Model } from '@chunk-db/core';
 export type TodoID = { _brand: 'TodoID' } & string;
 export type ListID = { _brand: 'ListID' } & string;
 
+export function makeTodoID(id: string): TodoID {
+    return id as any;
+}
+
+export function makeListID(id: string): ListID {
+    return id as any;
+}
+
 export interface ITodo {
     _id: TodoID;
     title: string;
