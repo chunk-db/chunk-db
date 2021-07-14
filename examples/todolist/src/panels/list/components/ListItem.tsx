@@ -1,13 +1,14 @@
+import { ISpace } from '@chunk-db/core';
 import { ListItem, ListItemSecondaryAction, ListItemText } from '@material-ui/core';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { ISpace, Space } from '@chunk-db/core';
-import { IList } from '../../../store/store.types';
 import Checkbox from '@material-ui/core/Checkbox/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
-import VisibilityIcon from '@material-ui/icons/Visibility';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { makeStyles } from '@material-ui/core/styles';
 import DeleteIcon from '@material-ui/icons/Delete';
+import VisibilityIcon from '@material-ui/icons/Visibility';
+import React from 'react';
+
+import { IList } from '../../../store/store.types';
 
 const useStyles = makeStyles(theme => ({
     list: {
@@ -20,14 +21,9 @@ interface IProps {
     space: ISpace;
 }
 
-export const SpaceListItem = ({ space, list }: IProps) => {
+export const SpaceListItem = ({ list }: IProps) => {
     const classes = useStyles();
 
-    const [open, setOpen] = React.useState(true);
-
-    const handleClick = () => {
-        setOpen(!open);
-    };
     return (
         <ListItem button dense className={classes.list}>
             <ListItemIcon>

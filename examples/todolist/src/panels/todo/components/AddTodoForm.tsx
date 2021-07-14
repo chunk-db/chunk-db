@@ -9,7 +9,7 @@ import AddIcon from '@material-ui/icons/Add';
 import React, { useState } from 'react';
 
 import { useInputState } from '../../../hooks/useInputState';
-import { ListID, listScheme } from '../../../store/store.types';
+import { ListID, listScheme, makeListID } from '../../../store/store.types';
 
 interface IProps {
     saveTodo: (text: string, listId: ListID) => void;
@@ -17,7 +17,7 @@ interface IProps {
 }
 
 export const AddTodoForm = ({ saveTodo }: IProps) => {
-    const [list, setList] = useState<ListID | null>(null);
+    const [list, setList] = useState<ListID | null>(makeListID(''));
     const { value, reset, onChange } = useInputState();
 
     let [lists] = useQueryAll(makeSpaceID('space'), space => space.collection(listScheme).find({}) as any);

@@ -6,10 +6,11 @@ import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import React from 'react';
 
-import { AddTodoForm } from './components/AddTodoForm';
-import { TodoList } from './components/TodoList';
 import { useAddTodo, useDeleteTodo } from '../../hooks/useTodoOperations';
 import { ListID, todoScheme } from '../../store/store.types';
+
+import { AddTodoForm } from './components/AddTodoForm';
+import { TodoList } from './components/TodoList';
 
 interface IProps {
     lists: ListID[];
