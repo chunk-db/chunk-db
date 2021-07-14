@@ -86,11 +86,22 @@ export class IndexedDBDriver implements IStorageDriver {
         return Promise.resolve(undefined);
     }
 
+    loadAllSpaces(): Promise<ISpace[]> {
+        console.log('LOAD ALL SPACES');
+        return new Promise<ISpace[]>((resolve, reject) => {
+            if (!this.db) return reject(new Error('DB not init'));
+            const tx = this.db.transaction([this.spacesCollection], 'readonly');
+            const req = tx.objectStore(this.spacesCollection).getAll();
+            req.addEventListener('success', () => resolve(req.result), { once: true });
+            req.addEventListener('error', reject, { once: true });
+        });
+    }
+
     loadSpace(id: SpaceID): Promise<ISpace | undefined> {
         console.log('LOAD SPACE ' + id);
         return new Promise<ISpace>((resolve, reject) => {
             if (!this.db) return reject(new Error('DB not init'));
-            const tx = this.db.transaction([this.spacesCollection], 'readwrite');
+            const tx = this.db.transaction([this.spacesCollection], 'readonly');
             const req = tx.objectStore(this.spacesCollection).get(id);
             req.addEventListener('success', () => resolve(req.result), { once: true });
             req.addEventListener('error', reject, { once: true });

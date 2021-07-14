@@ -36,6 +36,10 @@ export class Spaces {
         return this.spaces.get(id);
     }
 
+    getAllLoaded(): Space[] {
+        return Array.from(this.spaces.values());
+    }
+
     getDelayedSpaces(spaceIds: SpaceID[]): DelayedSpace {
         return new DelayedSpace(this, spaceIds);
     }
@@ -44,12 +48,31 @@ export class Spaces {
         return Array.from(this.spaces.values());
     }
 
+    refresh(): Promise<Space[]> {
+        return this.storage.loadAllSpaces().then(spaces => {
+            this.spaces = new Map(
+                spaces.map(data => {
+                    const space = new Space(data);
+                    return [space.id, space];
+                })
+            );
+
+            this.subscriptions.forEach(cb => cb());
+            return Array.from(this.spaces.values()).map(space => {
+                const subscriptions = this.spaceSubscriptions.get(space.id);
+                if (subscriptions) subscriptions.forEach(cb => cb());
+                return space;
+            });
+        });
+    }
+
     load(id: SpaceID): Promise<Space> {
         return this.storage.loadSpace(id).then(data => {
             const space = new Space(data);
             this.spaces.set(space.id, space);
             const subscriptions = this.spaceSubscriptions.get(space.id);
             if (subscriptions) subscriptions.forEach(cb => cb());
+            this.subscriptions.forEach(cb => cb());
             return space;
         });
     }

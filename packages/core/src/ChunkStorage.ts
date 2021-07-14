@@ -63,14 +63,20 @@ export class ChunkStorage {
         return promise;
     }
 
-    saveSpace(space: ISpace): Promise<ISpace> {
-        this.spaces.set(makeSpaceID(space.id), space);
-        return this.driver.saveSpace(space);
+    async loadAllSpaces(): Promise<ISpace[]> {
+        const spaces = await this.driver.loadAllSpaces();
+        this.spaces = new Map(spaces.map(space => [makeSpaceID(space.id), space]));
+        return spaces;
     }
 
     async loadSpace(id: SpaceID): Promise<ISpace> {
         const space = await this.driver.loadSpace(id);
         if (!space) throw new SpaceNotFoundError(id);
         return space;
+    }
+
+    saveSpace(space: ISpace): Promise<ISpace> {
+        this.spaces.set(makeSpaceID(space.id), space);
+        return this.driver.saveSpace(space);
     }
 }

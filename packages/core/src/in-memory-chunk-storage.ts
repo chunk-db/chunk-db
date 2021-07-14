@@ -71,7 +71,7 @@ export class InMemoryChunkStorage implements IStorageCacheDriver {
         this.spaces.clear();
     }
 
-    async getAllSpaces(): Promise<ISpace[]> {
+    async loadAllSpaces(): Promise<ISpace[]> {
         return Array.from(this.spaces.values());
     }
 }
