@@ -61,10 +61,6 @@ export class StorageTestDriver implements IStorageCacheDriver {
         return Promise.resolve(undefined);
     }
 
-    getAllSpaces(): Promise<ISpace[]> {
-        return Promise.resolve([]);
-    }
-
     loadChunk(id: ChunkID): Promise<IGenericChunk | undefined> {
         return new Promise((resolve, reject) => {
             this.actions.push({
@@ -115,6 +111,18 @@ export class StorageTestDriver implements IStorageCacheDriver {
                 type: 'saveSpace',
                 id: space.id,
                 value: space,
+                resolve,
+                reject,
+            });
+        });
+    }
+
+    loadAllSpaces(): Promise<ISpace[]> {
+        return new Promise((resolve, reject) => {
+            this.actions.push({
+                type: 'loadAllSpaces',
+                id: undefined,
+                value: undefined,
                 resolve,
                 reject,
             });

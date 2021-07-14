@@ -1,4 +1,4 @@
-import { IGenericChunk } from './chunks/ChunkFactory';
+import { IGenericChunk } from './chunks';
 import { ChunkID, SpaceID } from './common.types';
 import { IRecord } from './record.types';
 import { ISpace } from './space';
@@ -14,6 +14,8 @@ export interface IStorageDriver {
     markDraftChunkAsUnused(id: ChunkID): Promise<void>;
 
     // spaces
+    loadAllSpaces(): Promise<ISpace[]>;
+
     loadSpace(id: SpaceID): Promise<ISpace | undefined>;
 
     saveSpace(space: ISpace): Promise<ISpace>;
@@ -30,8 +32,6 @@ export interface IStorageCacheDriver extends IStorageDriver {
     clearChunks(): Promise<void>;
 
     // spaces
-    getAllSpaces(): Promise<ISpace[]>;
-
     clearSpaces(): Promise<void>;
 }
 

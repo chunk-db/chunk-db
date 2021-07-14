@@ -39,6 +39,7 @@ export class ChunkDB {
     public connect(): Promise<ChunkDB> {
         return this.storage
             .connect()
+            .then(() => this.spaces.refresh())
             .then(() => {
                 this.ready = true;
             })
