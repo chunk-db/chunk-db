@@ -1,19 +1,15 @@
-import { Collapse, List, ListItem, ListItemText, ListSubheader } from '@material-ui/core';
+import { Space } from '@chunk-db/core';
+import { useChunkDB, useSpaces } from '@chunk-db/react';
+import { Button, List } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import { ExpandLess, ExpandMore, StarBorder } from '@material-ui/icons';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
 import React from 'react';
 
-import { DevToolsUI } from '../devTools';
-import { IList, ListID, makeListID } from '../../store/store.types';
+import { IList, ListID } from '../../store/store.types';
 
-import { AddSpaceForm } from './components/AddSpaceForm';
-import { useQueryAll, useSpaces } from '@chunk-db/react';
-import { ISpace } from '@chunk-db/core';
 import { SpaceItem } from './components/SpaceItem';
+import { AddSpaceForm } from './widgets/AddSpaceForm';
 
 interface IProps {
     lists: ListID[];
@@ -30,38 +26,12 @@ const useStyles = makeStyles(theme => ({
 export const ListPanel = (_: IProps) => {
     const classes = useStyles();
 
-    const spaces: ISpace[] = useSpaces();
+    const db = useChunkDB();
+    const spaces: Space[] = useSpaces();
 
-    const lists: IList[][] = [
-        [
-            {
-                _id: makeListID('asd'),
-                title: 'list 1',
-            },
-            {
-                _id: makeListID('hdf'),
-                title: 'list 2',
-            },
-            {
-                _id: makeListID('dsf'),
-                title: 'list 3',
-            },
-        ],
-        [
-            {
-                _id: makeListID('asd'),
-                title: 'list 1',
-            },
-            {
-                _id: makeListID('hdf'),
-                title: 'list 2',
-            },
-            {
-                _id: makeListID('dsf'),
-                title: 'list 3',
-            },
-        ],
-    ];
+    const lists: IList[][] = [];
+
+    const refresh = () => db.spaces.refresh();
 
     return (
         <>
@@ -71,6 +41,9 @@ export const ListPanel = (_: IProps) => {
                 </Typography>
 
                 <AddSpaceForm />
+            </Box>
+            <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
+                <Button onClick={refresh}>Refresh</Button>
             </Box>
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
                 <List component="nav" aria-labelledby={`spaces-header`} className={classes.root}>

@@ -1,17 +1,17 @@
+import { makeSpaceID, Space } from '@chunk-db/core';
+import { useChunkDB, useQueryAll } from '@chunk-db/react';
 import { Collapse, ListItem, ListItemSecondaryAction, ListItemText } from '@material-ui/core';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
-import { ExpandLess, ExpandMore, StarBorder } from '@material-ui/icons';
-import React from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { ISpace, Space } from '@chunk-db/core';
-import { IList } from '../../../store/store.types';
-
-import List from '@material-ui/core/List';
 import Checkbox from '@material-ui/core/Checkbox/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
+import List from '@material-ui/core/List';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import { makeStyles } from '@material-ui/core/styles';
+import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
+import React from 'react';
+
+import { IList, listScheme } from '../../../store/store.types';
 
 import { SpaceListItem } from './ListItem';
 
@@ -23,21 +23,30 @@ const useStyles = makeStyles(theme => ({
 }));
 
 interface IProps {
-    space: ISpace;
+    space: Space;
     lists: IList[];
 }
 
-export const SpaceItem = ({ space, lists }: IProps) => {
+export const SpaceItem = ({ space }: IProps) => {
     const classes = useStyles();
 
+    const db = useChunkDB();
     const [open, setOpen] = React.useState(false);
 
-    const handleClick = () => {
+    const [lists] = useQueryAll(makeSpaceID(space.id), space => space.collection(listScheme).find({}) as any);
+
+    const openHandler = () => {
         setOpen(!open);
     };
+
+    const deleteHandler = e => {
+        e.stopPropagation();
+        db.spaces.delete(space.id);
+    };
+
     return (
         <>
-            <ListItem button onClick={handleClick} className={classes.space}>
+            <ListItem button onClick={openHandler} className={classes.space}>
                 <ListItemIcon>
                     <Checkbox
                         edge="start"
@@ -48,10 +57,10 @@ export const SpaceItem = ({ space, lists }: IProps) => {
                 </ListItemIcon>
                 <ListItemText primary={space.name} secondary={space.ref} />
                 <ListItemSecondaryAction className={classes.actions}>
-                    <IconButton edge="end" aria-label="comments">
+                    <IconButton edge="end" aria-label="add list">
                         <AddIcon />
                     </IconButton>
-                    <IconButton edge="end" aria-label="comments">
+                    <IconButton edge="end" aria-label="delete" onClick={deleteHandler}>
                         <DeleteIcon />
                     </IconButton>
                 </ListItemSecondaryAction>
@@ -59,9 +68,7 @@ export const SpaceItem = ({ space, lists }: IProps) => {
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    {lists.map(list => (
-                        <SpaceListItem list={list} space={space} />
-                    ))}
+                    {lists && lists.map(list => <SpaceListItem list={list} space={space} />)}
                 </List>
             </Collapse>
         </>

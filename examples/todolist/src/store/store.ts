@@ -19,12 +19,13 @@ export const db = new ChunkDB({
 
 db.connect().then((db: ChunkDB) => {
     console.log('connected');
-    db.spaces
-        .load(space.id)
-        .catch(() => {
-            db.spaces.create(space);
-            return db.spaces.save(space.id);
-        })
-        .then(data => (space = data))
-        .then(() => console.log('init spaces', db.spaces));
+    if (!db.spaces.getAllLoaded().length)
+        db.spaces
+            .load(space.id)
+            .catch(() => {
+                db.spaces.create(space);
+                return db.spaces.save(space.id);
+            })
+            .then(data => (space = data))
+            .then(() => console.log('init spaces', db.spaces));
 });
