@@ -81,11 +81,23 @@ export class Spaces {
         const exists = this.spaces.get(id);
         if (!exists) throw new SpaceNotFoundError(id);
 
+        const subscriptions = this.spaceSubscriptions.get(id);
+        if (subscriptions) subscriptions.forEach(cb => cb());
+        this.subscriptions.forEach(cb => cb());
+
         return this.storage.saveSpace(exists).then(() => exists);
     }
 
-    remove(id: SpaceID): Promise<void> {
-        throw new Error('not implemented');
+    delete(id: SpaceID): Promise<void> {
+        const exists = this.spaces.get(id);
+        if (!exists) throw new SpaceNotFoundError(id);
+
+        return this.storage.deleteSpace(exists.id).then(() => {
+            this.spaces.delete(exists.id);
+
+            this.spaceSubscriptions.delete(id);
+            this.subscriptions.forEach(cb => cb());
+        });
     }
 
     async updateSpaceRef(id: SpaceID, ref: ChunkID): Promise<void> {

@@ -79,4 +79,10 @@ export class ChunkStorage {
         this.spaces.set(makeSpaceID(space.id), space);
         return this.driver.saveSpace(space);
     }
+
+    deleteSpace(id: SpaceID): Promise<void> {
+        return this.driver.deleteSpace(id).then(() => {
+            this.spaces.delete(id);
+        });
+    }
 }

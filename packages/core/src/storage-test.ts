@@ -128,4 +128,16 @@ export class StorageTestDriver implements IStorageCacheDriver {
             });
         });
     }
+
+    deleteSpace(id: SpaceID): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            this.actions.push({
+                type: 'deleteSpace',
+                id: id,
+                value: undefined,
+                resolve,
+                reject,
+            });
+        });
+    }
 }
