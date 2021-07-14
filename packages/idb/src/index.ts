@@ -122,6 +122,19 @@ export class IndexedDBDriver implements IStorageDriver {
         });
     }
 
+    deleteSpace(id: SpaceID): Promise<void> {
+        console.log('DELETE SPACE ' + id);
+        return new Promise<void>((resolve, reject) => {
+            if (!this.db) return reject(new Error('DB not init'));
+            console.log('idb:', this.db);
+            const tx = this.db.transaction(this.spacesCollection, 'readwrite');
+            tx.addEventListener('complete', () => resolve(), { once: true });
+            tx.addEventListener('error', () => reject(), { once: true });
+            const spaceCollection = tx.objectStore(this.spacesCollection);
+            spaceCollection.delete(id);
+        });
+    }
+
     private get chunkStorageName(): string {
         return this.prefix + 'chunks';
     }

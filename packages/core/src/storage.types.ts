@@ -20,6 +20,8 @@ export interface IStorageDriver {
 
     saveSpace(space: ISpace): Promise<ISpace>;
 
+    deleteSpace(id: SpaceID): Promise<void>;
+
     // save meta
     // load meta
     // remove meta
