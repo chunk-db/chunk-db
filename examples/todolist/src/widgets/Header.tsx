@@ -8,6 +8,14 @@ import React from 'react';
 
 const useStyles = makeStyles(theme => ({
     root: {},
+    container: {
+        paddingLeft: theme.spacing(1),
+        paddingRight: theme.spacing(1),
+    },
+    toolbar: {
+        paddingLeft: theme.spacing(1),
+        paddingRight: theme.spacing(1),
+    },
     menuButton: {
         marginRight: theme.spacing(1),
     },
@@ -20,8 +28,8 @@ export const Header = () => {
     const classes = useStyles();
     return (
         <AppBar position="fixed">
-            <Container fixed>
-                <Toolbar>
+            <Container fixed maxWidth="md" className={classes.container}>
+                <Toolbar className={classes.toolbar}>
                     <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
                         <MenuIcon />
                     </IconButton>
