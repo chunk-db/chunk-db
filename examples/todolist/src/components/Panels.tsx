@@ -1,4 +1,4 @@
-import { Container, Grid, Paper } from '@material-ui/core';
+import { Grid, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import React, { ReactNodeArray } from 'react';
 
@@ -7,15 +7,6 @@ interface IProps {
 }
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        flexGrow: 1,
-    },
-    menuButton: {
-        marginRight: theme.spacing(1),
-    },
-    title: {
-        flexGrow: 1,
-    },
     panels: {},
     panel: {},
     paper: {
@@ -26,16 +17,12 @@ const useStyles = makeStyles(theme => ({
 export const Panels = ({ children }: IProps) => {
     const classes = useStyles();
     return (
-        <Container maxWidth="md">
-            <Container className={classes.panels} maxWidth="xl">
-                <Grid container spacing={2}>
-                    {children.map((panel, index) => (
-                        <Grid key={index} item xs={12} md={6}>
-                            <Paper className={classes.paper}>{panel}</Paper>
-                        </Grid>
-                    ))}
+        <Grid container spacing={2} className={classes.panels}>
+            {children.map((panel, index) => (
+                <Grid key={index} item xs={12} md={6}>
+                    <Paper className={classes.paper}>{panel}</Paper>
                 </Grid>
-            </Container>
-        </Container>
+            ))}
+        </Grid>
     );
 };
