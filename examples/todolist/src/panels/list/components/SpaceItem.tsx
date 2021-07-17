@@ -9,11 +9,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { IList, listScheme } from '../../../store/store.types';
 
 import { SpaceListItem } from './ListItem';
+import { ModalContext } from '../../../common-modals/ModalContext';
 
 const useStyles = makeStyles(theme => ({
     space: {},
@@ -25,28 +26,28 @@ const useStyles = makeStyles(theme => ({
 interface IProps {
     space: Space;
     lists: IList[];
+    onDelete?: (space: Space) => void;
 }
 
-export const SpaceItem = ({ space }: IProps) => {
+export const SpaceItem = ({ space, onDelete }: IProps) => {
     const classes = useStyles();
 
-    const db = useChunkDB();
-    const [open, setOpen] = React.useState(false);
+    const [openList, setOpenList] = React.useState(false);
 
     const [lists] = useQueryAll(makeSpaceID(space.id), space => space.collection(listScheme).find({}) as any);
 
-    const openHandler = () => {
-        setOpen(!open);
+    const toggleList = () => {
+        setOpenList(!openList);
     };
 
-    const deleteHandler = e => {
+    const handleDelete = e => {
         e.stopPropagation();
-        db.spaces.delete(space.id);
+        onDelete && onDelete(space);
     };
 
     return (
         <>
-            <ListItem button onClick={openHandler} className={classes.space}>
+            <ListItem button onClick={toggleList} className={classes.space}>
                 <ListItemIcon>
                     <Checkbox
                         edge="start"
@@ -60,13 +61,13 @@ export const SpaceItem = ({ space }: IProps) => {
                     <IconButton edge="end" aria-label="add list">
                         <AddIcon />
                     </IconButton>
-                    <IconButton edge="end" aria-label="delete" onClick={deleteHandler}>
+                    <IconButton edge="end" aria-label="delete" onClick={handleDelete}>
                         <DeleteIcon />
                     </IconButton>
                 </ListItemSecondaryAction>
-                <ListItemSecondaryAction>{open ? <ExpandLess /> : <ExpandMore />}</ListItemSecondaryAction>
+                <ListItemSecondaryAction>{openList ? <ExpandLess /> : <ExpandMore />}</ListItemSecondaryAction>
             </ListItem>
-            <Collapse in={open} timeout="auto" unmountOnExit>
+            <Collapse in={openList} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                     {lists && lists.map(list => <SpaceListItem list={list} space={space} />)}
                 </List>
