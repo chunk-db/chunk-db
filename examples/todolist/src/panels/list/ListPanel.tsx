@@ -4,8 +4,9 @@ import { Button, List } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import React from 'react';
+import React, { useContext } from 'react';
 
+import { ModalContext } from '../../common-modals/ModalContext';
 import { IList, ListID } from '../../store/store.types';
 
 import { SpaceItem } from './components/SpaceItem';
@@ -29,9 +30,17 @@ export const ListPanel = (_: IProps) => {
     const db = useChunkDB();
     const spaces: Space[] = useSpaces();
 
+    const { confirm } = useContext(ModalContext);
+
     const lists: IList[][] = [];
 
     const refresh = () => db.spaces.refresh();
+
+    const handleDeleteSpace = (space: Space) => {
+        confirm('Remove space', {
+            text: `Do you really want to remove space "${space.name}"`,
+        }).then(() => db.spaces.delete(space.id));
+    };
 
     return (
         <>
@@ -48,7 +57,7 @@ export const ListPanel = (_: IProps) => {
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
                 <List component="nav" aria-labelledby={`spaces-header`} className={classes.root}>
                     {spaces.map((space, index) => (
-                        <SpaceItem key={space.id} space={space} lists={lists[index]} />
+                        <SpaceItem key={space.id} space={space} lists={lists[index]} onDelete={handleDeleteSpace} />
                     ))}
                 </List>
             </Box>
