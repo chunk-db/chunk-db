@@ -1,6 +1,7 @@
 import { ChunkDBProvider } from '@chunk-db/react';
 import React, { useState } from 'react';
 
+import { CommonModals } from './common-modals/CommonModals';
 import { Footer } from './components/Footer';
 import { Main } from './components/Main';
 import { Panels } from './components/Panels';
@@ -16,15 +17,17 @@ export const TodoApp = () => {
 
     return (
         <ChunkDBProvider value={db}>
-            <Header />
-            <Main>
-                <Panels>
-                    <TodoPanel lists={lists} />
-                    <ListPanel lists={lists} onLists={setLists} />
-                    <DevToolsUI />
-                </Panels>
-            </Main>
-            <Footer />
+            <CommonModals>
+                <Header />
+                <Main>
+                    <Panels>
+                        <TodoPanel lists={lists} />
+                        <ListPanel lists={lists} onLists={setLists} />
+                        <DevToolsUI />
+                    </Panels>
+                </Main>
+                <Footer />
+            </CommonModals>
         </ChunkDBProvider>
     );
 };
