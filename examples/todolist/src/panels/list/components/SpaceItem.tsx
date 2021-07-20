@@ -27,17 +27,23 @@ interface IProps {
     space: Space;
     lists: IList[];
     onDelete?: (space: Space) => void;
+    onCreateList?: (space: Space) => void;
 }
 
-export const SpaceItem = ({ space, onDelete }: IProps) => {
+export const SpaceItem = ({ space, onDelete, onCreateList }: IProps) => {
     const classes = useStyles();
 
-    const [openList, setOpenList] = React.useState(false);
+    const [openList, setOpenList] = React.useState(true);
 
     const [lists] = useQueryAll(makeSpaceID(space.id), space => space.collection(listScheme).find({}) as any);
 
     const toggleList = () => {
         setOpenList(!openList);
+    };
+
+    const handleCreateList = e => {
+        e.stopPropagation();
+        onCreateList && onCreateList(space);
     };
 
     const handleDelete = e => {
@@ -58,7 +64,7 @@ export const SpaceItem = ({ space, onDelete }: IProps) => {
                 </ListItemIcon>
                 <ListItemText primary={space.name} secondary={space.ref} />
                 <ListItemSecondaryAction className={classes.actions}>
-                    <IconButton edge="end" aria-label="add list">
+                    <IconButton edge="end" aria-label="add list" onClick={handleCreateList}>
                         <AddIcon />
                     </IconButton>
                     <IconButton edge="end" aria-label="delete" onClick={handleDelete}>

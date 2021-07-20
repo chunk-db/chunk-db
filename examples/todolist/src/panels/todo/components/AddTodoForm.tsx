@@ -38,7 +38,9 @@ export const AddTodoForm = ({ saveTodo }: IProps) => {
                         <em>None</em>
                     </MenuItem>
                     {lists.map(item => (
-                        <MenuItem value={item._id}>{item.title}</MenuItem>
+                        <MenuItem key={item._id} value={item._id}>
+                            {item.title}
+                        </MenuItem>
                     ))}
                 </Select>
 
