@@ -35,10 +35,10 @@ export const ConfirmDialog = ({ open, title, text, agreeText, disagreeText, onAg
                 </DialogContent>
             )}
             <DialogActions>
-                <Button autoFocus onClick={onDisagree} color="primary">
+                <Button onClick={onDisagree} color="primary" autoFocus>
                     {disagreeText}
                 </Button>
-                <Button onClick={onAgree} color="primary" autoFocus>
+                <Button onClick={onAgree} color="primary">
                     {agreeText}
                 </Button>
             </DialogActions>

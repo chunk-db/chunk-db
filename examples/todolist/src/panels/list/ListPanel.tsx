@@ -1,15 +1,25 @@
 import { Space } from '@chunk-db/core';
 import { useChunkDB, useSpaces } from '@chunk-db/react';
-import { Button, List } from '@material-ui/core';
+import {
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+    DialogTitle,
+    List,
+    useMediaQuery,
+} from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 
 import { ModalContext } from '../../common-modals/ModalContext';
 import { IList, ListID } from '../../store/store.types';
 
 import { SpaceItem } from './components/SpaceItem';
+import { AddListFormModal } from './widgets/AddListFormModal';
 import { AddSpaceForm } from './widgets/AddSpaceForm';
 
 interface IProps {
@@ -32,6 +42,8 @@ export const ListPanel = (_: IProps) => {
 
     const { confirm } = useContext(ModalContext);
 
+    const [addListModal, setAddListModal] = useState<Space | null>(null);
+
     const lists: IList[][] = [];
 
     const refresh = () => db.spaces.refresh();
@@ -40,6 +52,14 @@ export const ListPanel = (_: IProps) => {
         confirm('Remove space', {
             text: `Do you really want to remove space "${space.name}"`,
         }).then(() => db.spaces.delete(space.id));
+    };
+
+    const handleCreateList = (space: Space) => {
+        setAddListModal(space);
+    };
+
+    const closeAddListModal = () => {
+        setAddListModal(null);
     };
 
     return (
@@ -57,10 +77,17 @@ export const ListPanel = (_: IProps) => {
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
                 <List component="nav" aria-labelledby={`spaces-header`} className={classes.root}>
                     {spaces.map((space, index) => (
-                        <SpaceItem key={space.id} space={space} lists={lists[index]} onDelete={handleDeleteSpace} />
+                        <SpaceItem
+                            key={space.id}
+                            space={space}
+                            lists={lists[index]}
+                            onDelete={handleDeleteSpace}
+                            onCreateList={handleCreateList}
+                        />
                     ))}
                 </List>
             </Box>
+            <AddListFormModal space={addListModal} open={!!addListModal} onClose={closeAddListModal} />
         </>
     );
 };
