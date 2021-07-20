@@ -15,6 +15,7 @@ import { IList, listScheme } from '../../../store/store.types';
 
 import { SpaceListItem } from './ListItem';
 import { ModalContext } from '../../../common-modals/ModalContext';
+import { shortId } from '../../../utils/uuid';
 
 const useStyles = makeStyles(theme => ({
     space: {},
@@ -62,7 +63,7 @@ export const SpaceItem = ({ space, onDelete, onCreateList }: IProps) => {
                         inputProps={{ 'aria-labelledby': `space-item-${space.id}` }}
                     />
                 </ListItemIcon>
-                <ListItemText primary={space.name} secondary={space.ref} />
+                <ListItemText primary={space.name} secondary={shortId(space.ref)} />
                 <ListItemSecondaryAction className={classes.actions}>
                     <IconButton edge="end" aria-label="add list" onClick={handleCreateList}>
                         <AddIcon />
@@ -75,7 +76,7 @@ export const SpaceItem = ({ space, onDelete, onCreateList }: IProps) => {
             </ListItem>
             <Collapse in={openList} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    {lists && lists.map(list => <SpaceListItem list={list} space={space} />)}
+                    {lists && lists.map(list => <SpaceListItem key={list._id} list={list} space={space} />)}
                 </List>
             </Collapse>
         </>
