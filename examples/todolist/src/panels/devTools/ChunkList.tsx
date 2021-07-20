@@ -13,6 +13,7 @@ import CopyIcon from '@material-ui/icons/FilterNone';
 import React from 'react';
 
 import { copyToClipboard } from '../../utils';
+import { shortId } from '../../utils/uuid';
 
 interface IProps {
     chunks: AbstractChunk[];
@@ -62,10 +63,4 @@ export function ChunkList({ chunks }: IProps) {
             </Table>
         </TableContainer>
     );
-}
-
-function shortId(id: UUID): string {
-    if (!id) return id;
-
-    return id.substr(0, 13) + '...' + id.substr(28);
 }
