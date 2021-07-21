@@ -6,9 +6,9 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { makeStyles } from '@material-ui/core/styles';
 import DeleteIcon from '@material-ui/icons/Delete';
 import VisibilityIcon from '@material-ui/icons/Visibility';
-import React from 'react';
+import React, { useCallback } from 'react';
 
-import { IList } from '../../../store/store.types';
+import { IList, ListID } from '../../../store/store.types';
 
 const useStyles = makeStyles(theme => ({
     list: {
@@ -19,17 +19,22 @@ const useStyles = makeStyles(theme => ({
 interface IProps {
     list: IList;
     space: ISpace;
+    selected: boolean;
+
+    onToggle(listId: ListID, selected: boolean): void;
 }
 
-export const SpaceListItem = ({ list }: IProps) => {
+export const SpaceListItem = ({ selected, onToggle, list }: IProps) => {
     const classes = useStyles();
+
+    const handleToggle = useCallback(e => onToggle && onToggle(list._id, !selected), [onToggle, selected]);
 
     return (
         <ListItem button dense className={classes.list}>
-            <ListItemIcon>
+            <ListItemIcon onChange={handleToggle}>
                 <Checkbox
+                    checked={selected}
                     edge="start"
-                    tabIndex={-1}
                     disableRipple
                     inputProps={{ 'aria-labelledby': `list-item-${list._id}` }}
                 />

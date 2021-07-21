@@ -9,11 +9,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import React, { useContext } from 'react';
+import React, { SyntheticEvent, useCallback, useContext } from 'react';
 
-import { IList, listScheme } from '../../../store/store.types';
+import { IList, ListID, listScheme } from '../../../store/store.types';
 
-import { SpaceListItem } from './ListItem';
+import { SpaceListItem } from './SpaceListItem';
 import { ModalContext } from '../../../common-modals/ModalContext';
 import { shortId } from '../../../utils/uuid';
 
@@ -27,35 +27,64 @@ const useStyles = makeStyles(theme => ({
 interface IProps {
     space: Space;
     lists: IList[];
+    selectedLists: ListID[];
+
     onDelete?: (space: Space) => void;
     onCreateList?: (space: Space) => void;
+
+    onToggle(listIDs: ListID[], selected: boolean): void;
 }
 
-export const SpaceItem = ({ space, onDelete, onCreateList }: IProps) => {
+export const SpaceItem = ({ space, selectedLists, onDelete, onCreateList, onToggle }: IProps) => {
     const classes = useStyles();
 
     const [openList, setOpenList] = React.useState(true);
 
     const [lists] = useQueryAll(makeSpaceID(space.id), space => space.collection(listScheme).find({}) as any);
 
-    const toggleList = () => {
+    const handleToggleOpenList = useCallback(() => {
         setOpenList(!openList);
-    };
+    }, [setOpenList, openList]);
 
-    const handleCreateList = e => {
-        e.stopPropagation();
-        onCreateList && onCreateList(space);
-    };
+    const handleCreateList = useCallback(
+        e => {
+            e.stopPropagation();
+            onCreateList && onCreateList(space);
+        },
+        [onCreateList, space]
+    );
 
-    const handleDelete = e => {
-        e.stopPropagation();
-        onDelete && onDelete(space);
-    };
+    const handleDelete = useCallback(
+        (e: SyntheticEvent) => {
+            e.stopPropagation();
+            onDelete && onDelete(space);
+        },
+        [onDelete, space]
+    );
+
+    const handleToggleList = useCallback(
+        (e: SyntheticEvent) => {
+            e.stopPropagation();
+            if (!lists) return;
+            if (lists.every(list => selectedLists.includes(list._id))) {
+                onToggle(
+                    lists.map(list => list._id),
+                    false
+                );
+            } else {
+                onToggle(
+                    lists.map(list => list._id),
+                    true
+                );
+            }
+        },
+        [selectedLists, onToggle]
+    );
 
     return (
         <>
-            <ListItem button onClick={toggleList} className={classes.space}>
-                <ListItemIcon>
+            <ListItem button onClick={handleToggleOpenList} className={classes.space}>
+                <ListItemIcon onClick={handleToggleList}>
                     <Checkbox
                         edge="start"
                         tabIndex={-1}
@@ -76,7 +105,16 @@ export const SpaceItem = ({ space, onDelete, onCreateList }: IProps) => {
             </ListItem>
             <Collapse in={openList} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
-                    {lists && lists.map(list => <SpaceListItem key={list._id} list={list} space={space} />)}
+                    {lists &&
+                        lists.map(list => (
+                            <SpaceListItem
+                                key={list._id}
+                                list={list}
+                                space={space}
+                                selected={selectedLists.includes(list._id)}
+                                onToggle={(id, value) => onToggle([id], value)}
+                            />
+                        ))}
                 </List>
             </Collapse>
         </>
