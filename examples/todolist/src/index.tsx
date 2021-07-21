@@ -13,7 +13,7 @@ import { ListID } from './store/store.types';
 import { Header } from './widgets/Header';
 
 export const TodoApp = () => {
-    const [lists, setLists] = useState<ListID[]>([]);
+    const [selectedLists, setSelectedLists] = useState<ListID[]>([]);
 
     return (
         <ChunkDBProvider value={db}>
@@ -21,8 +21,8 @@ export const TodoApp = () => {
                 <Header />
                 <Main>
                     <Panels>
-                        <TodoPanel lists={lists} />
-                        <ListPanel lists={lists} onLists={setLists} />
+                        <TodoPanel selectedLists={selectedLists} />
+                        <ListPanel selectedLists={selectedLists} onChangeSelectedLists={setSelectedLists} />
                         <DevToolsUI />
                     </Panels>
                 </Main>

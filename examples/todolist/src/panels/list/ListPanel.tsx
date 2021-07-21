@@ -1,19 +1,10 @@
 import { Space } from '@chunk-db/core';
 import { useChunkDB, useSpaces } from '@chunk-db/react';
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    List,
-    useMediaQuery,
-} from '@material-ui/core';
+import { Button, List } from '@material-ui/core';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import React, { useContext, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 
 import { ModalContext } from '../../common-modals/ModalContext';
 import { IList, ListID } from '../../store/store.types';
@@ -23,8 +14,8 @@ import { AddListFormModal } from './widgets/AddListFormModal';
 import { AddSpaceForm } from './widgets/AddSpaceForm';
 
 interface IProps {
-    lists: ListID[];
-    onLists?: (lists: ListID[]) => void;
+    selectedLists: ListID[];
+    onChangeSelectedLists?: (lists: ListID[]) => void;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -34,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export const ListPanel = (_: IProps) => {
+export const ListPanel = ({ selectedLists, onChangeSelectedLists }: IProps) => {
     const classes = useStyles();
 
     const db = useChunkDB();
@@ -62,6 +53,24 @@ export const ListPanel = (_: IProps) => {
         setAddListModal(null);
     };
 
+    const handleToggle = useCallback(
+        (listIDs: ListID[], selected: boolean) => {
+            listIDs.forEach(listId => {
+                if (selected) {
+                    if (!selectedLists.includes(listId)) {
+                        selectedLists = [...selectedLists, listId];
+                    }
+                } else {
+                    if (selectedLists.includes(listId)) {
+                        selectedLists = selectedLists.filter(id => id !== listId);
+                    }
+                }
+            });
+            onChangeSelectedLists(selectedLists);
+        },
+        [selectedLists]
+    );
+
     return (
         <>
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
@@ -81,8 +90,10 @@ export const ListPanel = (_: IProps) => {
                             key={space.id}
                             space={space}
                             lists={lists[index]}
+                            selectedLists={selectedLists}
                             onDelete={handleDeleteSpace}
                             onCreateList={handleCreateList}
+                            onToggle={handleToggle}
                         />
                     ))}
                 </List>

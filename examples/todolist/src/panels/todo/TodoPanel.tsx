@@ -13,10 +13,10 @@ import { AddTodoForm } from './components/AddTodoForm';
 import { TodoList } from './components/TodoList';
 
 interface IProps {
-    lists: ListID[];
+    selectedLists: ListID[];
 }
 
-export const TodoPanel = ({ lists }: IProps) => {
+export const TodoPanel = ({ selectedLists }: IProps) => {
     const addTodo = useAddTodo();
     const deleteTodo = useDeleteTodo();
 
@@ -24,7 +24,7 @@ export const TodoPanel = ({ lists }: IProps) => {
         makeSpaceID('space'),
         space =>
             space.collection(todoScheme).find({
-                listId: { $in: lists },
+                listId: { $in: selectedLists },
             }) as any
     );
 
@@ -32,7 +32,7 @@ export const TodoPanel = ({ lists }: IProps) => {
         space
             .collection(todoScheme)
             .find({
-                listId: { $in: lists },
+                listId: { $in: selectedLists },
             })
             .exec()
             .reduce((len, todo) => len + todo.title.length, 0)
@@ -46,7 +46,7 @@ export const TodoPanel = ({ lists }: IProps) => {
                 </Typography>
             </Box>
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
-                <AddTodoForm saveTodo={addTodo} lists={lists} />
+                <AddTodoForm saveTodo={addTodo} lists={selectedLists} />
             </Box>
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
                 <Alert severity="info" variant="outlined">
