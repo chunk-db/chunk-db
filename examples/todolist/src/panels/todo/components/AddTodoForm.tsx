@@ -17,7 +17,7 @@ interface IProps {
 }
 
 export const AddTodoForm = ({ saveTodo }: IProps) => {
-    const [list, setList] = useState<ListID | null>(makeListID(''));
+    const [list] = useState<ListID | null>(makeListID(''));
     const { value, reset, onChange } = useInputState();
 
     let [lists] = useQueryAll(makeSpaceID('space'), space => space.collection(listScheme).find({}) as any);

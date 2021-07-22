@@ -5,7 +5,7 @@ import { makeSubscription } from './common';
 import { ChunkID, makeSpaceID, SpaceID, Subscription } from './common.types';
 import { DelayedSpace } from './delayed-ref';
 import { SpaceNotFoundError } from './errors';
-import { ISpace, Refs, Space } from './space';
+import { ISpace, Space } from './space';
 
 /**
  *

@@ -3,7 +3,7 @@ import { IDemoRecord, TestRecord } from '../__tests__/chunks.demo';
 import { ChunkDB } from './ChunkDB';
 import { IGenericChunk } from './chunks';
 import { delay } from './common';
-import { makeSpaceID, SpaceID } from './common.types';
+import { makeSpaceID } from './common.types';
 import { ISpace, Space } from './space';
 import { StorageTestDriver } from './storage-test';
 

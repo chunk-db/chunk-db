@@ -1,7 +1,7 @@
 import { AbstractChunk, chunkFactory, ChunkType } from './chunks';
 import { ChunkID, makeSpaceID, SpaceID } from './common.types';
 import { SpaceNotFoundError } from './errors';
-import { ISpace, Space } from './space';
+import { ISpace } from './space';
 import { IStorageDriver, NotFoundChunkError } from './storage.types';
 
 export class ChunkStorage {

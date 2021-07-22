@@ -1,4 +1,4 @@
-import { ChunkID, makeChunkID, makeSpaceID, SpaceID, UUID } from './common.types';
+import { ChunkID, makeChunkID, makeSpaceID, SpaceID } from './common.types';
 
 export type Refs = {
     [key: string]: ChunkID;

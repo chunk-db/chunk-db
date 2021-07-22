@@ -5,7 +5,6 @@ import { AbstractChunk, ChunkType } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
 import { DelayedRefs } from '../delayed-ref';
 import { IRecord } from '../record.types';
-import { NotFoundChunkError } from '../storage.types';
 
 import { FindScenario } from './find.types';
 import { call } from './scenario.types';

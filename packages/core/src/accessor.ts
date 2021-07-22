@@ -80,7 +80,7 @@ export class Accessor {
         this.chunks[space] = chunk;
     }
 
-    private makeDelayedRefs<T extends IRecord>(scheme: Model<T>): DelayedRefs {
+    private makeDelayedRefs<T extends IRecord>(_: Model<T>): DelayedRefs {
         return () => Promise.resolve([this.refs.get(this.space.id)!]);
     }
 

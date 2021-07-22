@@ -1,7 +1,6 @@
 import { ChunkStorage } from '../ChunkStorage';
 import { Accessor } from '../accessor';
-import { ChunkID, SpaceID, UUID } from '../common.types';
-import { Refs } from '../space';
+import { ChunkID, SpaceID } from '../common.types';
 import { Spaces } from '../spaces';
 
 export interface ScenarioAction {

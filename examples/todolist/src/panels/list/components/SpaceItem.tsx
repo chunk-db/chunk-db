@@ -12,9 +12,9 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import React, { SyntheticEvent, useCallback } from 'react';
 
 import { IList, ListID, listScheme } from '../../../store/store.types';
+import { shortId } from '../../../utils/uuid';
 
 import { SpaceListItem } from './SpaceListItem';
-import { shortId } from '../../../utils/uuid';
 
 const useStyles = makeStyles(theme => ({
     space: {},

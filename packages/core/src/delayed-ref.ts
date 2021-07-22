@@ -19,7 +19,7 @@ export class DelayedSpace {
         );
     }
 
-    getRefs(model: Model<any>): DelayedRefs<any> {
+    getRefs(_: Model<any>): DelayedRefs<any> {
         // todo types
         return () => this.getSpaces().then(spaces => spaces.map(space => space.ref));
     }
