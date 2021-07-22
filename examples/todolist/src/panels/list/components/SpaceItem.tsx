@@ -1,5 +1,5 @@
 import { makeSpaceID, Space } from '@chunk-db/core';
-import { useChunkDB, useQueryAll } from '@chunk-db/react';
+import { useQueryAll } from '@chunk-db/react';
 import { Collapse, ListItem, ListItemSecondaryAction, ListItemText } from '@material-ui/core';
 import Checkbox from '@material-ui/core/Checkbox/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
@@ -9,12 +9,11 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ExpandLess, ExpandMore } from '@material-ui/icons';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
-import React, { SyntheticEvent, useCallback, useContext } from 'react';
+import React, { SyntheticEvent, useCallback } from 'react';
 
 import { IList, ListID, listScheme } from '../../../store/store.types';
 
 import { SpaceListItem } from './SpaceListItem';
-import { ModalContext } from '../../../common-modals/ModalContext';
 import { shortId } from '../../../utils/uuid';
 
 const useStyles = makeStyles(theme => ({
@@ -78,16 +77,23 @@ export const SpaceItem = ({ space, selectedLists, onDelete, onCreateList, onTogg
                 );
             }
         },
-        [selectedLists, onToggle]
+        [lists, selectedLists, onToggle]
     );
 
+    let checked: boolean | null = lists ? null : false;
+    if (lists) {
+        if (lists.every(list => selectedLists.includes(list._id))) checked = true;
+        if (lists.every(list => !selectedLists.includes(list._id))) checked = false;
+    }
     return (
         <>
             <ListItem button onClick={handleToggleOpenList} className={classes.space}>
-                <ListItemIcon onClick={handleToggleList}>
+                <ListItemIcon onClick={e => e.stopPropagation()}>
                     <Checkbox
+                        indeterminate={checked === null}
+                        checked={checked || checked === null}
+                        onChange={handleToggleList}
                         edge="start"
-                        tabIndex={-1}
                         disableRipple
                         inputProps={{ 'aria-labelledby': `space-item-${space.id}` }}
                     />
