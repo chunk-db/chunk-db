@@ -17,7 +17,7 @@ interface IProps {
     onClose?: () => void;
 }
 
-const useStyles = makeStyles((theme: Theme) => ({
+const useStyles = makeStyles((_: Theme) => ({
     root: {},
 }));
 

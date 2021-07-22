@@ -2,6 +2,6 @@ import { ChunkDB } from '../ChunkDB';
 
 describe('AbstractChunk', () => {
     test('fromUnknown', () => {
-        const db = new ChunkDB({} as any);
+        new ChunkDB({} as any);
     });
 });

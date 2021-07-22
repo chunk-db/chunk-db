@@ -1,4 +1,4 @@
-import { AbstractChunk, UUID } from '@chunk-db/core';
+import { AbstractChunk } from '@chunk-db/core';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import Paper from '@material-ui/core/Paper';

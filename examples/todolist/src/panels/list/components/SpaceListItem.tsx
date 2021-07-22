@@ -27,7 +27,7 @@ interface IProps {
 export const SpaceListItem = ({ selected, onToggle, list }: IProps) => {
     const classes = useStyles();
 
-    const handleToggle = useCallback(e => onToggle && onToggle(list._id, !selected), [onToggle, selected]);
+    const handleToggle = useCallback(() => onToggle && onToggle(list._id, !selected), [onToggle, selected]);
 
     return (
         <ListItem button dense className={classes.list}>

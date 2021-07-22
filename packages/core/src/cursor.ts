@@ -1,6 +1,6 @@
+import { UUID } from './common.types';
 import { QuerySelector } from './query-selector';
 import { IRecord } from './record.types';
-import { UUID } from './common.types';
 
 /**
  * Предоставляет возможность получения данных по конкретному запросу

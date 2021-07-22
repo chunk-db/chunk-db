@@ -55,12 +55,12 @@ export function useFlatChain(spaceID: SpaceID, collection: string, maxDepth?: nu
     return chain;
 }
 
-export function useQueryAll<PARAMS extends any[]>(
+export function useQueryAll<T = any, PARAMS extends any[] = any[]>(
     spaceID: SpaceID,
     queryBuilder: (space: DataSpace, ...params: PARAMS) => Query | Promise<any>,
     defaultValue: any = null,
     ...params: PARAMS
-): QueryResult<any[]> {
+): QueryResult<T[]> {
     const [result, setResult] = useState<QueryResult<any[]>>([defaultValue, true]);
 
     const db = useChunkDB();
@@ -75,7 +75,7 @@ export function useQueryAll<PARAMS extends any[]>(
                 .all()
                 .then(list => setResult([list, false]));
         else query.then(res => setResult([res, false]));
-    }, [space, ...params]);
+    }, [space, space?.ref, ...params]);
 
     return result;
 }

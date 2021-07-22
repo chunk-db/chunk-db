@@ -15,7 +15,7 @@ class TestEntity {
 
 describe('Model', () => {
     it('full initialization', () => {
-        const scheme = new Model<TestEntity>('test', {
+        new Model<TestEntity>('test', {
             uuid: 'id',
             sid: 'category',
             factory: data => new TestEntity(data),

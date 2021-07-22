@@ -1,7 +1,7 @@
 import { demoStorage, IDemoRecord, TestRecord } from '../__tests__/chunks.demo';
 
 import { ChunkDB } from './ChunkDB';
-import { makeChunkID, makeSpaceID, SpaceID } from './common.types';
+import { makeChunkID, makeSpaceID } from './common.types';
 import { InMemoryChunkStorage } from './in-memory-chunk-storage';
 import { call, getStorage, ScenarioContext } from './scenarios/scenario.types';
 import { Space } from './space';
@@ -110,7 +110,7 @@ describe('ChunkDB', () => {
             };
 
             // act 1: insert record
-            const event1 = await db1.transaction(space.id, async tx => {
+            await db1.transaction(space.id, async tx => {
                 const insertedRecord = await tx.upsert(TestRecord, { ...record });
                 expect(insertedRecord).toEqual(record);
             });

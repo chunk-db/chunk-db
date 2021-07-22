@@ -85,11 +85,11 @@ export class StorageTestDriver implements IStorageCacheDriver {
         });
     }
 
-    markDraftChunkAsUnused(id: ChunkID): Promise<void> {
+    markDraftChunkAsUnused(_: ChunkID): Promise<void> {
         return Promise.resolve(undefined);
     }
 
-    removeChunk(id: ChunkID): Promise<void> {
+    removeChunk(_: ChunkID): Promise<void> {
         return Promise.resolve(undefined);
     }
 

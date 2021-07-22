@@ -22,6 +22,7 @@
     "prettier:check": "prettier --check './**/*.{js,jsx,ts,tsx}'",
     "prettier": "prettier --write './**/*.{js,jsx,ts,tsx}'",
     "lint": "eslint --ext .ts,.tsx,.js,.jsx packages/*/src examples/*/src examples/*/pages",
+    "lint:ci": "yarn run lint --max-warnings 0",
     "test": "jest",
     "test:watch": "jest --watch",
     "docs": "npm run docs:clean && npm run docs:generate && npm run docs:export",

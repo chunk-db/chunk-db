@@ -1,7 +1,7 @@
 import { IGenericChunk } from './chunks';
 import { ChunkID, makeChunkID, makeSpaceID, SpaceID } from './common.types';
 import { DBError } from './errors';
-import { ISpace, Refs } from './space';
+import { ISpace } from './space';
 import { IStorageCacheDriver, NotFoundChunkError } from './storage.types';
 
 export class InMemoryChunkStorage implements IStorageCacheDriver {
