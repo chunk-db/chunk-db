@@ -6,7 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import AddIcon from '@material-ui/icons/Add';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import { useInputState } from '../../../hooks/useInputState';
 import { ListID, listScheme, makeListID } from '../../../store/store.types';
@@ -16,11 +16,10 @@ interface IProps {
     lists: ListID[];
 }
 
-export const AddTodoForm = ({ saveTodo }: IProps) => {
-    const [list] = useState<ListID | null>(makeListID(''));
+export const AddTodoForm = ({ saveTodo, lists }: IProps) => {
+    const [list, setList] = useState<ListID | null>(makeListID(''));
     const { value, reset, onChange } = useInputState();
 
-    let [lists] = useQueryAll(makeSpaceID('space'), space => space.collection(listScheme).find({}) as any);
     lists = lists || [];
 
     const saveTodoHandler = event => {
@@ -29,17 +28,25 @@ export const AddTodoForm = ({ saveTodo }: IProps) => {
         reset();
     };
 
+    const handleSelectList = useCallback(
+        (_, { props: { value } }) => {
+            console.log(value);
+            setList(value);
+        },
+        [setList]
+    );
+
     return (
         <form onSubmit={saveTodoHandler}>
             <Box alignItems="bottom">
                 <TextField size="small" placeholder="Add todo" margin="normal" onChange={onChange} value={value} />
-                <Select value={list} onChange={console.log} displayEmpty>
+                <Select value={list} onChange={handleSelectList} displayEmpty>
                     <MenuItem value="">
                         <em>None</em>
                     </MenuItem>
                     {lists.map(item => (
-                        <MenuItem key={item._id} value={item._id}>
-                            {item.title}
+                        <MenuItem key={item} value={item}>
+                            {item}
                         </MenuItem>
                     ))}
                 </Select>
