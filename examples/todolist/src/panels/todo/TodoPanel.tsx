@@ -7,13 +7,13 @@ import Alert from '@material-ui/lab/Alert';
 import React from 'react';
 
 import { useAddTodo, useDeleteTodo } from '../../hooks/useTodoOperations';
-import { ListID, todoScheme } from '../../store/store.types';
+import { IList, todoScheme } from '../../store/store.types';
 
 import { AddTodoForm } from './components/AddTodoForm';
 import { TodoList } from './components/TodoList';
 
 interface IProps {
-    selectedLists: ListID[];
+    selectedLists: IList[];
 }
 
 export const TodoPanel = ({ selectedLists }: IProps) => {
@@ -24,7 +24,7 @@ export const TodoPanel = ({ selectedLists }: IProps) => {
         makeSpaceID('space'),
         space =>
             space.collection(todoScheme).find({
-                listId: { $in: selectedLists },
+                listId: { $in: selectedLists.map(list => list._id) },
             }) as any
     );
 
@@ -32,7 +32,7 @@ export const TodoPanel = ({ selectedLists }: IProps) => {
         space
             .collection(todoScheme)
             .find({
-                listId: { $in: selectedLists },
+                listId: { $in: selectedLists.map(list => list._id) },
             })
             .exec()
             .reduce((len, todo) => len + todo.title.length, 0)

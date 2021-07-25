@@ -11,7 +11,7 @@ import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import React, { SyntheticEvent, useCallback } from 'react';
 
-import { IList, ListID, listScheme } from '../../../store/store.types';
+import { IList, listScheme } from '../../../store/store.types';
 import { shortId } from '../../../utils/uuid';
 
 import { SpaceListItem } from './SpaceListItem';
@@ -26,12 +26,12 @@ const useStyles = makeStyles(theme => ({
 interface IProps {
     space: Space;
     lists: IList[];
-    selectedLists: ListID[];
+    selectedLists: IList[];
 
     onDelete?: (space: Space) => void;
     onCreateList?: (space: Space) => void;
 
-    onToggle(listIDs: ListID[], selected: boolean): void;
+    onToggle(lists: IList[], selected: boolean): void;
 }
 
 export const SpaceItem = ({ space, selectedLists, onDelete, onCreateList, onToggle }: IProps) => {
@@ -65,16 +65,10 @@ export const SpaceItem = ({ space, selectedLists, onDelete, onCreateList, onTogg
         (e: SyntheticEvent) => {
             e.stopPropagation();
             if (!lists) return;
-            if (lists.every(list => selectedLists.includes(list._id))) {
-                onToggle(
-                    lists.map(list => list._id),
-                    false
-                );
+            if (lists.every(list => selectedLists.find(item => item._id === list._id))) {
+                onToggle(lists, false);
             } else {
-                onToggle(
-                    lists.map(list => list._id),
-                    true
-                );
+                onToggle(lists, true);
             }
         },
         [lists, selectedLists, onToggle]
@@ -82,8 +76,8 @@ export const SpaceItem = ({ space, selectedLists, onDelete, onCreateList, onTogg
 
     let checked: boolean | null = lists ? null : false;
     if (lists) {
-        if (lists.every(list => selectedLists.includes(list._id))) checked = true;
-        if (lists.every(list => !selectedLists.includes(list._id))) checked = false;
+        if (lists.every(list => selectedLists.find(item => item._id === list._id))) checked = true;
+        if (lists.every(list => !selectedLists.find(item => item._id === list._id))) checked = false;
     }
     return (
         <>
@@ -117,8 +111,8 @@ export const SpaceItem = ({ space, selectedLists, onDelete, onCreateList, onTogg
                                 key={list._id}
                                 list={list}
                                 space={space}
-                                selected={selectedLists.includes(list._id)}
-                                onToggle={(id, value) => onToggle([id], value)}
+                                selected={!!selectedLists.find(item => item._id === list._id)}
+                                onToggle={(list, value) => onToggle([list], value)}
                             />
                         ))}
                 </List>
