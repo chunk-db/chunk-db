@@ -1,5 +1,3 @@
-import { makeSpaceID } from '@chunk-db/core';
-import { useQueryAll } from '@chunk-db/react';
 import Box from '@material-ui/core/Box';
 import IconButton from '@material-ui/core/IconButton';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -9,44 +7,46 @@ import AddIcon from '@material-ui/icons/Add';
 import React, { useCallback, useState } from 'react';
 
 import { useInputState } from '../../../hooks/useInputState';
-import { ListID, listScheme, makeListID } from '../../../store/store.types';
+import { IList, ListID, makeListID } from '../../../store/store.types';
 
 interface IProps {
     saveTodo: (text: string, listId: ListID) => void;
-    lists: ListID[];
+    lists: IList[];
 }
 
 export const AddTodoForm = ({ saveTodo, lists }: IProps) => {
-    const [list, setList] = useState<ListID | null>(makeListID(''));
+    const [listId, setListId] = useState<ListID | null>(makeListID(''));
     const { value, reset, onChange } = useInputState();
 
     lists = lists || [];
 
-    const saveTodoHandler = event => {
-        event.preventDefault();
-        if (value.trim() && list) saveTodo(value, list);
-        reset();
-    };
+    const saveTodoHandler = useCallback(
+        event => {
+            event.preventDefault();
+            if (value.trim() && listId) saveTodo(value, listId);
+            reset();
+        },
+        [saveTodo, listId]
+    );
 
     const handleSelectList = useCallback(
         (_, { props: { value } }) => {
-            console.log(value);
-            setList(value);
+            setListId(value);
         },
-        [setList]
+        [setListId]
     );
 
     return (
         <form onSubmit={saveTodoHandler}>
             <Box alignItems="bottom">
                 <TextField size="small" placeholder="Add todo" margin="normal" onChange={onChange} value={value} />
-                <Select value={list} onChange={handleSelectList} displayEmpty>
+                <Select value={listId} onChange={handleSelectList} displayEmpty>
                     <MenuItem value="">
                         <em>None</em>
                     </MenuItem>
                     {lists.map(item => (
-                        <MenuItem key={item} value={item}>
-                            {item}
+                        <MenuItem key={item._id} value={item._id}>
+                            {item.title}
                         </MenuItem>
                     ))}
                 </Select>

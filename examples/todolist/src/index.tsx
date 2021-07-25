@@ -9,11 +9,11 @@ import { DevToolsUI } from './panels/devTools';
 import { ListPanel } from './panels/list/ListPanel';
 import { TodoPanel } from './panels/todo/TodoPanel';
 import { db } from './store/store';
-import { ListID } from './store/store.types';
+import { IList } from './store/store.types';
 import { Header } from './widgets/Header';
 
 export const TodoApp = () => {
-    const [selectedLists, setSelectedLists] = useState<ListID[]>([]);
+    const [selectedLists, setSelectedLists] = useState<IList[]>([]);
 
     return (
         <ChunkDBProvider value={db}>

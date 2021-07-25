@@ -8,7 +8,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import React, { useCallback } from 'react';
 
-import { IList, ListID } from '../../../store/store.types';
+import { IList } from '../../../store/store.types';
 
 const useStyles = makeStyles(theme => ({
     list: {
@@ -21,13 +21,13 @@ interface IProps {
     space: ISpace;
     selected: boolean;
 
-    onToggle(listId: ListID, selected: boolean): void;
+    onToggle(list: IList, selected: boolean): void;
 }
 
 export const SpaceListItem = ({ selected, onToggle, list }: IProps) => {
     const classes = useStyles();
 
-    const handleToggle = useCallback(() => onToggle && onToggle(list._id, !selected), [onToggle, selected]);
+    const handleToggle = useCallback(() => onToggle && onToggle(list, !selected), [onToggle, selected]);
 
     return (
         <ListItem button dense className={classes.list}>

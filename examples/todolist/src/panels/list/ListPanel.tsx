@@ -7,15 +7,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import React, { useCallback, useContext, useState } from 'react';
 
 import { ModalContext } from '../../common-modals/ModalContext';
-import { IList, ListID } from '../../store/store.types';
+import { IList } from '../../store/store.types';
 
 import { SpaceItem } from './components/SpaceItem';
 import { AddListFormModal } from './widgets/AddListFormModal';
 import { AddSpaceForm } from './widgets/AddSpaceForm';
 
 interface IProps {
-    selectedLists: ListID[];
-    onChangeSelectedLists?: (lists: ListID[]) => void;
+    selectedLists: IList[];
+    onChangeSelectedLists?: (lists: IList[]) => void;
 }
 
 const useStyles = makeStyles(theme => ({
@@ -54,15 +54,15 @@ export const ListPanel = ({ selectedLists, onChangeSelectedLists }: IProps) => {
     };
 
     const handleToggle = useCallback(
-        (listIDs: ListID[], selected: boolean) => {
-            listIDs.forEach(listId => {
+        (lists: IList[], selected: boolean) => {
+            lists.forEach(list => {
                 if (selected) {
-                    if (!selectedLists.includes(listId)) {
-                        selectedLists = [...selectedLists, listId];
+                    if (!selectedLists.find(item => item._id === list._id)) {
+                        selectedLists = [...selectedLists, list];
                     }
                 } else {
-                    if (selectedLists.includes(listId)) {
-                        selectedLists = selectedLists.filter(id => id !== listId);
+                    if (selectedLists.find(item => item._id === list._id)) {
+                        selectedLists = selectedLists.filter(item => item._id !== list._id);
                     }
                 }
             });
