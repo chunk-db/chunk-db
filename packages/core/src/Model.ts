@@ -18,7 +18,7 @@ interface IModel<T extends IRecord> {
 
 export type TypeOfModel<T> = T extends Model<infer R> ? R : never;
 
-export class Model<T extends IRecord> {
+export class Model<T extends IRecord = any> {
     public readonly name: string;
     public readonly uuid: keyof T;
     public readonly sid: null | keyof T;

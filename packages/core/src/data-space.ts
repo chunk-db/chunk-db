@@ -2,7 +2,6 @@ import { ChunkDB } from './ChunkDB';
 import { Model } from './Model';
 import { Collection } from './collection';
 import { ChunkID, makeChunkID, SpaceID } from './common.types';
-import { IRecord } from './record.types';
 import { ISpace, Space } from './space';
 import { SpaceReader } from './space-reader';
 
@@ -12,7 +11,7 @@ import { SpaceReader } from './space-reader';
 export class DataSpace implements ISpace {
     constructor(private readonly db: ChunkDB, public readonly spaceId: SpaceID) {}
 
-    public collection<T extends IRecord>(scheme: Model<T>): SpaceReader<T> {
+    public collection<T extends Model>(scheme: T): SpaceReader<T> {
         if (!(scheme instanceof Model)) {
             throw new Error(`Scheme must be instance of Model`);
         }

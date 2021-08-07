@@ -16,7 +16,7 @@ import { IStorageDriver } from './storage.types';
 
 export class ChunkDB {
     public storage: ChunkStorage;
-    public collections: { [key: string]: Collection<IRecord> };
+    public collections: { [key: string]: Collection<Model> };
     public readonly spaces: Spaces;
 
     public ready = false;
@@ -85,7 +85,7 @@ export class ChunkDB {
         return new DataSpace(this, spaceID);
     }
 
-    public collection<T extends IRecord>(scheme: Model<T>): Collection<T> {
+    public collection<T extends Model>(scheme: T): Collection<T> {
         if (scheme.name in this.collections) return this.collections[scheme.name] as any;
 
         throw new Error(`Invalid collection "${scheme.name}"`);
