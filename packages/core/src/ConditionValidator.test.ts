@@ -1,6 +1,6 @@
 import { buildQuery } from './ConditionValidator';
 
-describe('Query', () => {
+describe('ConditionValidator', () => {
     const obj = {
         _id: 'id',
         foo: 'bar',

@@ -1,7 +1,5 @@
 import { ChunkDB } from './ChunkDB';
 import { Model } from './Model';
-import { SpaceID } from './common.types';
-import { SpaceReader } from './space-reader';
 
 /**
  * Представляет собой доступ к настройкам и данным коллекции
@@ -9,9 +7,18 @@ import { SpaceReader } from './space-reader';
 export class Collection<T extends Model> {
     constructor(private readonly db: ChunkDB, public readonly model: T) {}
 
-    public space(space: SpaceID | SpaceID[]): SpaceReader<T> {
-        const delayedSpace = this.db.spaces.getDelayedSpaces(Array.isArray(space) ? space : [space]);
-        const delayedRefs = delayedSpace.getRefs(this.model);
-        return new SpaceReader(this.db, this.model, delayedRefs);
+    find(query: Query): Cursor<T> {
+        return new Cursor<T>();
+    }
+
+    async findOne(query: Query): Promise<T | null> {
+        return null;
+        // const records = await this.findAll(query);
+        // return records[0] || null;
+    }
+
+    async findAll(query: Query): Promise<T[]> {
+        return [];
+        // return this.find(query).exec().all();
     }
 }

@@ -2,10 +2,11 @@ import { ChunkDB } from './ChunkDB';
 import { IQuery } from './ConditionValidator';
 import { Model } from './Model';
 import { DelayedRefs } from './delayed-ref';
-import { Query } from './query';
+import { Query } from './Query';
 
 /**
  * Доступ к данным конкретной коллекции и пространства
+ * @deprecated
  */
 export class SpaceReader<T extends Model = Model> {
     constructor(private readonly db: ChunkDB, public readonly model: T, public readonly delayedRefs: DelayedRefs<T>) {}
