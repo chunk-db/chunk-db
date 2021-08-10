@@ -27,7 +27,6 @@ export type IPart<T extends IRecord = IRecord> =
           withParams?: boolean;
       };
 
-export type FindQuery = Record<string, any>;
 export type FilterQuery<T> = (record: T, params: Record<string, any>) => boolean;
 
 export type MapModifier<T, R> = (record: T, params: Record<string, any>) => R;
