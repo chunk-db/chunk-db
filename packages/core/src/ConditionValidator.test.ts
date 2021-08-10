@@ -1,4 +1,4 @@
-import { buildQuery } from './ConditionValidator';
+import { buildConditionQuery } from './ConditionValidator';
 
 describe('ConditionValidator', () => {
     const obj = {
@@ -13,25 +13,25 @@ describe('ConditionValidator', () => {
 
     describe('primitives', () => {
         test('string, positive', () => {
-            const query = buildQuery({
+            const query = buildConditionQuery({
                 foo: 'bar',
             });
             expect(query(obj)).toBeTruthy();
         });
         test('string, another string', () => {
-            const query = buildQuery({
+            const query = buildConditionQuery({
                 foo: 'nested',
             });
             expect(query(obj)).toBeFalsy();
         });
         test('boolean, but string', () => {
-            const query = buildQuery({
+            const query = buildConditionQuery({
                 'nested.foo': true,
             });
             expect(query(obj)).toBeFalsy();
         });
         test('number, but object', () => {
-            const query = buildQuery({
+            const query = buildConditionQuery({
                 nested: 1,
             });
             expect(query(obj)).toBeFalsy();

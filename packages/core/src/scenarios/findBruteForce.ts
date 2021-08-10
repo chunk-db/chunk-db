@@ -1,5 +1,5 @@
 import 'regenerator-runtime/runtime';
-import { buildQuery, ConditionValidator, IQuery } from '../ConditionValidator';
+import { buildConditionQuery, ConditionValidator, IQuery } from '../ConditionValidator';
 import { Model } from '../Model';
 import { AbstractChunk, ChunkType } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
@@ -16,7 +16,7 @@ export function* findBruteForce<T extends IRecord = IRecord>(
     query: IQuery = {}
 ): FindScenario<T> {
     const allFound = new Map<UUID, T | null>();
-    const builtQuery = buildQuery(query);
+    const builtQuery = buildConditionQuery(query);
     let chunks: AbstractChunk[];
 
     let chunkIDs: ChunkID[] = yield call(resolveRelayedRefs, delayedRefs);

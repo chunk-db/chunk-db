@@ -1,31 +1,81 @@
-import { FilterQuery } from './Query.types';
-import { partToPipeOperator } from './partProcessing';
+import { makePipeByParts } from './partProcessing';
 
 describe('partProcessing', () => {
-    describe('partToPipeOperator', () => {
-        describe('filter', () => {
+    describe('makePipeByParts', () => {
+        it('allow in right order', () => {
             const testRecord = Object.freeze({
                 id: 1,
                 name: 'test',
             });
 
-            it('base', () => {
-                // arrange
-                const fn: FilterQuery<any> = jest.fn(() => true);
-
-                // act
-                const op = partToPipeOperator({
-                    type: 'filter',
-                    value: fn,
-                });
-                const result = op(testRecord);
-
-                // assert
-                console.log(fn.mock.calls[0]);
-                expect(fn.mock.calls.length).toBe(1);
-                expect(fn.mock.calls[0][0]).toBe(testRecord);
-                expect(result).toBe(testRecord);
+            // act
+            const order: string[] = [];
+            const filter = jest.fn(_ => {
+                order.push('filter');
+                return true;
             });
+            const map = jest.fn(record => {
+                order.push('map');
+                return { ...record };
+            });
+
+            const pipe = makePipeByParts([
+                {
+                    type: 'filter',
+                    value: filter,
+                },
+                {
+                    type: 'map',
+                    value: map,
+                },
+            ]);
+            const result = pipe(testRecord, { id: 1 });
+
+            // assert
+            expect(result).not.toBe(testRecord);
+            expect(result).toEqual(testRecord);
+
+            expect(order).toEqual(['filter', 'map']);
+
+            expect(filter.mock.calls.length).toBe(1);
+            expect(map.mock.calls.length).toBe(1);
+        });
+        it('deny if return undefined', () => {
+            const testRecord = Object.freeze({
+                id: 1,
+                name: 'test',
+            });
+
+            // act
+            const filter = jest.fn(_ => false);
+            const map = jest.fn(record => ({ ...record }));
+
+            const pipe = makePipeByParts([
+                {
+                    type: 'filter',
+                    value: filter,
+                },
+                {
+                    type: 'map',
+                    value: map,
+                },
+            ]);
+            const result = pipe(testRecord, { id: 1 });
+
+            // assert
+            expect(result).toEqual(undefined);
+
+            expect(filter.mock.calls.length).toBe(1);
+            expect(map.mock.calls.length).toBe(0);
+        });
+        it('error if unknown part', () => {
+            expect(() =>
+                makePipeByParts([
+                    {
+                        type: 'unknown',
+                    } as any,
+                ])
+            ).toThrow('Unknown part type "unknown"');
         });
     });
 });

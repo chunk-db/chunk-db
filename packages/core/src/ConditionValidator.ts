@@ -23,7 +23,7 @@ export type IQuery = {
 
 export type ConditionValidator<T extends IRecord = IRecord> = (record: T) => boolean;
 
-export function buildQuery(query: IQuery): ConditionValidator {
+export function buildConditionQuery(query: IQuery): ConditionValidator {
     if (typeof query !== 'object') throw new Error('ConditionValidator must be an object');
 
     const byFields = Object.keys(query).map(path => {
