@@ -57,6 +57,7 @@ export const TodoPanel = ({ selectedLists }: IProps) => {
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
                 <TodoList todos={todos} deleteTodo={deleteTodo} loading={loading} />
             </Box>
+            <pre>{JSON.stringify(selectedLists, null, 2)}</pre>
         </>
     );
 };

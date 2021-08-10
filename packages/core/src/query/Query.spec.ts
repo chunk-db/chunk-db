@@ -1,4 +1,4 @@
-import { Model } from './Model';
+import { Model } from '../Model';
 import { param, Query } from './Query';
 
 const model = new Model('test', {

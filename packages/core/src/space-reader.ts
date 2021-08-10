@@ -2,7 +2,7 @@ import { ChunkDB } from './ChunkDB';
 import { IQuery } from './ConditionValidator';
 import { Model } from './Model';
 import { DelayedRefs } from './delayed-ref';
-import { Query } from './Query';
+import { Query } from './query/Query';
 
 /**
  * Доступ к данным конкретной коллекции и пространства

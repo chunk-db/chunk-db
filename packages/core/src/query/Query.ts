@@ -1,14 +1,14 @@
-import { Model } from './Model';
-import { DynamicSortQuery, FindQuery, IPart, SortQuery } from './Query.types';
-import { IRecord } from './record.types';
-import { isSerializable } from './utils';
+import { Model } from '../Model';
+import { DynamicSortQuery, FindQuery, IPart, QueryParams, SortQuery } from './Query.types';
+import { IRecord } from '../record.types';
+import { isSerializable } from '../utils';
 
 /**
  * Создание запроса к БД
  */
 export class Query<T extends IRecord = IRecord> {
     public readonly parts: IPart<T>[] = [];
-    public readonly params: Record<string, any> = {};
+    public readonly params: QueryParams = {};
     private readonly model: Model<T>;
 
     constructor(model: Model<T>);

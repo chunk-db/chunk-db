@@ -13,6 +13,8 @@ import { isCall, ScenarioAction, ScenarioContext } from './scenarios/scenario.ty
 import { Space } from './space';
 import { Spaces } from './spaces';
 import { IStorageDriver } from './storage.types';
+import { Query } from './query/Query';
+import { Cursor } from './cursor';
 
 export class ChunkDB {
     public storage: ChunkStorage;
@@ -90,6 +92,8 @@ export class ChunkDB {
 
         throw new Error(`Invalid collection "${scheme.name}"`);
     }
+
+    public query<T>(query: Query<T>): Cursor<T> {}
 
     public run(scenario: any): any {
         const context: ScenarioContext = {
