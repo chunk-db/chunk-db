@@ -1,5 +1,7 @@
 import { Model } from '../Model';
-import { param, Query } from './Query';
+
+import { Query } from './Query';
+import { param } from './param';
 
 const model = new Model('test', {
     uuid: 'id',

@@ -1,9 +1,4 @@
-import { Primitive } from '../common.types';
 import { IRecord } from '../record.types';
-
-export interface QueryParams {
-    [key: string]: Primitive;
-}
 
 export type IPart<T extends IRecord = IRecord> =
     | {

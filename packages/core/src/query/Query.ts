@@ -1,7 +1,10 @@
 import { Model } from '../Model';
-import { DynamicSortQuery, FindQuery, IPart, QueryParams, SortQuery } from './Query.types';
 import { IRecord } from '../record.types';
 import { isSerializable } from '../utils';
+
+import { DynamicSortQuery, IPart, SortQuery } from './Query.types';
+import { FindQuery } from './operators/find.types';
+import { QueryParams } from './operators/operators.types';
 
 /**
  * Создание запроса к БД
@@ -63,10 +66,4 @@ export class Query<T extends IRecord = IRecord> {
             });
         throw new Error('Query.sort allow only serializable object or function as an argument');
     }
-}
-
-export function param(strings: TemplateStringsArray) {
-    const paramName = strings[0];
-    if (!paramName || strings.length !== 1) throw new Error(`Invalid parameter "${strings.raw}"`);
-    return '$parameter$' + paramName;
 }
