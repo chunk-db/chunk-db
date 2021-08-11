@@ -93,7 +93,9 @@ export class ChunkDB {
         throw new Error(`Invalid collection "${scheme.name}"`);
     }
 
-    public query<T>(query: Query<T>): Cursor<T> {}
+    public query<T>(query: Query<T>): Cursor<T> {
+        return null as any;
+    }
 
     public run(scenario: any): any {
         const context: ScenarioContext = {

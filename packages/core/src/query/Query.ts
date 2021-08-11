@@ -5,6 +5,7 @@ import { isSerializable } from '../utils';
 import { DynamicSortQuery, IPart, SortQuery } from './Query.types';
 import { FindQuery } from './operators/find.types';
 import { QueryParams } from './operators/operators.types';
+import { SpaceID } from '../common.types';
 
 /**
  * Создание запроса к БД
@@ -65,5 +66,17 @@ export class Query<T extends IRecord = IRecord> {
                 value: sort,
             });
         throw new Error('Query.sort allow only serializable object or function as an argument');
+    }
+
+    one(): Query<T> {
+        return this;
+    }
+
+    all(): Query<T> {
+        return this;
+    }
+
+    space(spaceID: SpaceID | SpaceID[]): Query<T> {
+        return this;
     }
 }

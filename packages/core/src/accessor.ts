@@ -10,6 +10,7 @@ import { UpdateEvent } from './events';
 import { IRecord } from './record.types';
 import { Space } from './space';
 import { SpaceReader } from './space-reader';
+import { Query } from './query/Query';
 
 export class Accessor {
     public readonly initialRefs: ReadonlyMap<SpaceID, ChunkID>;
@@ -42,8 +43,12 @@ export class Accessor {
         return this.stats;
     }
 
-    public collection<T extends IRecord>(model: Model<T>): SpaceReader<T> {
+    public collection<T extends IRecord>(model: Model<T>): SpaceReader {
         return new SpaceReader<any>(this.db, model, this.makeDelayedRefs(model));
+    }
+
+    public query<T>(query: Query<T>): Promise<T> {
+        return Promise.reject() as any;
     }
 
     async upsert<T extends IRecord>(scheme: Model<T>, record: T): Promise<T> {

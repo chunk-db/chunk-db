@@ -13,7 +13,7 @@ export const Operators = {
 };
 
 export function makePipeByParts<T extends IRecord = IRecord>(
-    parts: IPart[]
+    parts: IPart<T>[]
 ): (record: T, params: QueryParams) => T | undefined {
     const operations = parts.map(partToPipeOperator);
     const length = operations.length;
