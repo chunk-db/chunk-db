@@ -1,11 +1,11 @@
 import { Model } from '../Model';
+import { SpaceID } from '../common.types';
 import { IRecord } from '../record.types';
 import { isSerializable } from '../utils';
 
 import { DynamicSortQuery, IPart, SortQuery } from './Query.types';
 import { FindQuery } from './operators/find.types';
 import { QueryParams } from './operators/operators.types';
-import { SpaceID } from '../common.types';
 
 /**
  * Создание запроса к БД
@@ -33,6 +33,21 @@ export class Query<T extends IRecord = IRecord> {
         return query;
     }
 
+    findByPk(id: string | string[]): Query<T> {
+        if (!id) throw new Error();
+        if (Array.isArray(id)) {
+            return this.addPart({
+                type: 'find',
+                value: { [this.model.uuid]: { $in: id } },
+            });
+        } else {
+            return this.addPart({
+                type: 'find',
+                value: { [this.model.uuid]: { $eq: id } },
+            });
+        }
+    }
+
     find(staticQuery: FindQuery): Query<T> {
         if (!isSerializable(staticQuery)) throw new Error('Query.find allow only serializable argument');
 
@@ -42,6 +57,10 @@ export class Query<T extends IRecord = IRecord> {
         });
     }
 
+    /**
+     * @deprecated Method not ready
+     * @param fn
+     */
     filter(fn: (record: T) => boolean): Query<T> {
         if (typeof fn !== 'function') throw new Error('Query.filter allow only function');
         return this.addPart({
@@ -50,10 +69,26 @@ export class Query<T extends IRecord = IRecord> {
         });
     }
 
+    /**
+     * @deprecated Method not ready
+     * @param fn
+     */
     spaces(): Query<T> {
         return this;
     }
 
+    /**
+     * @deprecated Method not ready
+     * @param fn
+     */
+    space(spaceID: SpaceID | SpaceID[]): Query<T> {
+        return this;
+    }
+
+    /**
+     * @deprecated Method not ready
+     * @param fn
+     */
     sort(sort: SortQuery | DynamicSortQuery<T>): Query<T> {
         if (typeof sort === 'function')
             return this.addPart({
@@ -73,10 +108,6 @@ export class Query<T extends IRecord = IRecord> {
     }
 
     all(): Query<T> {
-        return this;
-    }
-
-    space(spaceID: SpaceID | SpaceID[]): Query<T> {
         return this;
     }
 }

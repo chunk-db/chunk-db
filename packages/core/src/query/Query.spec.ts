@@ -38,7 +38,7 @@ describe('Query', () => {
             expect(query.parts.length).toBe(1);
         });
         it('no serializable query', () => {
-            expect(() => new Query(model).find({ x: () => null })).toThrow(
+            expect(() => new Query(model).find({ x: () => null } as any)).toThrow(
                 'Query.find allow only serializable argument'
             );
         });

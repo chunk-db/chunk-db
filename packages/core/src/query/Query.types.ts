@@ -1,11 +1,15 @@
 import { IRecord } from '../record.types';
 
+import { FindQuery } from './operators/find.types';
+import { QueryParams } from './operators/operators.types';
+
+export type IStaticPart<T extends IRecord = IRecord> = {
+    type: 'find';
+    value: FindQuery;
+    withParams?: boolean;
+};
 export type IPart<T extends IRecord = IRecord> =
-    | {
-          type: 'find';
-          value: FindQuery;
-          withParams?: boolean;
-      }
+    | IStaticPart
     | {
           type: 'filter';
           value: FilterQuery<T>;
