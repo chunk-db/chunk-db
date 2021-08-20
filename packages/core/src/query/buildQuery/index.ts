@@ -1,3 +1,4 @@
+import { ChunkID } from '../../common.types';
 import { Query } from '../Query';
 import { makePipeByParts } from '../partProcessing';
 
@@ -24,7 +25,12 @@ export function buildQuery<T>(ctx: BuildQueryContext, query: Query<T>, options: 
     const pipe = makePipeByParts(optimizedQuery.parts);
     // make pipe by parts
 
+    const refs: ChunkID[] = [];
+    ctx.refs.forEach(space => refs.push(space.ref));
+
     return {
+        model: query.model,
+        refs,
         staticQuery,
         params: {},
         pipe,

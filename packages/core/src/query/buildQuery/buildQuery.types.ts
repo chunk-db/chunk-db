@@ -1,9 +1,16 @@
+import { Model } from '../../Model';
+import { ChunkID, SpaceID } from '../../common.types';
+import { Refs } from '../../space';
 import { FindQuery } from '../operators/find.types';
 import { QueryParams } from '../operators/operators.types';
 
-export interface BuildQueryContext {}
+export interface BuildQueryContext {
+    refs: Map<SpaceID, { ref: ChunkID }>;
+}
 
 export interface BuiltQuery<T, R = T> {
+    refs: ChunkID[];
+    model: Model<T>;
     staticQuery: FindQuery;
     /**
      * @deprecated Property not ready

@@ -11,7 +11,7 @@ import { ISpace, Space } from './space';
  *
  */
 export class Spaces {
-    private spaces: Map<SpaceID, Space> = new Map();
+    public readonly spaces: Map<SpaceID, Space> = new Map();
     private subscriptions: Array<() => void> = [];
     private spaceSubscriptions = new Map<SpaceID, Array<() => void>>();
 

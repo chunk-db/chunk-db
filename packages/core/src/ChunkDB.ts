@@ -16,6 +16,8 @@ import { IStorageDriver } from './storage.types';
 import { Query } from './query/Query';
 import { Cursor } from './cursor';
 import { buildQuery } from './query/buildQuery';
+import { QuerySelector } from './query-selector';
+import { FindQuery } from './query/operators/find.types';
 
 export class ChunkDB {
     public storage: ChunkStorage;
@@ -95,15 +97,21 @@ export class ChunkDB {
     }
 
     public find<T>(query: Query<T>): Cursor<T> {
-        const ctx = {};
+        const ctx = {
+            refs: this.spaces.spaces,
+        };
         const builtQuery = buildQuery(ctx, query, {
             optimization: false,
         });
 
         // chose scenario (strategy)
-        // create QuerySelector
-        // create Cursor by QuerySelector and Query
-        return null as any;
+        const querySelector = this.makeQuerySelector(builtQuery.model, builtQuery.staticQuery, builtQuery.refs);
+
+        return new Cursor<T>(querySelector, builtQuery);
+    }
+
+    private makeQuerySelector<T>(model: Model<T>, staticQuery: FindQuery, refs: ChunkID[]): QuerySelector<T> {
+        return new QuerySelector(this, model, staticQuery, refs);
     }
 
     public run(scenario: any): any {

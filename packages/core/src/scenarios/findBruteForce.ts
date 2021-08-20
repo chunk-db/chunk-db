@@ -3,15 +3,14 @@ import { buildConditionQuery, ConditionValidator, IQuery } from '../ConditionVal
 import { Model } from '../Model';
 import { AbstractChunk, ChunkType } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
-import { DelayedRefs } from '../delayed-ref';
 import { IRecord } from '../record.types';
 
 import { FindScenario } from './find.types';
 import { call } from './scenario.types';
-import { getChunks, resolveRelayedRefs } from './utils';
+import { getChunks } from './utils';
 
 export function* findBruteForce<T extends IRecord = IRecord>(
-    delayedRefs: DelayedRefs<any>,
+    refs: ChunkID[],
     model: Model<T>,
     query: IQuery = {}
 ): FindScenario<T> {
@@ -19,9 +18,7 @@ export function* findBruteForce<T extends IRecord = IRecord>(
     const builtQuery = buildConditionQuery(query);
     let chunks: AbstractChunk[];
 
-    let chunkIDs: ChunkID[] = yield call(resolveRelayedRefs, delayedRefs);
-
-    chunkIDs = chunkIDs.filter(item => !!item);
+    const chunkIDs = refs.filter(item => !!item);
 
     if (!chunkIDs.length)
         return {

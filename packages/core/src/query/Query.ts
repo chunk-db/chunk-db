@@ -13,7 +13,7 @@ import { QueryParams } from './operators/operators.types';
 export class Query<T extends IRecord = IRecord> {
     public readonly parts: IPart<T>[] = [];
     public readonly params: QueryParams = {};
-    private readonly model: Model<T>;
+    public readonly model: Model<T>;
 
     constructor(model: Model<T>);
     constructor(query: Query<T>);
