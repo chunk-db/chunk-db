@@ -5,19 +5,17 @@ import { AbstractChunk, ChunkType } from './chunks';
 import { Collection } from './collection';
 import { makeSubscription } from './common';
 import { ChunkID, IChunkDBConfig, ITransactionConfig, SpaceID, Subscription, Transaction } from './common.types';
-import { DataSpace } from './data-space';
+import { Cursor } from './cursor';
 import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';
+import { QuerySelector } from './query-selector';
+import { Query } from './query/Query';
+import { buildQuery } from './query/buildQuery';
+import { FindQuery } from './query/operators/find.types';
 import { IRecord } from './record.types';
 import { isCall, ScenarioAction, ScenarioContext } from './scenarios/scenario.types';
-import { Space } from './space';
 import { Spaces } from './spaces';
 import { IStorageDriver } from './storage.types';
-import { Query } from './query/Query';
-import { Cursor } from './cursor';
-import { buildQuery } from './query/buildQuery';
-import { QuerySelector } from './query-selector';
-import { FindQuery } from './query/operators/find.types';
 
 export class ChunkDB {
     public storage: ChunkStorage;
@@ -76,18 +74,6 @@ export class ChunkDB {
         }
 
         return this.spaces.subscribe(spaceID, cb as () => void);
-    }
-
-    /**
-     * Get [[DataSpace]]
-     */
-    public space(space: SpaceID | Space): DataSpace {
-        let spaceID: SpaceID;
-        if (!space) throw new Error(`Invalid space ""`);
-        if (typeof space === 'object') spaceID = (space as Space).id;
-        else spaceID = space;
-
-        return new DataSpace(this, spaceID);
     }
 
     public collection<T extends Model>(scheme: T): Collection<T> {

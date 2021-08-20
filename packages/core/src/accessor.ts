@@ -7,10 +7,9 @@ import { ChunkID, makeChunkID, SpaceID, UUID } from './common.types';
 import { DelayedRefs } from './delayed-ref';
 import { InnerDBError } from './errors';
 import { UpdateEvent } from './events';
+import { Query } from './query/Query';
 import { IRecord } from './record.types';
 import { Space } from './space';
-import { SpaceReader } from './space-reader';
-import { Query } from './query/Query';
 
 export class Accessor {
     public readonly initialRefs: ReadonlyMap<SpaceID, ChunkID>;
@@ -41,10 +40,6 @@ export class Accessor {
 
     getStats(): UpdateEvent {
         return this.stats;
-    }
-
-    public collection<T extends IRecord>(model: Model<T>): SpaceReader {
-        return new SpaceReader<any>(this.db, model, this.makeDelayedRefs(model));
     }
 
     public query<T>(query: Query<T>): Promise<T> {
