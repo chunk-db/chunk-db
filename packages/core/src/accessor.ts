@@ -42,7 +42,7 @@ export class Accessor {
         return this.stats;
     }
 
-    public query<T>(query: Query<T>): Promise<T> {
+    public find<T>(query: Query<T>): Promise<T> {
         return Promise.reject() as any;
     }
 

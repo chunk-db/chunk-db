@@ -18,7 +18,7 @@ export function* findBruteForce<T extends IRecord = IRecord>(
     const builtQuery = buildConditionQuery(query);
     let chunks: AbstractChunk[];
 
-    const chunkIDs = refs.filter(item => !!item);
+    let chunkIDs = refs.filter(item => !!item);
 
     if (!chunkIDs.length)
         return {

@@ -1,8 +1,9 @@
 import { IRecord } from '../record.types';
 
-import { IPart, PipeOperation, PipeOperator, QueryParams } from './Query.types';
+import { IPart, PipeOperation, PipeOperator } from './Query.types';
 import { filter } from './operators/filter';
 import { map } from './operators/map';
+import { QueryParams } from './operators/operators.types';
 
 export const Operators = {
     find: (_: any) => (_record: any, _params: any) => void 0,

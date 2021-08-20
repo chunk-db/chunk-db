@@ -7,4 +7,5 @@ export function optimizeQuery<T>(ctx: BuildQueryContext, query: Query<T>, optimi
         case Optimization.None:
             return query;
     }
+    return query;
 }

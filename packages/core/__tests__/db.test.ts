@@ -41,6 +41,7 @@ describe('ChunkDB e2e tests', () => {
             storage,
             collections: [TestRecord],
         });
+        return await db.spaces.refresh();
     });
 
     describe('fetch data', () => {
@@ -173,7 +174,7 @@ describe('ChunkDB e2e tests', () => {
 
                 // act
                 const event = await db.transaction(space.id, async tx => {
-                    const record = await tx.query(new Query(TestRecord).find({ user: 1 }).one());
+                    const record = await tx.find(new Query(TestRecord).find({ user: 1 }).one());
                     expect(record).toEqual({
                         _id: 'a',
                         user: 1,
@@ -228,7 +229,7 @@ describe('ChunkDB e2e tests', () => {
                     expect(recordsFromOut.length).toBe(0);
 
                     // query in the transaction
-                    const recordsFromTx = await tx.query(new Query(TestRecord).find({ user: 8 }).all());
+                    const recordsFromTx = await tx.find(new Query(TestRecord).find({ user: 8 }).all());
                     expect(recordsFromTx).toEqual([
                         {
                             _id: record._id,
