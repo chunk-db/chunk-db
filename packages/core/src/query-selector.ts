@@ -19,10 +19,10 @@ export class QuerySelector<T extends IRecord = IRecord> {
     constructor(
         private readonly db: ChunkDB,
         private readonly model: Model<T>,
-        private readonly query: IQuery,
+        private readonly _query: IQuery,
         private readonly refs: ChunkID[]
     ) {
-        this.scenario = this.db.run(findBruteForce(this.refs, this.model, this.query));
+        this.scenario = this.db.run(findBruteForce(this.refs, this.model));
     }
 
     async next(): Promise<IFindResult<T>> {

@@ -12,8 +12,8 @@ import { QueryParams } from './operators/operators.types';
  * API for creating query
  */
 export class Query<T extends IRecord = IRecord> {
-    public readonly parts: IPart<T>[] = [];
-    public readonly model: Model<T>;
+    private readonly _parts: IPart<T>[] = [];
+    private readonly _model: Model<T>;
     private readonly _params: QueryParams = {};
     private readonly _refs: Refs = {};
 
@@ -21,10 +21,10 @@ export class Query<T extends IRecord = IRecord> {
     constructor(query: Query<T>);
     constructor(query: Query<T> | Model<T> | any) {
         if (query instanceof Model) {
-            this.model = query;
+            this._model = query;
         } else if (query instanceof Query) {
-            this.model = query.model;
-            this.parts = [...query.parts];
+            this._model = query._model;
+            this._parts = [...query._parts];
             this._params = { ...query._params };
             this._refs = { ...query._refs };
         } else {
@@ -34,7 +34,7 @@ export class Query<T extends IRecord = IRecord> {
 
     private addPart(newPart: IPart<T>): Query<T> {
         const query = new Query(this);
-        query.parts.push(newPart);
+        query._parts.push(newPart);
         return query;
     }
 
@@ -43,12 +43,12 @@ export class Query<T extends IRecord = IRecord> {
         if (Array.isArray(id)) {
             return this.addPart({
                 type: 'find',
-                value: { [this.model.uuid]: { $in: id } },
+                value: { [this._model.uuid]: { $in: id } },
             });
         } else {
             return this.addPart({
                 type: 'find',
-                value: { [this.model.uuid]: { $eq: id } },
+                value: { [this._model.uuid]: { $eq: id } },
             });
         }
     }
@@ -110,5 +110,13 @@ export class Query<T extends IRecord = IRecord> {
 
     getRefs(): Readonly<Refs> {
         return this._refs;
+    }
+
+    getModel(): Readonly<Model<T>> {
+        return this._model;
+    }
+
+    getParts(): Readonly<IPart<T>[]> {
+        return this._parts;
     }
 }

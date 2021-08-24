@@ -1,5 +1,4 @@
 import 'regenerator-runtime/runtime';
-import { ConditionValidator, IQuery } from '../ConditionValidator';
 import { Model } from '../Model';
 import { AbstractChunk, ChunkType } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
@@ -9,11 +8,7 @@ import { FindScenario } from './find.types';
 import { call } from './scenario.types';
 import { getChunks } from './utils';
 
-export function* findBruteForce<T extends IRecord = IRecord>(
-    refs: ChunkID[],
-    model: Model<T>,
-    query: IQuery = {}
-): FindScenario<T> {
+export function* findBruteForce<T extends IRecord = IRecord>(refs: ChunkID[], model: Model<T>): FindScenario<T> {
     let chunks: AbstractChunk[];
 
     let chunkIDs = refs.filter(item => !!item);
@@ -61,18 +56,4 @@ export function* findBruteForce<T extends IRecord = IRecord>(
             };
         }
     }
-}
-
-function isNewFactory<T extends IRecord>(map: Map<UUID, T | null>, filter: ConditionValidator) {
-    // todo
-    return (record: any) => {
-        if (!record) return true;
-
-        if (map.has(record._id)) return false;
-
-        if (!filter(record)) return false;
-
-        map.set(record._id, record);
-        return true;
-    };
 }

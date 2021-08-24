@@ -1,7 +1,7 @@
 import { Query } from '../Query';
 import { IPart, IStaticPart } from '../Query.types';
-import { FindQuery } from '../operators/find.types';
 import { QueryOperators } from '../operators/find';
+import { FindQuery } from '../operators/find.types';
 
 /**
  * Calculate safe part of query what can be stored as serializable object
@@ -10,7 +10,7 @@ import { QueryOperators } from '../operators/find';
  */
 export function buildStaticQuery<T>(query: Query<T>): FindQuery {
     const staticQuery: FindQuery = {};
-    for (const part of query.parts) {
+    for (const part of query.getParts()) {
         if (!isStaticPartOfQuery(part)) break;
 
         addPartIntoFindQuery(staticQuery, part.value);
@@ -19,15 +19,13 @@ export function buildStaticQuery<T>(query: Query<T>): FindQuery {
 }
 
 export function isStaticPartOfQuery<T>(part: IPart<T>): part is IStaticPart<T> {
-    if (part.type === 'find') return true;
-
-    return false;
+    return part.type === 'find';
 }
 
 /**
  * Add conditions into FindQuery
- * @param target
- * @param conditions
+ * @param targetQuery
+ * @param additional
  * @return mutated target
  */
 export function addPartIntoFindQuery(targetQuery: FindQuery, additional: IPart['value'] | FindQuery): FindQuery {

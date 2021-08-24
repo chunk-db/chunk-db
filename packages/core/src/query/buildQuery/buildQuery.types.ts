@@ -1,9 +1,11 @@
 import { Model } from '../../Model';
+import { Collection } from '../../collection';
 import { ChunkID, SpaceID } from '../../common.types';
 import { FindQuery } from '../operators/find.types';
 import { QueryParams } from '../operators/operators.types';
 
 export interface BuildQueryContext {
+    collections: { [key: string]: Collection<Model> };
     refs: Map<SpaceID, { ref: ChunkID }>;
 }
 
@@ -34,8 +36,4 @@ export interface BuiltQuery<T> {
 export enum Optimization {
     Auto = 'auto',
     None = 'none',
-}
-
-export interface BuildQueryOptions {
-    optimization?: false | Optimization;
 }

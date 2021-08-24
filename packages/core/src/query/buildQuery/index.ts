@@ -2,7 +2,7 @@ import { ChunkID, makeSpaceID } from '../../common.types';
 import { Query } from '../Query';
 import { makePipeOperation } from '../partProcessing';
 
-import { BuildQueryContext, BuildQueryOptions, BuiltQuery, Optimization } from './buildQuery.types';
+import { BuildQueryContext, BuiltQuery } from './buildQuery.types';
 import { buildStaticQuery } from './buildStaticQuery';
 
 /**
@@ -10,23 +10,18 @@ import { buildStaticQuery } from './buildStaticQuery';
  *
  * @param ctx context with functions and data required for building
  * @param query query for building
- * @param options options for building
  */
-export function buildQuery<T>(ctx: BuildQueryContext, query: Query<T>, options: BuildQueryOptions = {}): BuiltQuery<T> {
-    const staticQuery = buildStaticQuery(query);
+export function buildQuery<T>(ctx: BuildQueryContext, query: Query<T>): BuiltQuery<T> {
+    const queryModel = query.getModel();
+    if (!ctx.collections[queryModel.name]) throw new Error(`Unregistered collection "${queryModel.name}"`);
+    const model = ctx.collections[queryModel.name].model;
 
-    options = Object.assign(
-        {
-            optimization: 'auto',
-        },
-        options
-    );
-    if (options.optimization === false) options.optimization = Optimization.None;
+    const staticQuery = buildStaticQuery(query);
 
     const limit = Infinity;
     const offset = 0;
 
-    const pipe = query.parts.map(makePipeOperation);
+    const pipe = query.getParts().map(makePipeOperation);
     // make pipe by parts
 
     const refs: ChunkID[] = [];
@@ -45,7 +40,7 @@ export function buildQuery<T>(ctx: BuildQueryContext, query: Query<T>, options: 
     }
 
     return {
-        model: query.model,
+        model,
         refs,
         staticQuery,
         params: query.getParams(),

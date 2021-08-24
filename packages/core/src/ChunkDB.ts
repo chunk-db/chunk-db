@@ -11,7 +11,7 @@ import { UpdateEvent } from './events';
 import { QuerySelector } from './query-selector';
 import { Query } from './query/Query';
 import { buildQuery } from './query/buildQuery';
-import { Optimization } from './query/buildQuery/buildQuery.types';
+import { BuildQueryContext, Optimization } from './query/buildQuery/buildQuery.types';
 import { optimizeQuery } from './query/buildQuery/optimizeQuery';
 import { FindQuery } from './query/operators/find.types';
 import { IRecord } from './record.types';
@@ -85,13 +85,12 @@ export class ChunkDB {
     }
 
     public find<T>(query: Query<T>): Cursor<T> {
-        const ctx = {
+        const ctx: BuildQueryContext = {
+            collections: this.collections,
             refs: this.spaces.spaces,
         };
         const optimizedQuery = optimizeQuery(ctx, query, Optimization.None);
-        const builtQuery = buildQuery(ctx, optimizedQuery, {
-            optimization: false,
-        });
+        const builtQuery = buildQuery(ctx, optimizedQuery);
 
         // chose scenario (strategy)
         const querySelector = this.makeQuerySelector(builtQuery.model, builtQuery.staticQuery, builtQuery.refs);

@@ -1,6 +1,5 @@
 import { demoStorage, TestRecord } from '../../__tests__/chunks.demo';
 import { ChunkDB } from '../ChunkDB';
-import { IQuery } from '../ConditionValidator';
 import { makeChunkID } from '../common.types';
 
 import { findBruteForce } from './findBruteForce';
@@ -14,11 +13,11 @@ describe('findBruteForce', () => {
         });
     });
 
-    test('base', async () => {
+    test('scan chunks', async () => {
         // arrange
 
         // act
-        const gen = db.run(findBruteForce(() => Promise.resolve([makeChunkID('a1')]), TestRecord));
+        const gen = db.run(findBruteForce([makeChunkID('a1')], TestRecord));
 
         // assert
         expect(await gen.next()).toEqual({
@@ -32,57 +31,10 @@ describe('findBruteForce', () => {
             done: true,
             value: {
                 chunkIDs: ['initial'],
-                records: new Map([['d', { _id: 'd', user: 2, value: 'd0' }]]),
-            },
-        });
-    });
-
-    test('query', async () => {
-        // arrange
-
-        // act
-        const gen = db.run(
-            findBruteForce(() => Promise.resolve([makeChunkID('a1')]), TestRecord, { user: 2 } as IQuery)
-        );
-
-        // assert
-        expect(await gen.next()).toEqual({
-            done: false,
-            value: {
-                chunkIDs: ['a1'],
-                records: new Map(),
-            },
-        });
-        expect(await gen.next()).toEqual({
-            done: true,
-            value: {
-                chunkIDs: ['initial'],
-                records: new Map([['d', { _id: 'd', user: 2, value: 'd0' }]]),
-            },
-        });
-    });
-
-    test('query invalid', async () => {
-        // arrange
-
-        // act
-        const gen = db.run(
-            findBruteForce(() => Promise.resolve([makeChunkID('a1')]), TestRecord, { user: 10 } as IQuery)
-        );
-
-        // assert
-        expect(await gen.next()).toEqual({
-            done: false,
-            value: {
-                chunkIDs: ['a1'],
-                records: new Map(),
-            },
-        });
-        expect(await gen.next()).toEqual({
-            done: true,
-            value: {
-                chunkIDs: ['initial'],
-                records: new Map(),
+                records: new Map([
+                    ['a', { _id: 'a', user: 1, value: 'a0' }],
+                    ['d', { _id: 'd', user: 2, value: 'd0' }],
+                ]),
             },
         });
     });
@@ -91,23 +43,24 @@ describe('findBruteForce', () => {
         // arrange
 
         // act
-        const gen = db.run(
-            findBruteForce(() => Promise.resolve([makeChunkID('initial')]), TestRecord, { user: 1 } as IQuery)
-        );
+        const gen = db.run(findBruteForce([makeChunkID('initial')], TestRecord));
 
         // assert
         expect(await gen.next()).toEqual({
             done: true,
             value: {
                 chunkIDs: ['initial'],
-                records: new Map([['a', { _id: 'a', user: 1, value: 'a0' }]]),
+                records: new Map([
+                    ['a', { _id: 'a', user: 1, value: 'a0' }],
+                    ['d', { _id: 'd', user: 2, value: 'd0' }],
+                ]),
             },
         });
     });
 
     test('empty space', async () => {
         // act
-        const gen = db.run(findBruteForce(() => Promise.resolve([makeChunkID('')]), TestRecord));
+        const gen = db.run(findBruteForce([makeChunkID('')], TestRecord));
 
         // assert
         expect(await gen.next()).toEqual({
