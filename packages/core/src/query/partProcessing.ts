@@ -2,11 +2,12 @@ import { IRecord } from '../record.types';
 
 import { IPart, PipeOperation, PipeOperator } from './Query.types';
 import { filter } from './operators/filter';
+import { find } from './operators/find';
 import { map } from './operators/map';
 import { QueryParams } from './operators/operators.types';
 
 export const Operators = {
-    find: (_: any) => (_record: any, _params: any) => void 0,
+    find,
     filter,
     map,
     staticSort: (_: any) => (_record: any, _params: any) => void 0,
@@ -16,7 +17,7 @@ export const Operators = {
 export function makePipeByParts<T extends IRecord = IRecord>(
     parts: IPart<T>[]
 ): (record: T, params: QueryParams) => T | undefined {
-    const operations = parts.map(partToPipeOperator);
+    const operations = parts.map(makePipeOperation);
     const length = operations.length;
 
     return (record, params) => {
@@ -28,7 +29,7 @@ export function makePipeByParts<T extends IRecord = IRecord>(
     };
 }
 
-function partToPipeOperator<T extends IRecord = IRecord>(part: IPart<T>): PipeOperation<T, T> {
+export function makePipeOperation<T extends IRecord = IRecord>(part: IPart<T>): PipeOperation<T, T> {
     const { type, value } = part;
     const operator: PipeOperator<T, any> = Operators[type];
     if (!operator) {

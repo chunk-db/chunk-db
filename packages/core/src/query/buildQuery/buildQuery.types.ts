@@ -1,6 +1,5 @@
 import { Model } from '../../Model';
 import { ChunkID, SpaceID } from '../../common.types';
-import { Refs } from '../../space';
 import { FindQuery } from '../operators/find.types';
 import { QueryParams } from '../operators/operators.types';
 
@@ -8,7 +7,9 @@ export interface BuildQueryContext {
     refs: Map<SpaceID, { ref: ChunkID }>;
 }
 
-export interface BuiltQuery<T, R = T> {
+export type PipeItem<T> = (record: T, params: QueryParams) => T | undefined;
+
+export interface BuiltQuery<T> {
     refs: ChunkID[];
     model: Model<T>;
     staticQuery: FindQuery;
@@ -19,11 +20,7 @@ export interface BuiltQuery<T, R = T> {
     /**
      * @deprecated Property not ready
      */
-    pipe: (record: T, params: QueryParams) => T | undefined;
-    /**
-     * @deprecated Property not ready
-     */
-    postProcessing: undefined | ((record: T) => R);
+    pipe: PipeItem<T>[];
     /**
      * @deprecated Property not ready
      */

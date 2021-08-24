@@ -1,6 +1,7 @@
 import { v4 } from 'uuid';
 
 import { ChunkDB } from './ChunkDB';
+import { Cursor } from './Cursor';
 import { Model } from './Model';
 import { TemporaryTransactionChunk } from './chunks';
 import { ChunkID, makeChunkID, SpaceID, UUID } from './common.types';
@@ -42,8 +43,8 @@ export class Accessor {
         return this.stats;
     }
 
-    public find<T>(query: Query<T>): Promise<T> {
-        return Promise.reject() as any;
+    public find<T>(query: Query<T>): Cursor<T> {
+        return this.db.find(query.space(this.space.id, this.refs.get(this.space.id) || this.space.ref));
     }
 
     async upsert<T extends IRecord>(scheme: Model<T>, record: T): Promise<T> {

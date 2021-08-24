@@ -1,6 +1,7 @@
 import { Model } from '../Model';
-import { SpaceID } from '../common.types';
+import { ChunkID, makeChunkID, SpaceID } from '../common.types';
 import { IRecord } from '../record.types';
+import { Refs } from '../space';
 import { isSerializable } from '../utils';
 
 import { DynamicSortQuery, IPart, SortQuery } from './Query.types';
@@ -8,22 +9,26 @@ import { FindQuery } from './operators/find.types';
 import { QueryParams } from './operators/operators.types';
 
 /**
- * Создание запроса к БД
+ * API for creating query
  */
 export class Query<T extends IRecord = IRecord> {
     public readonly parts: IPart<T>[] = [];
-    public readonly params: QueryParams = {};
     public readonly model: Model<T>;
+    private readonly _params: QueryParams = {};
+    private readonly _refs: Refs = {};
 
     constructor(model: Model<T>);
     constructor(query: Query<T>);
-    constructor(query: Query<T> | Model<T>) {
+    constructor(query: Query<T> | Model<T> | any) {
         if (query instanceof Model) {
             this.model = query;
-        } else {
+        } else if (query instanceof Query) {
             this.model = query.model;
             this.parts = [...query.parts];
-            this.params = { ...query.params };
+            this._params = { ...query._params };
+            this._refs = { ...query._refs };
+        } else {
+            throw new Error('Scheme must be instance of Model');
         }
     }
 
@@ -69,20 +74,16 @@ export class Query<T extends IRecord = IRecord> {
         });
     }
 
-    /**
-     * @deprecated Method not ready
-     * @param fn
-     */
-    spaces(): Query<T> {
-        return this;
+    spaces(spaceIDs: SpaceID[]): Query<T> {
+        const query = new Query(this);
+        spaceIDs.forEach(spaceID => (query._refs[spaceID] = makeChunkID('')));
+        return query;
     }
 
-    /**
-     * @deprecated Method not ready
-     * @param fn
-     */
-    space(spaceID: SpaceID | SpaceID[]): Query<T> {
-        return this;
+    space(spaceID: SpaceID, chunkID?: ChunkID): Query<T> {
+        const query = new Query(this);
+        query._refs[spaceID] = makeChunkID(chunkID || '');
+        return query;
     }
 
     /**
@@ -103,11 +104,11 @@ export class Query<T extends IRecord = IRecord> {
         throw new Error('Query.sort allow only serializable object or function as an argument');
     }
 
-    one(): Query<T> {
-        return this;
+    getParams(): Readonly<QueryParams> {
+        return this._params;
     }
 
-    all(): Query<T> {
-        return this;
+    getRefs(): Readonly<Refs> {
+        return this._refs;
     }
 }

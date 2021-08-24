@@ -1,7 +1,6 @@
 import { Query } from '../Query';
 import { IPart, IStaticPart } from '../Query.types';
 import { FindQuery } from '../operators/find.types';
-import { QueryParams } from '../operators/operators.types';
 import { QueryOperators } from '../operators/find';
 
 /**

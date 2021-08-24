@@ -1,16 +1,18 @@
 import { ChunkStorage } from './ChunkStorage';
+import { Cursor } from './Cursor';
 import { Model } from './Model';
 import { Accessor } from './accessor';
 import { AbstractChunk, ChunkType } from './chunks';
 import { Collection } from './collection';
 import { makeSubscription } from './common';
 import { ChunkID, IChunkDBConfig, ITransactionConfig, SpaceID, Subscription, Transaction } from './common.types';
-import { Cursor } from './cursor';
 import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';
 import { QuerySelector } from './query-selector';
 import { Query } from './query/Query';
 import { buildQuery } from './query/buildQuery';
+import { Optimization } from './query/buildQuery/buildQuery.types';
+import { optimizeQuery } from './query/buildQuery/optimizeQuery';
 import { FindQuery } from './query/operators/find.types';
 import { IRecord } from './record.types';
 import { isCall, ScenarioAction, ScenarioContext } from './scenarios/scenario.types';
@@ -86,14 +88,15 @@ export class ChunkDB {
         const ctx = {
             refs: this.spaces.spaces,
         };
-        const builtQuery = buildQuery(ctx, query, {
+        const optimizedQuery = optimizeQuery(ctx, query, Optimization.None);
+        const builtQuery = buildQuery(ctx, optimizedQuery, {
             optimization: false,
         });
 
         // chose scenario (strategy)
         const querySelector = this.makeQuerySelector(builtQuery.model, builtQuery.staticQuery, builtQuery.refs);
 
-        return new Cursor<T>(querySelector, builtQuery);
+        return new Cursor<T>(querySelector, builtQuery, {});
     }
 
     private makeQuerySelector<T>(model: Model<T>, staticQuery: FindQuery, refs: ChunkID[]): QuerySelector<T> {

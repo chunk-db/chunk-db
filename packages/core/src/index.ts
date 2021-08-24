@@ -7,6 +7,5 @@ export * from './storage.types';
 export * from './chunks';
 export * from './record.types';
 export * from './query/Query';
-export * from './cursor';
+export * from './Cursor';
 export * from './Model';
-export * from './cursor';
