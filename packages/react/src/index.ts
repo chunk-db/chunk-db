@@ -1,5 +1,6 @@
-import { AbstractChunk, ChunkDB, DataSpace, Query, Space, SpaceID } from '@chunk-db/core';
+import { AbstractChunk, ChunkDB, IRecord, Query, Space, SpaceID } from '@chunk-db/core';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { QueryParams } from '@chunk-db/core/dist/query/operators/operators.types';
 
 export type QueryResult<T> = [T, boolean]; // FIXME: [result: T, loading: boolean];
 
@@ -16,14 +17,14 @@ export function useChunkDB(): ChunkDB {
     return useContext(ChunkDBContext);
 }
 
-export function useSpace(spaceID: SpaceID): DataSpace | undefined {
+export function useSpace(spaceID: SpaceID): Space | null {
     const db = useChunkDB();
-    const [space, setSpace] = useState<DataSpace | undefined>(undefined);
+    const [space, setSpace] = useState<Space | null>(null);
 
     useEffect(() => {
         if (!db || !spaceID) return;
-        setSpace(new DataSpace(db, spaceID));
-        return db.spaces.subscribe(spaceID, () => setSpace(new DataSpace(db, spaceID)));
+        setSpace(db.spaces.getLoaded(spaceID));
+        return db.spaces.subscribe(spaceID, () => setSpace(db.spaces.getLoaded(spaceID)));
     }, [db, spaceID]);
 
     return space;
@@ -55,6 +56,8 @@ export function useFlatChain(spaceID: SpaceID, collection: string, maxDepth?: nu
     return chain;
 }
 
+export function useQuery<T>(query: Query<T>, params?: QueryParams): ReactCursor<T> {}
+
 export function useQueryAll<T = any, PARAMS extends any[] = any[]>(
     spaceID: SpaceID,
     queryBuilder: (space: DataSpace, ...params: PARAMS) => Query | Promise<any>,
@@ -78,4 +81,8 @@ export function useQueryAll<T = any, PARAMS extends any[] = any[]>(
     }, [space, space?.ref, ...params]);
 
     return result;
+}
+
+export class ReactCursor<T extends IRecord> {
+    one;
 }

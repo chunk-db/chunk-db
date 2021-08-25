@@ -32,8 +32,8 @@ export class Spaces {
         return this.spaces.has(id);
     }
 
-    getLoaded(id: SpaceID): Space | undefined {
-        return this.spaces.get(id);
+    getLoaded(id: SpaceID): Space | null {
+        return this.spaces.get(id) || null;
     }
 
     getAllLoaded(): Space[] {
