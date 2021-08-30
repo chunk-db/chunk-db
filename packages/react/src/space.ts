@@ -1,5 +1,7 @@
+import { Space, SpaceID } from '@chunk-db/core';
 import { useEffect, useState } from 'react';
-import { useChunkDB } from './index';
+
+import { useChunkDB } from './context';
 
 export function useSpace(spaceID: SpaceID): Space | null {
     const db = useChunkDB();

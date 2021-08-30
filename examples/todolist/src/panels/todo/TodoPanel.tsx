@@ -1,4 +1,4 @@
-import { makeSpaceID } from '@chunk-db/core';
+import { makeSpaceID, Query } from '@chunk-db/core';
 import { useQueryAll } from '@chunk-db/react';
 import Box from '@material-ui/core/Box';
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -21,25 +21,25 @@ export const TodoPanel = ({ selectedLists }: IProps) => {
     const deleteTodo = useDeleteTodo();
 
     const [todos, loading] = useQueryAll(
-        makeSpaceID('space'),
-        space =>
-            space.collection(todoScheme).find({
-                listId: { $in: selectedLists.map(list => list._id) },
-            }) as any
+        lists =>
+            new Query(todoScheme).find({
+                listId: { $in: lists },
+            }),
+        [selectedLists.map(list => list._id)]
     );
 
-    const [symbols, calculating] = useQueryAll(makeSpaceID('space'), space =>
-        space
-            .collection(todoScheme)
-            .find({
-                listId: { $in: selectedLists.map(list => list._id) },
-            })
-            .exec()
-            .reduce((len, todo) => len + todo.title.length, 0)
-    );
+    // const [symbols, calculating] = useQueryAll(
+    //     lists =>
+    //         new Query(todoScheme).find({
+    //             listId: { $in: lists },
+    //         }),
+    //     // .reduce((len, todo) => len + todo.title.length, 0)
+    //     [selectedLists.map(list => list._id)]
+    // );
 
     return (
         <>
+            <button>refresh</button>
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
                 <Typography component="h5" variant="h5">
                     Todos
@@ -49,10 +49,10 @@ export const TodoPanel = ({ selectedLists }: IProps) => {
                 <AddTodoForm saveTodo={addTodo} lists={selectedLists} />
             </Box>
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
-                <Alert severity="info" variant="outlined">
-                    Total symbols in titles:&nbsp;
-                    {calculating ? <CircularProgress size={12} /> : symbols}
-                </Alert>
+                {/*<Alert severity="info" variant="outlined">*/}
+                {/*    Total symbols in titles:&nbsp;*/}
+                {/*    {calculating ? <CircularProgress size={12} /> : symbols}*/}
+                {/*</Alert>*/}
             </Box>
             <Box display="flex" alignItems="stretch" flexDirection="column" m={1}>
                 <TodoList todos={todos} deleteTodo={deleteTodo} loading={loading} />

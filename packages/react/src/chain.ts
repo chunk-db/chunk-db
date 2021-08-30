@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from 'react';
-import { ChunkDBContext } from './index';
+import { AbstractChunk, SpaceID } from '@chunk-db/core';
+import { useEffect, useState } from 'react';
 
-export function useChunkDB(): ChunkDB {
-    return useContext(ChunkDBContext);
-}
+import { useChunkDB } from './context';
+import { useSpace } from './space';
 
 export function useFlatChain(spaceID: SpaceID, collection: string, maxDepth?: number): Array<AbstractChunk> {
     const [chain, setChain] = useState<Array<AbstractChunk>>([]);

@@ -1,4 +1,4 @@
-import { makeSpaceID, Space } from '@chunk-db/core';
+import { makeSpaceID, Query, Space } from '@chunk-db/core';
 import { useQueryAll } from '@chunk-db/react';
 import { Collapse, ListItem, ListItemSecondaryAction, ListItemText } from '@material-ui/core';
 import Checkbox from '@material-ui/core/Checkbox/Checkbox';
@@ -39,7 +39,7 @@ export const SpaceItem = ({ space, selectedLists, onDelete, onCreateList, onTogg
 
     const [openList, setOpenList] = React.useState(true);
 
-    const [lists] = useQueryAll(makeSpaceID(space.id), space => space.collection(listScheme).find({}) as any);
+    const [lists] = useQueryAll(id => new Query(listScheme).find({}).space(id), [space.id]);
 
     const handleToggleOpenList = useCallback(() => {
         setOpenList(!openList);

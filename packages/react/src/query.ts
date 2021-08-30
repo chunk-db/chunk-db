@@ -1,34 +1,51 @@
-import { Cursor, IRecord, Query } from '@chunk-db/core';
-import { QueryParams } from '@chunk-db/core/query/operators/operators.types';
-import { useState } from 'react';
+import { Query } from '@chunk-db/core';
+import { useEffect, useState } from 'react';
 
-import { useChunkDB } from './index';
+import { useChunkDB, useCurrentHash } from './context';
 
 export type QueryResult<T> = [T, boolean]; // FIXME: [result: T, loading: boolean];
 
-export function useQueryAll<T>(query: Query<T>, defaultValue: any = null): QueryResult<T[]> {
+export function useQueryAll<T>(
+    queryBuilder: (...params: any[]) => Query<T>,
+    params: any[],
+    defaultValue: any = []
+): QueryResult<T[]> {
     const db = useChunkDB();
+    const hash = useCurrentHash();
 
     const [status, setStatus] = useState<'initiating' | 'pending' | 'complete' | 'error'>('initiating');
     const [result, setResult] = useState<T[]>([]);
 
-    if (status === 'pending') return [[], true];
+    const keyParams = params.map(value => {
+        if (Array.isArray(value)) return value.join(',');
+        if (typeof value === 'object') throw new Error(`Params must be an array or a primitive`);
+        return value;
+    });
+
+    useEffect(() => {
+        console.log('#### update');
+        setStatus('pending');
+        const query = queryBuilder(...params);
+        db.find(query)
+            .all()
+            .then(
+                (data: T[]) => {
+                    console.log('#### complete');
+                    setStatus('complete');
+                    setResult(data);
+                },
+                (error: any) => {
+                    setStatus('error');
+                    console.error(error);
+                }
+            );
+    }, [hash, ...keyParams]);
+
+    if (status === 'pending') return [defaultValue, true];
 
     if (status === 'complete') return [result, false];
 
-    if (status === 'error') return [[], false];
+    if (status === 'error') return [defaultValue, false];
 
-    setStatus('pending');
-    db.find(query)
-        .all()
-        .then(
-            (data: T[]) => {
-                setStatus('complete');
-                setResult(data);
-            },
-            (error: any) => {
-                setStatus('error');
-                setResult([]);
-            }
-        );
+    return [defaultValue, true];
 }
