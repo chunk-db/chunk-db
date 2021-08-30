@@ -11,7 +11,7 @@ import { ISpace, Space } from './space';
  *
  */
 export class Spaces {
-    private spaces: Map<SpaceID, Space> = new Map();
+    public readonly spaces: Map<SpaceID, Space> = new Map();
     private subscriptions: Array<() => void> = [];
     private spaceSubscriptions = new Map<SpaceID, Array<() => void>>();
 
@@ -32,8 +32,8 @@ export class Spaces {
         return this.spaces.has(id);
     }
 
-    getLoaded(id: SpaceID): Space | undefined {
-        return this.spaces.get(id);
+    getLoaded(id: SpaceID): Space | null {
+        return this.spaces.get(id) || null;
     }
 
     getAllLoaded(): Space[] {
@@ -50,12 +50,11 @@ export class Spaces {
 
     refresh(): Promise<Space[]> {
         return this.storage.loadAllSpaces().then(spaces => {
-            this.spaces = new Map(
-                spaces.map(data => {
-                    const space = new Space(data);
-                    return [space.id, space];
-                })
-            );
+            this.spaces.clear();
+            spaces.forEach(data => {
+                const space = new Space(data);
+                this.spaces.set(space.id, space);
+            });
 
             this.subscriptions.forEach(cb => cb());
             return Array.from(this.spaces.values()).map(space => {

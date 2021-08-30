@@ -1,4 +1,4 @@
-import { getFieldByPath } from './utils';
+import { getFieldByPath, isSerializable } from './utils';
 
 describe('utils', () => {
     describe('getFieldByPath', () => {
@@ -12,29 +12,76 @@ describe('utils', () => {
             },
         };
 
-        test('direct', () => {
+        it('direct', () => {
             const getter = getFieldByPath(['foo']);
             expect(getter(obj)).toEqual('bar');
         });
 
-        test('undefined field', () => {
+        it('undefined field', () => {
             const getter = getFieldByPath(['bad']);
             expect(getter(obj)).toEqual(undefined);
         });
 
-        test('nested (as array)', () => {
+        it('nested (as array)', () => {
             const getter = getFieldByPath(['nested', 'sub', 'foo3']);
             expect(getter(obj)).toEqual('bar3');
         });
 
-        test('nested (as string)', () => {
+        it('nested (as string)', () => {
             const getter = getFieldByPath('nested.sub');
             expect(getter(obj)).toEqual({ foo3: 'bar3' });
         });
 
-        test('undefined nested', () => {
+        it('undefined nested', () => {
             const getter = getFieldByPath(['foo', 'bad']);
             expect(getter(obj)).toEqual(undefined);
+        });
+    });
+    describe('isSerializable', () => {
+        it('empty object', () => {
+            expect(isSerializable({})).toBeTruthy();
+        });
+        it('sub object', () => {
+            expect(isSerializable({ x: { y: 1 } })).toBeTruthy();
+        });
+        it('sub object with function', () => {
+            expect(isSerializable({ x: { y: () => null } })).toBeFalsy();
+        });
+        it('boolean', () => {
+            expect(isSerializable(true)).toBeTruthy();
+        });
+        it('number', () => {
+            expect(isSerializable(5)).toBeTruthy();
+        });
+        it('NaN', () => {
+            expect(isSerializable(NaN)).toBeFalsy();
+        });
+        it('Infinity', () => {
+            expect(isSerializable(Infinity)).toBeFalsy();
+        });
+        it('string', () => {
+            expect(isSerializable('123')).toBeTruthy();
+        });
+        it('boolean topMustBeObject=true', () => {
+            expect(isSerializable(false, true)).toBeFalsy();
+        });
+        it('number topMustBeObject=true', () => {
+            expect(isSerializable(5, true)).toBeFalsy();
+        });
+        it('string topMustBeObject=true', () => {
+            expect(isSerializable('123', true)).toBeFalsy();
+        });
+        it('null', () => {
+            expect(isSerializable(null)).toBeFalsy();
+        });
+        it('undefined', () => {
+            expect(isSerializable(undefined)).toBeFalsy();
+        });
+        it('function', () => {
+            expect(isSerializable(() => null)).toBeFalsy();
+        });
+        it('symbol', () => {
+            expect(isSerializable(Symbol())).toBeFalsy();
         });
     });
 });

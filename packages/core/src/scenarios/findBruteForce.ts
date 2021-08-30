@@ -1,44 +1,33 @@
 import 'regenerator-runtime/runtime';
-import { buildQuery, ConditionValidator, IQuery } from '../ConditionValidator';
 import { Model } from '../Model';
 import { AbstractChunk, ChunkType } from '../chunks';
 import { ChunkID, UUID } from '../common.types';
-import { DelayedRefs } from '../delayed-ref';
 import { IRecord } from '../record.types';
 
 import { FindScenario } from './find.types';
 import { call } from './scenario.types';
-import { getChunks, resolveRelayedRefs } from './utils';
+import { getChunks } from './utils';
 
-export function* findBruteForce<T extends IRecord = IRecord>(
-    delayedRefs: DelayedRefs<any>,
-    model: Model<T>,
-    query: IQuery = {}
-): FindScenario<T> {
-    const allFound = new Map<UUID, T | null>();
-    const builtQuery = buildQuery(query);
+export function* findBruteForce<T extends IRecord = IRecord>(refs: ChunkID[], model: Model<T>): FindScenario<T> {
     let chunks: AbstractChunk[];
 
-    let chunkIDs: ChunkID[] = yield call(resolveRelayedRefs, delayedRefs);
-
-    chunkIDs = chunkIDs.filter(item => !!item);
+    let chunkIDs = refs.filter(item => !!item);
 
     if (!chunkIDs.length)
         return {
             chunkIDs,
         };
 
-    const isNew = isNewFactory(allFound, builtQuery);
-
     while (true) {
         chunks = yield call(getChunks, chunkIDs);
         const nextChunkIDs: ChunkID[] = [];
 
         const records = new Map<UUID, T>();
+
         chunks.forEach(chunk => {
             const data: ReadonlyMap<UUID, T> | undefined = chunk.data.get(model.name) as any;
             if (data) {
-                data.forEach((record, key) => isNew(record) && records.set(key, record));
+                data.forEach((record, key) => records.has(key) || records.set(key, record));
             }
 
             switch (chunk.type) {
@@ -67,18 +56,4 @@ export function* findBruteForce<T extends IRecord = IRecord>(
             };
         }
     }
-}
-
-function isNewFactory<T extends IRecord>(map: Map<UUID, T | null>, filter: ConditionValidator) {
-    // todo
-    return (record: any) => {
-        if (!record) return true;
-
-        if (map.has(record._id)) return false;
-
-        if (!filter(record)) return false;
-
-        map.set(record._id, record);
-        return true;
-    };
 }

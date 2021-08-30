@@ -3,6 +3,7 @@ import { demoStorage, IDemoRecord, TestRecord } from '../__tests__/chunks.demo';
 import { ChunkDB } from './ChunkDB';
 import { makeChunkID, makeSpaceID } from './common.types';
 import { InMemoryChunkStorage } from './in-memory-chunk-storage';
+import { Query } from './query/Query';
 import { call, getStorage, ScenarioContext } from './scenarios/scenario.types';
 import { Space } from './space';
 
@@ -134,9 +135,8 @@ describe('ChunkDB', () => {
             await db2.connect();
             await db2.spaces.load(makeSpaceID('test-space'));
             const foundRecord = await db2
-                .collection(TestRecord)
-                .space(makeSpaceID('test-space'))
-                .findOne({ _id: '123' });
+                .find(new Query(TestRecord).space(makeSpaceID('test-space')).find({ _id: '123' }))
+                .one();
 
             // assert
             expect(foundRecord).toEqual(record);

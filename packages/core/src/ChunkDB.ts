@@ -1,22 +1,27 @@
 import { ChunkStorage } from './ChunkStorage';
+import { Cursor } from './Cursor';
 import { Model } from './Model';
 import { Accessor } from './accessor';
 import { AbstractChunk, ChunkType } from './chunks';
 import { Collection } from './collection';
 import { makeSubscription } from './common';
 import { ChunkID, IChunkDBConfig, ITransactionConfig, SpaceID, Subscription, Transaction } from './common.types';
-import { DataSpace } from './data-space';
 import { SpaceNotFoundError } from './errors';
 import { UpdateEvent } from './events';
+import { QuerySelector } from './query-selector';
+import { Query } from './query/Query';
+import { buildQuery } from './query/buildQuery';
+import { BuildQueryContext, Optimization } from './query/buildQuery/buildQuery.types';
+import { optimizeQuery } from './query/buildQuery/optimizeQuery';
+import { FindQuery } from './query/operators/find.types';
 import { IRecord } from './record.types';
 import { isCall, ScenarioAction, ScenarioContext } from './scenarios/scenario.types';
-import { Space } from './space';
 import { Spaces } from './spaces';
 import { IStorageDriver } from './storage.types';
 
 export class ChunkDB {
     public storage: ChunkStorage;
-    public collections: { [key: string]: Collection<IRecord> };
+    public collections: { [key: string]: Collection<Model> };
     public readonly spaces: Spaces;
 
     public ready = false;
@@ -73,22 +78,28 @@ export class ChunkDB {
         return this.spaces.subscribe(spaceID, cb as () => void);
     }
 
-    /**
-     * Get [[DataSpace]]
-     */
-    public space(space: SpaceID | Space): DataSpace {
-        let spaceID: SpaceID;
-        if (!space) throw new Error(`Invalid space ""`);
-        if (typeof space === 'object') spaceID = (space as Space).id;
-        else spaceID = space;
-
-        return new DataSpace(this, spaceID);
-    }
-
-    public collection<T extends IRecord>(scheme: Model<T>): Collection<T> {
+    public collection<T extends Model>(scheme: T): Collection<T> {
         if (scheme.name in this.collections) return this.collections[scheme.name] as any;
 
         throw new Error(`Invalid collection "${scheme.name}"`);
+    }
+
+    public find<T>(query: Query<T>): Cursor<T> {
+        const ctx: BuildQueryContext = {
+            collections: this.collections,
+            refs: this.spaces.spaces,
+        };
+        const optimizedQuery = optimizeQuery(ctx, query, Optimization.None);
+        const builtQuery = buildQuery(ctx, optimizedQuery);
+
+        // chose scenario (strategy)
+        const querySelector = this.makeQuerySelector(builtQuery.model, builtQuery.staticQuery, builtQuery.refs);
+
+        return new Cursor<T>(querySelector, builtQuery, {});
+    }
+
+    private makeQuerySelector<T>(model: Model<T>, staticQuery: FindQuery, refs: ChunkID[]): QuerySelector<T> {
+        return new QuerySelector(this, model, staticQuery, refs);
     }
 
     public run(scenario: any): any {

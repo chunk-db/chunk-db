@@ -1,15 +1,16 @@
 import { v4 } from 'uuid';
 
 import { ChunkDB } from './ChunkDB';
+import { Cursor } from './Cursor';
 import { Model } from './Model';
 import { TemporaryTransactionChunk } from './chunks';
 import { ChunkID, makeChunkID, SpaceID, UUID } from './common.types';
 import { DelayedRefs } from './delayed-ref';
 import { InnerDBError } from './errors';
 import { UpdateEvent } from './events';
+import { Query } from './query/Query';
 import { IRecord } from './record.types';
 import { Space } from './space';
-import { SpaceReader } from './space-reader';
 
 export class Accessor {
     public readonly initialRefs: ReadonlyMap<SpaceID, ChunkID>;
@@ -42,8 +43,8 @@ export class Accessor {
         return this.stats;
     }
 
-    public collection<T extends IRecord>(model: Model<T>): SpaceReader<T> {
-        return new SpaceReader<any>(this.db, model, this.makeDelayedRefs(model));
+    public find<T>(query: Query<T>): Cursor<T> {
+        return this.db.find(query.space(this.space.id, this.refs.get(this.space.id) || this.space.ref));
     }
 
     async upsert<T extends IRecord>(scheme: Model<T>, record: T): Promise<T> {

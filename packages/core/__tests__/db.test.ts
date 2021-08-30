@@ -1,15 +1,22 @@
-import { ChunkDB, ChunkType, Cursor, delay, InMemoryChunkStorage, makeSpaceID, Model, Space, UUID } from '../src';
+import {
+    ChunkDB,
+    ChunkType,
+    Cursor,
+    delay,
+    InMemoryChunkStorage,
+    makeChunkID,
+    makeSpaceID,
+    Model,
+    Query,
+    Space,
+    UUID,
+} from '../src';
 
-import { allDemoChunks, IDemoRecord, TestRecord } from './chunks.demo';
+import { allDemoChunks, TestRecord } from './chunks.demo';
 
 describe('ChunkDB e2e tests', () => {
     let storage: InMemoryChunkStorage;
     let db: ChunkDB;
-    const baseSpace = new Space({
-        id: makeSpaceID('base-space'),
-        name: 'initial',
-        ref: 'initial',
-    });
     const space = new Space({
         id: makeSpaceID('test-space'),
         name: 'a1',
@@ -23,23 +30,37 @@ describe('ChunkDB e2e tests', () => {
     beforeEach(async () => {
         storage = new InMemoryChunkStorage();
         storage.reset(allDemoChunks);
-        storage.saveSpace(baseSpace);
         storage.saveSpace(space);
         storage.saveSpace(spaceX);
         db = new ChunkDB({
             storage,
             collections: [TestRecord],
         });
+        return await db.spaces.refresh();
     });
 
     describe('fetch data', () => {
-        describe('find (by collection)', () => {
+        describe('find', () => {
             describe('all', () => {
-                test('all', async () => {
-                    // arrange
-
+                test('no restrictions', async () => {
                     // act
-                    const cursor = db.collection(TestRecord).space(makeSpaceID('test-space')).find({}).exec();
+                    const cursor = db.find(new Query(TestRecord).find({}));
+                    // .space(makeSpaceID('test-space'))
+
+                    // assert
+                    expect(cursor).toBeInstanceOf(Cursor);
+
+                    const result = await cursor.all();
+
+                    expect(result).toEqual([
+                        { _id: 'a', user: 1, value: 'a1' },
+                        { _id: 'x', user: 101, value: 'x1' },
+                        { _id: 'd', user: 2, value: 'd0' },
+                    ]);
+                });
+                test('one space', async () => {
+                    // act
+                    const cursor = db.find(new Query(TestRecord).space(makeSpaceID('test-space')).find({}));
 
                     // assert
                     expect(cursor).toBeInstanceOf(Cursor);
@@ -58,10 +79,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .collection(TestRecord)
-                        .space(makeSpaceID('test-space'))
-                        .find({ user: 2 })
-                        .exec()
+                        .find(new Query(TestRecord).space(makeSpaceID('test-space')).find({ user: 2 }))
                         .one();
 
                     // assert
@@ -72,10 +90,11 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .collection(TestRecord)
-                        .space(makeSpaceID('base-space'))
-                        .find({ user: 1 })
-                        .exec()
+                        .find(
+                            new Query(TestRecord)
+                                .space(makeSpaceID('test-space'), makeChunkID('initial'))
+                                .find({ user: 1 })
+                        )
                         .one();
 
                     // assert
@@ -86,74 +105,7 @@ describe('ChunkDB e2e tests', () => {
 
                     // act
                     const result = await db
-                        .collection(TestRecord)
-                        .space(makeSpaceID('test-space'))
-                        .find({ user: 10 })
-                        .exec()
-                        .all();
-
-                    // assert
-                    expect(result).toEqual([]);
-                });
-            });
-        });
-        describe('find (by space)', () => {
-            describe('all', () => {
-                test('all', async () => {
-                    // arrange
-
-                    // act
-                    const cursor = db.space(makeSpaceID('test-space')).collection(TestRecord).find({}).exec();
-
-                    // assert
-                    expect(cursor).toBeInstanceOf(Cursor);
-
-                    const result = await cursor.all();
-
-                    expect(result).toEqual([
-                        { _id: 'a', user: 1, value: 'a1' },
-                        { _id: 'd', user: 2, value: 'd0' },
-                    ]);
-                });
-            });
-            describe('one', () => {
-                test('one', async () => {
-                    // arrange
-
-                    // act
-                    const result = await db
-                        .space(makeSpaceID('test-space'))
-                        .collection(TestRecord)
-                        .find({ user: 2 })
-                        .exec()
-                        .one();
-
-                    // assert
-                    expect(result).toEqual({ _id: 'd', user: 2, value: 'd0' });
-                });
-                test('query on another head', async () => {
-                    // arrange
-
-                    // act
-                    const result = await db
-                        .collection(TestRecord)
-                        .space(makeSpaceID('base-space'))
-                        .find({ user: 1 })
-                        .exec()
-                        .one();
-
-                    // assert
-                    expect(result).toEqual({ _id: 'a', user: 1, value: 'a0' });
-                });
-                test('no results', async () => {
-                    // arrange
-
-                    // act
-                    const result = await db
-                        .collection(TestRecord)
-                        .space(makeSpaceID('test-space'))
-                        .find({ user: 10 })
-                        .exec()
+                        .find(new Query(TestRecord).space(makeSpaceID('test-space')).find({ user: 10 }))
                         .all();
 
                     // assert
@@ -162,33 +114,38 @@ describe('ChunkDB e2e tests', () => {
             });
         });
         describe('reduce', () => {
-            test('base', async () => {
-                // arrange
-
-                // act
-                const cursor = db.collection(TestRecord).space(makeSpaceID('test-space')).find({}).exec<IDemoRecord>();
-
-                // assert
-                expect(cursor).toBeInstanceOf(Cursor);
-
-                const result = await cursor.reduce(
-                    (acc, record) => ({
-                        users: acc.users.add(record.user),
-                        values: acc.values.concat(record.value),
-                    }),
-                    { users: new Set<number>(), values: <string[]>[] }
-                );
-
-                expect(result).toEqual({
-                    users: new Set([1, 2]),
-                    values: ['a1', 'd0'],
-                });
-            });
+            // test('base', async () => {
+            //     // arrange
+            //
+            //     // act
+            //     const cursor = db.collection(TestRecord).space(makeSpaceID('test-space')).find({}).exec<IDemoRecord>();
+            //
+            //     // assert
+            //     expect(cursor).toBeInstanceOf(Cursor);
+            //
+            //     const result = await cursor.reduce(
+            //         (acc, record) => ({
+            //             users: acc.users.add(record.user),
+            //             values: acc.values.concat(record.value),
+            //         }),
+            //         { users: new Set<number>(), values: <string[]>[] }
+            //     );
+            //
+            //     expect(result).toEqual({
+            //         users: new Set([1, 2]),
+            //         values: ['a1', 'd0'],
+            //     });
+            // });
         });
         describe('errors', () => {
             test('find in null space', async () => {
-                expect(() => db.space(makeSpaceID('')).collection(TestRecord).find({}).exec()).toThrowError(
-                    `Invalid space ""`
+                expect(() => db.find(new Query(TestRecord).space(makeSpaceID('')).find({}))).toThrowError(
+                    `Space "" not found`
+                );
+            });
+            test('find in invalid space', async () => {
+                expect(() => db.find(new Query(TestRecord).space(makeSpaceID('invalid-space')).find({}))).toThrowError(
+                    `Space "invalid-space" not found`
                 );
             });
             test('find in unregistered collection', async () => {
@@ -199,16 +156,12 @@ describe('ChunkDB e2e tests', () => {
                 });
 
                 expect(() =>
-                    db.space(makeSpaceID('test-space')).collection(UnregisteredModel).find({}).exec()
+                    db.find(new Query(UnregisteredModel).space(makeSpaceID('test-space')).find({}))
                 ).toThrowError(`Unregistered collection "unknown"`);
             });
             test('find in invalid collection', async () => {
                 expect(() =>
-                    db
-                        .space(makeSpaceID('test-space'))
-                        .collection('unknown' as any)
-                        .find({})
-                        .exec()
+                    db.find(new Query('unknown' as any).space(makeSpaceID('test-space')).find({}))
                 ).toThrowError(`Scheme must be instance of Model`);
             });
         });
@@ -220,7 +173,7 @@ describe('ChunkDB e2e tests', () => {
             const space2 = makeSpaceID('space-x');
 
             // act
-            const cursor = db.collection(TestRecord).space([space1, space2]).find({}).exec();
+            const cursor = db.find(new Query(TestRecord).spaces([space1, space2]).find({}));
 
             // assert
             expect(cursor).toBeInstanceOf(Cursor);
@@ -243,7 +196,7 @@ describe('ChunkDB e2e tests', () => {
 
                 // act
                 const event = await db.transaction(space.id, async tx => {
-                    const record = await tx.collection(TestRecord).findOne({ user: 1 });
+                    const record = await tx.find(new Query(TestRecord).find({ user: 1 })).one();
                     expect(record).toEqual({
                         _id: 'a',
                         user: 1,
@@ -259,7 +212,7 @@ describe('ChunkDB e2e tests', () => {
                     id = insertedRecord._id;
                 });
 
-                const records = await db.collection(TestRecord).space(space.id).findAll({ user: 3 });
+                const records = await db.find(new Query(TestRecord).space(space.id).find({ user: 3 })).all();
                 const newSpace = db.spaces.getLoaded(space.id)!;
                 expect(space.ref).not.toEqual(newSpace.ref);
                 expect(newSpace.ref).not.toBe(refBefore);
@@ -294,11 +247,11 @@ describe('ChunkDB e2e tests', () => {
                     await delay(10);
 
                     // emulate query out from transaction in the middle of transaction
-                    const recordsFromOut = await db.space(space.id).collection(TestRecord).findAll({ user: 8 });
+                    const recordsFromOut = await db.find(new Query(TestRecord).space(space.id).find({ user: 8 })).all();
                     expect(recordsFromOut.length).toBe(0);
 
                     // query in the transaction
-                    const recordsFromTx = await tx.collection(TestRecord).findAll({ user: 8 });
+                    const recordsFromTx = await tx.find(new Query(TestRecord).find({ user: 8 })).all();
                     expect(recordsFromTx).toEqual([
                         {
                             _id: record._id,
@@ -315,7 +268,7 @@ describe('ChunkDB e2e tests', () => {
                         value: 'new value',
                     });
                 });
-                const records = await db.collection(TestRecord).space(space.id).findAll({ user: 8 });
+                const records = await db.find(new Query(TestRecord).space(space.id).find({ user: 8 })).all();
 
                 // assert
                 expect(records.length).toBe(1);
@@ -342,7 +295,7 @@ describe('ChunkDB e2e tests', () => {
                     await tx.remove(TestRecord, 'd');
                 });
 
-                const records = await db.collection(TestRecord).space(space.id).findAll({});
+                const records = await db.find(new Query(TestRecord).space(space.id).find({})).all();
                 const newSpace = db.spaces.getLoaded(space.id)!;
                 expect(space.ref).not.toEqual(newSpace.ref);
                 expect(newSpace.ref).not.toBe(refBefore);

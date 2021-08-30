@@ -1,6 +1,10 @@
-import { Primitive } from './common.types';
-import { IRecord } from './record.types';
-import { getFieldByPath } from './utils';
+import { IQuery } from '../../ConditionValidator';
+import { Primitive } from '../../common.types';
+import { getFieldByPath } from '../../utils';
+import { PipeOperation } from '../Query.types';
+
+import { Condition, FindQuery } from './find.types';
+import { QueryParams } from './operators.types';
 
 /**
  * Доступные операторы
@@ -15,15 +19,7 @@ export const QueryOperators = {
     $in: (condition: (string | number)[]) => (value: any) => condition.indexOf(value) !== -1,
 };
 
-type Condition = { [key in keyof typeof QueryOperators]?: any };
-
-export type IQuery = {
-    [key: string]: Primitive | Condition;
-};
-
-export type ConditionValidator<T extends IRecord = IRecord> = (record: T) => boolean;
-
-export function buildConditionQuery(query: IQuery): ConditionValidator {
+export function find<T>(query: FindQuery): PipeOperation<T, T> {
     if (typeof query !== 'object') throw new Error('ConditionValidator must be an object');
 
     const byFields = Object.keys(query).map(path => {
@@ -35,11 +31,12 @@ export function buildConditionQuery(query: IQuery): ConditionValidator {
         };
     });
 
-    return (record: IRecord): boolean => {
-        return byFields.every(({ getter, conditions }) => {
+    return (record: T, params: QueryParams): T | undefined => {
+        const allow = byFields.every(({ getter, conditions }) => {
             const value = getter(record);
             return conditions.every(condition => condition(value));
         });
+        return allow ? record : undefined;
     };
 }
 
